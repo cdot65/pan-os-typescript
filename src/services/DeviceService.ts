@@ -3,6 +3,7 @@
 import { BaseService } from './BaseService';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
 import { JobsResponse } from '../interfaces/JobsResponse';
+import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
 import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 
 /**
@@ -102,17 +103,17 @@ export class DeviceService extends BaseService {
   }
 
   /**
-   * Retrieves system information from a PAN-OS device, such as hostname, IP address, and software version.
-   * This method abstracts the details of sending a system information request and processing the response.
+   * Requests license information from the PAN-OS device.
+   * This method executes the 'request license info' command and returns detailed license information.
    *
-   * @param apiKey - The API key for authentication.
-   * @returns A promise resolving to the system information in a structured format.
-   * @throws An error if retrieving the information fails.
+   * @param apiKey - The API key for authenticating the request.
+   * @returns A promise resolving to the device's license information.
+   * @throws An error if the request fails or the response format is unexpected.
    */
-  public async showSystemInfoResponse(
+  public async requestLicenseInfo(
     apiKey: string,
-  ): Promise<SystemInfoResponse> {
-    const xmlCmd = '<show><system><info/></system></show>';
+  ): Promise<LicenseInfoResponse> {
+    const xmlCmd = '<request><license><info/></license></request>';
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;
   }
@@ -149,6 +150,22 @@ export class DeviceService extends BaseService {
     jobId: string,
   ): Promise<JobsResponse> {
     const xmlCmd = `<show><jobs><id>${jobId}</id></jobs></show>`;
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
+  }
+
+  /**
+   * Retrieves system information from a PAN-OS device, such as hostname, IP address, and software version.
+   * This method abstracts the details of sending a system information request and processing the response.
+   *
+   * @param apiKey - The API key for authentication.
+   * @returns A promise resolving to the system information in a structured format.
+   * @throws An error if retrieving the information fails.
+   */
+  public async showSystemInfoResponse(
+    apiKey: string,
+  ): Promise<SystemInfoResponse> {
+    const xmlCmd = '<show><system><info/></system></show>';
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;
   }
