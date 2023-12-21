@@ -1,0 +1,8 @@
+{
+  "entryPoints": ["src/index.ts", "src/services/*.ts", "src/interfaces/*.ts"],
+  "out": "docs",
+  "exclude": ["**/node_modules/**"],
+  "entryPointStrategy": "expand",
+  "excludeNotDocumented": false,
+  "excludePrivate": true
+}

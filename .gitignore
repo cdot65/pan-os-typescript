@@ -1,0 +1,39 @@
+# Dependency directories
+node_modules/
+
+# Build outputs
+build/
+dist/
+
+# Environment files
+.env.dev
+.env.prod
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating System
+**/.DS_Store
+.settings
+
+# VS Code
+**/.vscode/*
+!**/.vscode/tasks.json
+!**/.vscode/settings.template.json
+!**/.vscode/launch.template.json
+!**/.vscode/extensions.json
+
+# Yarn
+yarn.lock
+yarn-error.log
+
+# npm
+package-lock.json
+.eslintcache
+*v8.log
+/lib/

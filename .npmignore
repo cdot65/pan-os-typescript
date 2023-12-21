@@ -1,0 +1,19 @@
+# Node modules
+node_modules/
+
+# Build directory
+build/
+
+# Test directory
+tests/
+
+# Configuration files
+tsconfig.json
+babel.config.js
+.nyc_output
+.coverage
+*.log
+
+# Environment files
+.env.dev
+.env.prod
