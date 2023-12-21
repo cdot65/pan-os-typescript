@@ -1,10 +1,9 @@
 // src/services/DeviceService.ts
 
 import { BaseService } from './BaseService';
-import { SystemInfo } from '../interfaces/SystemInfo';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
-import { JobsAllResponse } from '../interfaces/JobsAllResponse';
 import { JobsResponse } from '../interfaces/JobsResponse';
+import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 
 /**
  * `DeviceService` is a specialized service class extending `BaseService`.
@@ -110,7 +109,9 @@ export class DeviceService extends BaseService {
    * @returns A promise resolving to the system information in a structured format.
    * @throws An error if retrieving the information fails.
    */
-  public async showSystemInfo(apiKey: string): Promise<SystemInfo> {
+  public async showSystemInfoResponse(
+    apiKey: string,
+  ): Promise<SystemInfoResponse> {
     const xmlCmd = '<show><system><info/></system></show>';
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;
@@ -126,7 +127,7 @@ export class DeviceService extends BaseService {
    * @returns A promise resolving to a structured representation of all jobs.
    * @throws An error if the request or parsing fails.
    */
-  public async showJobsAll(apiKey: string): Promise<JobsAllResponse> {
+  public async showJobsAll(apiKey: string): Promise<JobsResponse> {
     const xmlCmd = '<show><jobs><all/></jobs></show>';
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;

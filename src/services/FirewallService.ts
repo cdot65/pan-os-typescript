@@ -2,6 +2,7 @@
 
 import { DeviceService } from './DeviceService';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
+import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 
 /**
  * `FirewallService` is a subclass of `DeviceService` dedicated to providing methods
@@ -27,6 +28,21 @@ export class FirewallService extends DeviceService {
     apiKey: string,
   ): Promise<ResourceMonitorResponse> {
     const cmd = 'show running resource-monitor minute';
+
+    // Using executeOperationalCommand from DeviceService to handle the command execution.
+    return this.executeOperationalCommand(apiKey, cmd);
+  }
+
+  /**
+   * Retrieves routing information from the firewall.
+   * This method executes the 'show routing route' command and returns the routing table.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @returns A promise resolving to the firewall's routing table information.
+   * @throws An error if the request fails or the response format is unexpected.
+   */
+  public async showRoutingRoute(apiKey: string): Promise<RoutingRouteResponse> {
+    const cmd = 'show routing route';
 
     // Using executeOperationalCommand from DeviceService to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);

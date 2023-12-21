@@ -26,7 +26,7 @@ export interface Job {
 }
 
 /**
- * Represents the structure of the 'show jobs' response from the PAN-OS API.
+ * Represents the structure of the 'show jobs ' response from the PAN-OS API.
  */
 export interface JobsResponse {
   response: {

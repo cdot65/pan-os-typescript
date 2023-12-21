@@ -1,11 +1,11 @@
-// src/interfaces/SystemInfo.ts
+// src/interfaces/SystemInfoResponse.ts
 
 /**
- * `SystemInfo` provides a structured representation of the system information
+ * `SystemInfoResponse` provides a structured representation of the system information
  * response from a PAN-OS device. It includes basic details like hostname, IP
  * configuration, serial number, and other relevant system-level information.
  */
-export interface SystemInfo {
+export interface SystemInfoResponse {
   hostname: string; // Hostname of the PAN-OS device.
   ipAddress: string; // IP address of the device.
   netmask: string; // Subnet mask of the device's network.
