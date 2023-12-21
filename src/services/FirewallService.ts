@@ -23,7 +23,7 @@ export class FirewallService extends DeviceService {
    * @returns A promise that resolves to the firewall's resource monitoring data in a structured format.
    * @throws An error if the request to fetch the resource monitoring data fails or if the response format is not as expected.
    */
-  public async getResourceMonitor(
+  public async showResourceMonitor(
     apiKey: string,
   ): Promise<ResourceMonitorResponse> {
     const cmd = 'show running resource-monitor minute';

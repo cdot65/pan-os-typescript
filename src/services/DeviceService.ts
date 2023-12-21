@@ -3,6 +3,8 @@
 import { BaseService } from './BaseService';
 import { SystemInfo } from '../interfaces/SystemInfo';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
+import { JobsAllResponse } from '../interfaces/JobsAllResponse';
+import { JobsResponse } from '../interfaces/JobsResponse';
 
 /**
  * `DeviceService` is a specialized service class extending `BaseService`.
@@ -108,8 +110,44 @@ export class DeviceService extends BaseService {
    * @returns A promise resolving to the system information in a structured format.
    * @throws An error if retrieving the information fails.
    */
-  public async getSystemInfo(apiKey: string): Promise<SystemInfo> {
+  public async showSystemInfo(apiKey: string): Promise<SystemInfo> {
     const xmlCmd = '<show><system><info/></system></show>';
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
+  }
+
+  /**
+   * Retrieves all jobs from the PAN-OS device.
+   *
+   * This method sends a command to the PAN-OS device to retrieve details of all jobs.
+   * It parses the XML response and returns a structured representation of job details.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @returns A promise resolving to a structured representation of all jobs.
+   * @throws An error if the request or parsing fails.
+   */
+  public async showJobsAll(apiKey: string): Promise<JobsAllResponse> {
+    const xmlCmd = '<show><jobs><all/></jobs></show>';
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
+  }
+
+  /**
+   * Retrieves all jobs from the PAN-OS device.
+   *
+   * This method sends a command to the PAN-OS device to retrieve details of all jobs.
+   * It parses the XML response and returns a structured representation of job details.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @param jobId - The ID of the job for the request.
+   * @returns A promise resolving to a structured representation of all jobs.
+   * @throws An error if the request or parsing fails.
+   */
+  public async showJobsId(
+    apiKey: string,
+    jobId: string,
+  ): Promise<JobsResponse> {
+    const xmlCmd = `<show><jobs><id>${jobId}</id></jobs></show>`;
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;
   }
