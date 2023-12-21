@@ -4,6 +4,7 @@ import { DeviceService } from './DeviceService';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
 import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 import { SessionAllResponse } from '../interfaces/SessionAllResponse';
+import { SessionIdResponse } from '../interfaces/SessionIdResponse';
 
 /**
  * `FirewallService` is a subclass of `DeviceService` dedicated to providing methods
@@ -62,5 +63,23 @@ export class FirewallService extends DeviceService {
 
     // Using executeOperationalCommand from DeviceService to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
+  }
+
+  /**
+   * Retrieves detailed information about a specific session on the PAN-OS device by its session ID.
+   * This method executes the 'show session id' command and returns detailed information for the specified session.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @param sessionId - The ID of the session to retrieve information for.
+   * @returns A promise resolving to the session information.
+   * @throws An error if the request fails or the response format is unexpected.
+   */
+  public async showSessionId(
+    apiKey: string,
+    sessionId: string,
+  ): Promise<SessionIdResponse> {
+    const xmlCmd = `<show><session><id>${sessionId}</id></session></show>`;
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
   }
 }
