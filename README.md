@@ -1,296 +1,343 @@
-# twilio-node
+# 🌐 Panos TypeScript SDK
 
-[![NPM](https://nodei.co/npm/twilio.png?downloads=true&stars=true)](https://nodei.co/npm/twilio/)
+![Stage](https://img.shields.io/badge/stage-alpha-blue.svg)
+![Version](https://img.shields.io/badge/version-0.0.4-blue.svg)
+![Language](https://img.shields.io/github/languages/top/cdot65/pan-os-typescript?color=blue&label=TypeScript)
 
-[![Tests](https://github.com/twilio/twilio-node/actions/workflows/test-and-deploy.yml/badge.svg)](https://github.com/twilio/twilio-node/actions/workflows/test-and-deploy.yml)
-[![Learn with TwilioQuest](https://img.shields.io/static/v1?label=TwilioQuest&message=Learn%20to%20contribute%21&color=F22F46&labelColor=1f243c&style=flat-square&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAASFBMVEUAAAAZGRkcHBwjIyMoKCgAAABgYGBoaGiAgICMjIyzs7PJycnMzMzNzc3UoBfd3d3m5ubqrhfrMEDu7u739/f4vSb/3AD///9tbdyEAAAABXRSTlMAAAAAAMJrBrEAAAKoSURBVHgB7ZrRcuI6EESdyxXGYoNFvMD//+l2bSszRgyUYpFAsXOeiJGmj4NkuWx1Qeh+Ekl9DgEXOBwOx+Px5xyQhDykfgq4wG63MxxaR4ddIkg6Ul3g84vCIcjPBA5gmUMeXESrlukuoK33+33uID8TWeLAdOWsKpJYzwVMB7bOzYSGOciyUlXSn0/ABXTosJ1M1SbypZ4O4MbZuIDMU02PMbauhhHMHXbmebmALIiEbbbbbUrpF1gwE9kFfRNAJaP+FQEXCCTGyJ4ngDrjOFo3jEL5JdqjF/pueR4cCeCGgAtwmuRS6gDwaRiGvu+DMFwSBLTE3+jF8JyuV1okPZ+AC4hDFhCHyHQjdjPHUKFDlHSJkHQXMB3KpSwXNGJPcwwTdZiXlRN0gSp0zpWxNtM0beYE0nRH6QIbO7rawwXaBYz0j78gxjokDuv12gVeUuBD0MDi0OQCLvDaAho4juP1Q/jkAncXqIcCfd+7gAu4QLMACCLxpRsSuQh0igu0C9Svhi7weAGZg50L3IE3cai4IfkNZAC8dfdhsUD3CgKBVC9JE5ABAFzg4QL/taYPAAWrHdYcgfLaIgAXWJ7OV38n1LEF8tt2TH29E+QAoDoO5Ve/LtCQDmKM9kPbvCEBApK+IXzbcSJ0cIGF6e8gpcRhUDogWZ8JnaWjPXc/fNnBBUKRngiHgTUSivSzDRDgHZQOLvBQgf8rRt+VdBUUhwkU6VpJ+xcOwQUqZr+mR0kvBUgv6cB4+37hQAkXqE8PwGisGhJtN4xAHMzrsgvI7rccXqSvKh6jltGlrOHA3Xk1At3LC4QiPdX9/0ndHpGVvTjR4bZA1ypAKgVcwE5vx74ulwIugDt8e/X7JgfkucBMIAr26ndnB4UCLnDOqvteQsHlgX9N4A+c4cW3DXSPbwAAAABJRU5ErkJggg==)](https://twil.io/learn-open-source)
+## 🚀 Introduction
 
-## Documentation
+Panos TypeScript SDK is a modern library tailored for interacting with Palo Alto Networks firewalls and Panorama appliances. It facilitates task automation, configuration management, and data retrieval from PAN-OS devices with a focus on ease of use and modularity.
 
-The documentation for the Twilio API can be found [here][apidocs].
+## 🌟 Features
 
-The Node library documentation can be found [here][libdocs].
+- 🔑 Simplified API key generation.
+- 🛠️ Convenient methods for PAN-OS operations.
+- 🌐 Compatibility with major web frameworks like Angular and React.
+- 🧩 Modular and structured service and interface design.
 
-## Versions
+## 📦 Installation
 
-`twilio-node` uses a modified version of [Semantic Versioning](https://semver.org) for all changes. [See this document](VERSIONS.md) for details.
-
-### Supported Node.js Versions
-
-This library supports the following Node.js implementations:
-
-- Node.js 14
-- Node.js 16
-- Node.js 18
-
-TypeScript is supported for TypeScript version 2.9 and above.
-
-> **Warning**
-> Do not use this Node.js library in a front-end application. Doing so can expose your Twilio credentials to end-users as part of the bundled HTML/JavaScript sent to their browser.
-
-## Installation
-
-`npm install twilio` or `yarn add twilio`
-
-### Test your installation
-
-To make sure the installation was successful, try sending yourself an SMS message, like this:
-
-```js
-// Your AccountSID and Auth Token from console.twilio.com
-const accountSid = 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
-const authToken = 'your_auth_token';
-
-const client = require('twilio')(accountSid, authToken);
-
-client.messages
-  .create({
-    body: 'Hello from twilio-node',
-    to: '+12345678901', // Text your number
-    from: '+12345678901', // From a valid Twilio number
-  })
-  .then((message) => console.log(message.sid));
+```bash
+npm i pan-os-typescript
 ```
 
-After a brief delay, you will receive the text message on your phone.
+## 📖 Detailed Documentation
 
-> **Warning**
-> It's okay to hardcode your credentials when testing locally, but you should use environment variables to keep them secret before committing any code or deploying to production. Check out [How to Set Environment Variables](https://www.twilio.com/blog/2017/01/how-to-set-environment-variables.html) for more information.
+For comprehensive API documentation, including usage examples, configuration details, and service descriptions, visit our [GitHub Pages](https://cdot65.github.io/pan-os-typescript/).
 
-## Usage
+## 📚 Quick Examples
 
-Check out these [code examples](examples) in JavaScript and TypeScript to get up and running quickly.
+**Generating an API key:**
 
-### Environment Variables
+```typescript
+// tests/testGenerateApiKey.ts
 
-`twilio-node` supports credential storage in environment variables. If no credentials are provided when instantiating the Twilio client (e.g., `const client = require('twilio')();`), the values in following env vars will be used: `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN`.
+// Import dotenv for managing environment variables
+import dotenv from 'dotenv';
 
-If your environment requires SSL decryption, you can set the path to CA bundle in the env var `TWILIO_CA_BUNDLE`.
-
-### Client Initialization
-
-If you invoke any V2010 operations without specifying an account SID, `twilio-node` will automatically use the `TWILIO_ACCOUNT_SID` value that the client was initialized with. This is useful for when you'd like to, for example, fetch resources for your main account but also your subaccount. See below:
-
-```javascript
-// Your Account SID, Subaccount SID Auth Token from console.twilio.com
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const subaccountSid = process.env.TWILIO_ACCOUNT_SUBACCOUNT_SID;
-
-const client = require('twilio')(accountSid, authToken);
-const mainAccountCalls = client.api.v2010.account.calls.list; // SID not specified, so defaults to accountSid
-const subaccountCalls = client.api.v2010.account(subaccountSid).calls.list; // SID specified as subaccountSid
-```
-
-### Lazy Loading
-
-`twilio-node` supports lazy loading required modules for faster loading time. Lazy loading is enabled by default. To disable lazy loading, simply instantiate the Twilio client with the `lazyLoading` flag set to `false`:
-
-```javascript
-// Your Account SID and Auth Token from console.twilio.com
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-const client = require('twilio')(accountSid, authToken, {
-  lazyLoading: false,
+// Configure dotenv to load environment variables based on the current environment
+dotenv.config({
+  path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
+
+// Import necessary classes from the SDK
+import { BaseClient } from 'pan-os-typescript';
+import { FirewallService } from 'pan-os-typescript';
+
+/**
+ * Test script for generating an API key using the SDK's FirewallService.
+ * This script demonstrates how to use the SDK to programmatically generate
+ * an API key required for authenticating further API requests.
+ */
+async function testGenerateApiKey() {
+  // Retrieve PAN-OS username and password from environment variables
+  const username = process.env.PANOS_USERNAME || '';
+  const password = process.env.PANOS_PASSWORD || '';
+
+  // Initialize BaseClient with the PAN-OS device's base URL
+  const baseClient = new BaseClient('https://datacenter.cdot.io');
+  // Create an instance of FirewallService with the configured BaseClient
+  const firewallService = new FirewallService(baseClient);
+
+  try {
+    // Check if username and password are set
+    if (!username || !password) {
+      throw new Error(
+        'Username or password is not set in environment variables.',
+      );
+    }
+
+    // Use the FirewallService instance to generate an API key
+    const apiKey = await firewallService.generateApiKey(username, password);
+
+    // Log the generated API key
+    console.log('Generated API Key:', apiKey);
+  } catch (error) {
+    // Handle and log any errors encountered during API key generation
+    console.error('Error:', error);
+  }
+}
+
+// Execute the test function
+testGenerateApiKey();
 ```
 
-### Enable Auto-Retry with Exponential Backoff
+Executing with `ts-node`:
 
-`twilio-node` supports automatic retry with exponential backoff when API requests receive an [Error 429 response](https://support.twilio.com/hc/en-us/articles/360044308153-Twilio-API-response-Error-429-Too-Many-Requests-). This retry with exponential backoff feature is disabled by default. To enable this feature, instantiate the Twilio client with the `autoRetry` flag set to `true`.
-
-Optionally, the maximum number of retries performed by this feature can be set with the `maxRetries` flag. The default maximum number of retries is `3`.
-
-```javascript
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-const client = require('twilio')(accountSid, authToken, {
-  autoRetry: true,
-  maxRetries: 3,
-});
-```
-
-### Specify Region and/or Edge
-
-To take advantage of Twilio's [Global Infrastructure](https://www.twilio.com/docs/global-infrastructure), specify the target Region and/or Edge for the client:
-
-```javascript
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-const client = require('twilio')(accountSid, authToken, {
-  region: 'au1',
-  edge: 'sydney',
-});
-```
-
-Alternatively, specify the edge and/or region after constructing the Twilio client:
-
-```javascript
-const client = require('twilio')(accountSid, authToken);
-client.region = 'au1';
-client.edge = 'sydney';
-```
-
-This will result in the `hostname` transforming from `api.twilio.com` to `api.sydney.au1.twilio.com`.
-
-### Iterate through records
-
-The library automatically handles paging for you. Collections, such as `calls` and `messages`, have `list` and `each` methods that page under the hood. With both `list` and `each`, you can specify the number of records you want to receive (`limit`) and the maximum size you want each page fetch to be (`pageSize`). The library will then handle the task for you.
-
-`list` eagerly fetches all records and returns them as a list, whereas `each` streams records and lazily retrieves pages of records as you iterate over the collection. You can also page manually using the `page` method.
-
-For more information about these methods, view the [auto-generated library docs](https://www.twilio.com/docs/libraries/reference/twilio-node/).
-
-```js
-// Your Account SID and Auth Token from console.twilio.com
-const accountSid = 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
-const authToken = 'your_auth_token';
-const client = require('twilio')(accountSid, authToken);
-
-client.calls.each((call) => console.log(call.direction));
-```
-
-### Enable Debug Logging
-
-There are two ways to enable debug logging in the default HTTP client. You can create an environment variable called `TWILIO_LOG_LEVEL` and set it to `debug` or you can set the logLevel variable on the client as debug:
-
-```javascript
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-const client = require('twilio')(accountSid, authToken, {
-  logLevel: 'debug',
-});
-```
-
-You can also set the logLevel variable on the client after constructing the Twilio client:
-
-```javascript
-const client = require('twilio')(accountSid, authToken);
-client.logLevel = 'debug';
-```
-
-### Debug API requests
-
-To assist with debugging, the library allows you to access the underlying request and response objects. This capability is built into the default HTTP client that ships with the library.
-
-For example, you can retrieve the status code of the last response like so:
-
-```js
-const accountSid = 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
-const authToken = 'your_auth_token';
-
-const client = require('twilio')(accountSid, authToken);
-
-client.messages
-  .create({
-    to: '+14158675309',
-    from: '+14258675310',
-    body: 'Ahoy!',
-  })
-  .then(() => {
-    // Access details about the last request
-    console.log(client.lastRequest.method);
-    console.log(client.lastRequest.url);
-    console.log(client.lastRequest.auth);
-    console.log(client.lastRequest.params);
-    console.log(client.lastRequest.headers);
-    console.log(client.lastRequest.data);
-
-    // Access details about the last response
-    console.log(client.httpClient.lastResponse.statusCode);
-    console.log(client.httpClient.lastResponse.body);
-  });
-```
-
-### Handle exceptions
-
-If the Twilio API returns a 400 or a 500 level HTTP response, `twilio-node` will throw an error including relevant information, which you can then `catch`:
-
-```js
-client.messages
-  .create({
-    body: 'Hello from Node',
-    to: '+12345678901',
-    from: '+12345678901',
-  })
-  .then((message) => console.log(message))
-  .catch((error) => {
-    // You can implement your fallback code here
-    console.log(error);
-  });
-```
-
-or with `async/await`:
-
-```js
-try {
-  const message = await client.messages.create({
-    body: 'Hello from Node',
-    to: '+12345678901',
-    from: '+12345678901',
-  });
-  console.log(message);
-} catch (error) {
-  // You can implement your fallback code here
-  console.error(error);
+```bash
+ts-node testGenerateApiKey.ts
+Generated API Key: {
+  key: 'LUFRPT1OMERyZmhrbW9HN2ZNMUhRMDhXSm9yL3JEOXc9N2dxVE1qdUZFM0FROE40Tm9WVFRLSmx5QWRCdnlKRnduQ3dDZUxPek5hMXpJcGJnVVU5R1lMMEUvckdRSHg2d215OUE1amd3WTBVRXROeDNvajFHZ1E9PQ=='
 }
 ```
 
-If you are using callbacks, error information will be included in the `error` parameter of the callback.
+**Executing an operational CLI command:**
 
-400-level errors are [normal during API operation](https://www.twilio.com/docs/api/rest/request#get-responses) ("Invalid number", "Cannot deliver SMS to that number", for example) and should be handled appropriately.
+```typescript
+// tests/testExecuteOperationalCommand.ts
 
-### Use a custom HTTP Client
+// Importing dotenv to manage environment variables
+import dotenv from "dotenv";
 
-To use a custom HTTP client with this helper library, please see the [advanced example of how to do so](./advanced-examples/custom-http-client.md).
+// Configuring environment variables based on the environment (production or development)
+dotenv.config({
+  path: process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev",
+});
 
-### Use webhook validation
+// Importing necessary classes from the SDK
+import { BaseClient } from "pan-os-typescript";
+import { FirewallService } from "pan-os-typescript";
 
-See [example](examples/express.js) for a code sample for incoming Twilio request validation.
+/**
+ * Test script to execute operational commands on a PAN-OS device.
+ * This script demonstrates how to use the SDK's FirewallService to execute
+ * operational commands and handle responses.
+ */
+async function testExecuteOperationalCommand() {
+  // Retrieve the API key from environment variables
+  const apiKey = process.env.PANOS_API_KEY || "";
+  if (!apiKey) {
+    throw new Error("API key is not set in environment variables.");
+  }
 
-## Docker image
+  // Initialize BaseClient with the base URL and API key
+  const baseClient = new BaseClient("https://datacenter.cdot.io", apiKey);
 
-The `Dockerfile` present in this repository and its respective `twilio/twilio-node` Docker image are currently used by Twilio for testing purposes only.
+  // Instantiate FirewallService with the configured BaseClient
+  const firewallService = new FirewallService(baseClient);
 
-## Getting help
+  try {
+    // Retrieve the command line argument or use a default command
+    const cliCmd = process.argv[2] || 'show interface "management"';
 
-If you need help installing or using the library, please check the [Twilio Support Help Center](https://support.twilio.com) first, and [file a support ticket](https://twilio.com/help/contact) if you don't find an answer to your question.
+    // Execute the operational command using FirewallService
+    const cliCommandResponse = await firewallService.executeOperationalCommand(
+      apiKey,
+      cliCmd
+    );
 
-If you've instead found a bug in the library or would like new features added, go ahead and open issues or pull requests against this repo!
+    // Log the command and its response for verification
+    console.log(
+      "CLI Command: " + cliCmd,
+      "\n",
+      JSON.stringify(cliCommandResponse, null, 2)
+    );
+  } catch (error) {
+    // Handle and log any errors during command execution
+    console.error("Error executing operational command:", error);
+  }
+}
 
-## Contributing
-
-Bug fixes, docs, and library improvements are always welcome. Please refer to our [Contributing Guide](CONTRIBUTING.md) for detailed information on how you can contribute.
-
-> ⚠️ Please be aware that a large share of the files are auto-generated by our backend tool. You are welcome to suggest changes and submit PRs illustrating the changes. However, we'll have to make the changes in the underlying tool. You can find more info about this in the [Contributing Guide](CONTRIBUTING.md).
-
-If you're not familiar with the GitHub pull request/contribution process, [this is a nice tutorial](https://gun.io/blog/how-to-github-fork-branch-and-pull-request/).
-
-### Get started
-
-If you want to familiarize yourself with the project, you can start by [forking the repository](https://help.github.com/articles/fork-a-repo/) and [cloning it in your local development environment](https://help.github.com/articles/cloning-a-repository/). The project requires [Node.js](https://nodejs.org) to be installed on your machine.
-
-After cloning the repository, install the dependencies by running the following command in the directory of your cloned repository:
-
-```bash
-npm install
+// Execute the test function
+testExecuteOperationalCommand();
 ```
 
-You can run the existing tests to see if everything is okay by executing:
+Execute with `ts-node`:
 
 ```bash
-npm test
+❯ ts-node testExecuteOperationalCommand.ts 'show system info'
+CLI Command: show system info
+ {
+  "response": {
+    "$": {
+      "status": "success"
+    },
+    "result": [
+      {
+        "system": [
+          {
+            "hostname": [
+              "DataCenter"
+            ],
+            "ip-address": [
+              "10.0.0.3"
+            ],
+            "public-ip-address": [
+              "unknown"
+            ],
+            "netmask": [
+              "255.255.255.0"
+            ],
+            "default-gateway": [
+              "10.0.0.1"
+            ],
+            "is-dhcp": [
+              "no"
+            ],
+            "ipv6-address": [
+              "unknown"
+            ],
+            "ipv6-link-local-address": [
+              "fe80::8e36:7a00:0000:0000/64"
+            ],
+            "mac-address": [
+              "8c:36:7a:00:00:00"
+            ],
+            "time": [
+              "Thu Dec 21 09:09:32 2023\n"
+            ],
+            "uptime": [
+              "4 days, 3:11:15"
+            ],
+            "devicename": [
+              "DataCenter"
+            ],
+            "family": [
+              "400"
+            ],
+            "model": [
+              "PA-440"
+            ],
+            "serial": [
+              "012345678901"
+            ],
+            "base_mac": [
+              "c8:29:c8:49:be:00"
+            ],
+            "mac_count": [
+              "254"
+            ],
+            "cloud-mode": [
+              "non-cloud"
+            ],
+            "sw-version": [
+              "11.0.3"
+            ],
+            "global-protect-client-package-version": [
+              "6.2.2"
+            ],
+            "device-dictionary-version": [
+              "106-456"
+            ],
+            "device-dictionary-release-date": [
+              "2023/12/14 16:38:55 CST"
+            ],
+            "app-version": [
+              "8790-8462"
+            ],
+            "app-release-date": [
+              "2023/12/14 17:07:49 CST"
+            ],
+            "av-version": [
+              "4668-5186"
+            ],
+            "av-release-date": [
+              "2023/12/16 06:03:28 CST"
+            ],
+            "threat-version": [
+              "8790-8462"
+            ],
+            "threat-release-date": [
+              "2023/12/14 17:07:49 CST"
+            ],
+            "wf-private-version": [
+              "0"
+            ],
+            "wf-private-release-date": [
+              "unknown"
+            ],
+            "url-db": [
+              "paloaltonetworks"
+            ],
+            "wildfire-version": [
+              "0"
+            ],
+            "wildfire-rt": [
+              "Disabled"
+            ],
+            "url-filtering-version": [
+              "20231221.20228"
+            ],
+            "global-protect-datafile-version": [
+              "0"
+            ],
+            "global-protect-datafile-release-date": [
+              "unknown"
+            ],
+            "global-protect-clientless-vpn-version": [
+              "0"
+            ],
+            "logdb-version": [
+              "11.0.0"
+            ],
+            "plugin_versions": [
+              {
+                "entry": [
+                  {
+                    "$": {
+                      "name": "dlp",
+                      "version": "4.0.2"
+                    },
+                    "pkginfo": [
+                      "dlp-4.0.2"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "platform-family": [
+              "400"
+            ],
+            "vpn-disable-mode": [
+              "off"
+            ],
+            "multi-vsys": [
+              "off"
+            ],
+            "ZTP": [
+              "Disabled"
+            ],
+            "operational-mode": [
+              "normal"
+            ],
+            "advanced-routing": [
+              "off"
+            ],
+            "device-certificate-status": [
+              "Valid"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
 ```
 
-To run just one specific test file instead of the whole suite, provide a JavaScript regular expression that will match your spec file's name, like:
+## 🤝 Contributing
 
-```bash
-npm run test:javascript -- -m .\*client.\*
-```
+We welcome contributions. Please:
 
-[apidocs]: https://www.twilio.com/docs/api
-[libdocs]: https://twilio.github.io/twilio-node
+- Write clear and concise code.
+- Include tests for new features.
+- Adhere to the existing code style.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+## 📄 License
+
+Licensed under the [MIT License](LICENSE).
+
+## ✉️ Contact
+
+For queries or feedback, open an issue on [GitHub Issues](https://github.com/cdot65/pan-os-typescript/issues).
