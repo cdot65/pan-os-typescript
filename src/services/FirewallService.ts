@@ -3,6 +3,7 @@
 import { DeviceService } from './DeviceService';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
 import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
+import { SessionAllResponse } from '../interfaces/SessionAllResponse';
 
 /**
  * `FirewallService` is a subclass of `DeviceService` dedicated to providing methods
@@ -43,6 +44,21 @@ export class FirewallService extends DeviceService {
    */
   public async showRoutingRoute(apiKey: string): Promise<RoutingRouteResponse> {
     const cmd = 'show routing route';
+
+    // Using executeOperationalCommand from DeviceService to handle the command execution.
+    return this.executeOperationalCommand(apiKey, cmd);
+  }
+
+  /**
+   * Retrieves a list of all active sessions on the PAN-OS device.
+   * This method executes the 'show session all' command and returns detailed session information.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @returns A promise resolving to the active session information.
+   * @throws An error if the request fails or the response format is unexpected.
+   */
+  public async showSessionAll(apiKey: string): Promise<SessionAllResponse> {
+    const cmd = 'show session all';
 
     // Using executeOperationalCommand from DeviceService to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
