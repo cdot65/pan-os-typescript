@@ -22,4 +22,5 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {},
+  ignorePatterns: ['babel.config.js'],
 };
