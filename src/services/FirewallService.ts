@@ -6,6 +6,7 @@ import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 import { SessionAllResponse } from '../interfaces/SessionAllResponse';
 import { SessionIdResponse } from '../interfaces/SessionIdResponse';
 import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
+import { SessionResponse } from '../interfaces/SessionResponse';
 
 /**
  * `FirewallService` is a subclass of `DeviceService` dedicated to providing methods
@@ -64,6 +65,27 @@ export class FirewallService extends DeviceService {
 
     // Using executeOperationalCommand from DeviceService to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
+  }
+
+  /**
+   * Retrieves detailed information about flows on the PAN-OS device that match a filter pattern.
+   * This method executes the 'show session all filter source x.x.x.x destination x.x.x.x' command
+   * and returns detailed information for the specified session.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @param destinationIp - The destination IP of the session to retrieve information for.
+   * @param sourceIp - The source IP of the session to retrieve information for.
+   * @returns A promise resolving to the session information.
+   * @throws An error if the request fails or the response format is unexpected.
+   */
+  public async showSessionAllFilter(
+    apiKey: string,
+    destinationIp: string,
+    sourceIp: string,
+  ): Promise<SessionResponse> {
+    const xmlCmd = `<show><session><all><filter><source>${sourceIp}</source><destination>${destinationIp}</destination></filter></all></session></show>`;
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
   }
 
   /**
