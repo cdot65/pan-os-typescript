@@ -7,6 +7,7 @@ import { SessionAllResponse } from '../interfaces/SessionAllResponse';
 import { SessionIdResponse } from '../interfaces/SessionIdResponse';
 import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
 import { SessionResponse } from '../interfaces/SessionResponse';
+import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
 
 /**
  * `FirewallService` is a subclass of `DeviceService` dedicated to providing methods
@@ -124,5 +125,24 @@ export class FirewallService extends DeviceService {
 
     // Using executeOperationalCommand from DeviceService to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
+  }
+
+  /**
+   * Retrieves category information about a specific URL.
+   * This method executes the 'test url-info-cloud' command on PAN-OS and returns category information
+   * for the specified URL. It provides insights such as risk levels, categorization, and other relevant metadata.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @param url - The URL to retrieve categorization information for.
+   * @returns A promise resolving to the URL categorization information.
+   * @throws An error if the request fails or if the response format is unexpected.
+   */
+  public async testUrlInfo(
+    apiKey: string,
+    url: string,
+  ): Promise<TestUrlInfoResponse> {
+    const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
   }
 }
