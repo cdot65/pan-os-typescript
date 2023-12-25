@@ -1,8 +1,10 @@
 // src/services/DeviceService.ts
 
 import { BaseService } from './BaseService';
-import { SystemInfo } from '../interfaces/SystemInfo';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
+import { JobsResponse } from '../interfaces/JobsResponse';
+import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
+import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 
 /**
  * `DeviceService` is a specialized service class extending `BaseService`.
@@ -101,6 +103,58 @@ export class DeviceService extends BaseService {
   }
 
   /**
+   * Requests license information from the PAN-OS device.
+   * This method executes the 'request license info' command and returns detailed license information.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @returns A promise resolving to the device's license information.
+   * @throws An error if the request fails or the response format is unexpected.
+   */
+  public async requestLicenseInfo(
+    apiKey: string,
+  ): Promise<LicenseInfoResponse> {
+    const xmlCmd = '<request><license><info/></license></request>';
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
+  }
+
+  /**
+   * Retrieves all jobs from the PAN-OS device.
+   *
+   * This method sends a command to the PAN-OS device to retrieve details of all jobs.
+   * It parses the XML response and returns a structured representation of job details.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @returns A promise resolving to a structured representation of all jobs.
+   * @throws An error if the request or parsing fails.
+   */
+  public async showJobsAll(apiKey: string): Promise<JobsResponse> {
+    const xmlCmd = '<show><jobs><all/></jobs></show>';
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
+  }
+
+  /**
+   * Retrieves all jobs from the PAN-OS device.
+   *
+   * This method sends a command to the PAN-OS device to retrieve details of all jobs.
+   * It parses the XML response and returns a structured representation of job details.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @param jobId - The ID of the job for the request.
+   * @returns A promise resolving to a structured representation of all jobs.
+   * @throws An error if the request or parsing fails.
+   */
+  public async showJobsId(
+    apiKey: string,
+    jobId: string,
+  ): Promise<JobsResponse> {
+    const xmlCmd = `<show><jobs><id>${jobId}</id></jobs></show>`;
+    const response = await this.executeOperationalCommand(apiKey, xmlCmd);
+    return response;
+  }
+
+  /**
    * Retrieves system information from a PAN-OS device, such as hostname, IP address, and software version.
    * This method abstracts the details of sending a system information request and processing the response.
    *
@@ -108,7 +162,9 @@ export class DeviceService extends BaseService {
    * @returns A promise resolving to the system information in a structured format.
    * @throws An error if retrieving the information fails.
    */
-  public async getSystemInfo(apiKey: string): Promise<SystemInfo> {
+  public async showSystemInfoResponse(
+    apiKey: string,
+  ): Promise<SystemInfoResponse> {
     const xmlCmd = '<show><system><info/></system></show>';
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;

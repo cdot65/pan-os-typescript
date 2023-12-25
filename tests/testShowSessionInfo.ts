@@ -1,4 +1,4 @@
-// tests/testGetSystemInfo.ts
+// tests/testShowSessionInfo.ts
 
 // Import dotenv for environment variable management.
 import dotenv from 'dotenv';
@@ -16,7 +16,7 @@ import { FirewallService } from '../src/index';
  * Test script for retrieving system information using the SDK's FirewallService.
  * Demonstrates how to use the SDK to fetch system information from a PAN-OS device.
  */
-async function testGetSystemInfo() {
+async function testShowSessionInfo() {
   // Retrieve API key from environment variables.
   const apiKey = process.env.PANOS_API_KEY || '';
   // Initialize BaseClient with the base URL of the PAN-OS device and the API key.
@@ -30,11 +30,15 @@ async function testGetSystemInfo() {
       throw new Error('API key is not set in environment variables.');
     }
 
-    // Fetch system information using FirewallService.
-    const systemInfo = await firewallService.getSystemInfo(apiKey);
+    // Fetch session information using FirewallService.
+    const showSessionInfoResponse =
+      await firewallService.showSessionInfo(apiKey);
 
-    // Log the retrieved system information, formatted for readability.
-    console.log('System Info:', JSON.stringify(systemInfo, null, 2));
+    // Log the retrieved `show session info`, formatted for readability.
+    console.log(
+      'System Info:',
+      JSON.stringify(showSessionInfoResponse, null, 2),
+    );
   } catch (error) {
     // Handle and log any errors encountered during the retrieval of system information.
     console.error('Error:', error);
@@ -42,4 +46,4 @@ async function testGetSystemInfo() {
 }
 
 // Execute the test function.
-testGetSystemInfo();
+testShowSessionInfo();

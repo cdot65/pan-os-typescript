@@ -1,4 +1,4 @@
-// tests/testGetResourceMonitor.ts
+// tests/testShowResourceMonitor.ts
 
 // Import dotenv for environment variable management
 import dotenv from 'dotenv';
@@ -16,7 +16,7 @@ import { FirewallService } from '../src/index';
  * Test script for retrieving resource monitor information using the SDK's FirewallService.
  * This script demonstrates the use of the SDK to fetch resource monitoring data from a PAN-OS device.
  */
-async function testGetResourceMonitor() {
+async function testShowResourceMonitor() {
   // Retrieve the API key from the environment variables
   const apiKey = process.env.PANOS_API_KEY || '';
   // Initialize BaseClient with the PAN-OS device's base URL and the API key
@@ -32,7 +32,7 @@ async function testGetResourceMonitor() {
 
     // Fetch resource monitor information using FirewallService
     const resourceMonitorInfo =
-      await firewallService.getResourceMonitor(apiKey);
+      await firewallService.showResourceMonitor(apiKey);
 
     // Log the resource monitor information, formatted for readability
     console.log(
@@ -46,4 +46,4 @@ async function testGetResourceMonitor() {
 }
 
 // Execute the test function
-testGetResourceMonitor();
+testShowResourceMonitor();
