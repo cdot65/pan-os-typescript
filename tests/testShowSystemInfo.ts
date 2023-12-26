@@ -1,45 +1,47 @@
 // tests/testShowSystemInfoResponse.ts
 
-// Import dotenv for environment variable management.
 import dotenv from 'dotenv';
 
-// Configure dotenv based on the current environment.
+// Load and configure environment variables from the .env file based on the current environment (development or production).
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Import necessary classes from the SDK.
-import { BaseClient } from '../src/index';
-import { FirewallService } from '../src/index';
+import { Firewall } from '../src/index';
 
 /**
- * Test script for retrieving system information using the SDK's FirewallService.
- * Demonstrates how to use the SDK to fetch system information from a PAN-OS device.
+ * Retrieves and logs the system information from a PAN-OS device.
+ * This script demonstrates the use of the `Firewall` class from the SDK to obtain system-related details,
+ * validating the SDK's ability to interact with the device API and handle the returned data.
+ * Errors are thrown if the API key is not set in environment variables or if there is a failure in fetching the information.
+ *
+ * @async
+ * @function testShowSystemInfoResponse
+ * @throws {Error} When the API key is not provided in environment variables or if the request to retrieve system information fails.
  */
 async function testShowSystemInfoResponse() {
-  // Retrieve API key from environment variables.
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
-  // Initialize BaseClient with the base URL of the PAN-OS device and the API key.
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-  // Create an instance of FirewallService using the configured BaseClient.
-  const firewallService = new FirewallService(baseClient);
+
+  // Ensure the API key is present before attempting the operation; otherwise, throw an error.
+  if (!apiKey) {
+    throw new Error('API key is not set in environment variables.');
+  }
+
+  // Initialize a new instance of the Firewall class with API key and hostname.
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Verify that the API key is set.
-    if (!apiKey) {
-      throw new Error('API key is not set in environment variables.');
-    }
+    // Fetch the system information from the PAN-OS device using the Firewall class's method.
+    const systemInfo = await firewall.showSystemInfoResponse();
 
-    // Fetch system information using FirewallService.
-    const systemInfo = await firewallService.showSystemInfoResponse(apiKey);
-
-    // Log the retrieved system information, formatted for readability.
+    // Log the retrieved system information to the console for verification.
     console.log('System Info:', JSON.stringify(systemInfo, null, 2));
   } catch (error) {
-    // Handle and log any errors encountered during the retrieval of system information.
-    console.error('Error:', error);
+    // Log any errors encountered during the retrieval process.
+    console.error('Error retrieving system info:', error);
   }
 }
 
-// Execute the test function.
+// Run the function to test system information retrieval.
 testShowSystemInfoResponse();

@@ -1,41 +1,43 @@
 // src/objects/PanObject.ts
 
 /**
- * Abstract base class representing an object within PAN-OS.
- * This class provides common functionality for all PAN-OS objects, such as
- * hierarchical parent-child relationships and XML conversion.
+ * Represents a base object within the PAN-OS ecosystem.
+ * This abstract class provides foundational features common to all PAN-OS objects,
+ * such as hierarchical structuring and XML representation.
  */
 export abstract class PanObject {
   /**
-   * The parent object in the PAN-OS object hierarchy, if any.
+   * The parent of this object in the PAN-OS hierarchy, if any.
    * @protected
    */
-  protected parent: PanObject | null = null;
+  protected parent: PanObject | null;
 
   /**
-   * The list of children objects in the PAN-OS object hierarchy.
+   * A list of child objects within the PAN-OS hierarchy.
    * @protected
    */
-  protected children: PanObject[] = [];
+  protected children: PanObject[];
 
   /**
-   * The name of the PAN-OS object.
+   * The unique name of the PAN-OS object.
    */
   public name: string;
 
   /**
-   * Constructs a new `PanObject` with a given name.
-   * @param name - The name of the object.
+   * Constructs a new instance of a PanObject.
+   * @param name - The unique name assigned to this PAN-OS object.
    */
   constructor(name: string) {
     this.name = name;
+    this.parent = null;
+    this.children = [];
   }
 
   /**
-   * Adds a child `PanObject` to this object's hierarchy.
-   * Sets the current object as the parent of the child.
+   * Adds a child object to this object's hierarchy.
+   * The method sets this object as the parent of the provided child.
    *
-   * @param child - The child `PanObject` to add.
+   * @param child - The child object to be added to the hierarchy.
    */
   public addChild(child: PanObject): void {
     child.parent = this;
@@ -43,25 +45,27 @@ export abstract class PanObject {
   }
 
   /**
-   * Removes a child `PanObject` from this object's hierarchy.
-   * Resets the removed child's parent to null.
+   * Removes a child object from this object's hierarchy.
+   * Upon removal, the child's parent reference is reset to null.
    *
-   * @param child - The child `PanObject` to remove.
+   * @param child - The child object to be removed from the hierarchy.
    */
   public removeChild(child: PanObject): void {
     const index = this.children.indexOf(child);
-    if (index > -1) {
+    if (index !== -1) {
       this.children.splice(index, 1);
       child.parent = null;
     }
   }
 
   /**
-   * Converts the PAN-OS object into its XML representation.
-   * This method must be implemented by all subclasses to provide the specific XML structure required by PAN-OS.
-   * @returns The XML string representation of the PAN-OS object.
+   * Converts the object into its XML string representation.
+   * Implementing classes must override this method to provide the specific XML structure required by PAN-OS.
+   *
+   * @returns A string representing the XML format of the PAN-OS object.
+   * @abstract
    */
   public abstract toXml(): string;
 
-  // Other common methods like find(), xpath(), etc., can be added here
+  // Additional methods and properties can be defined here as needed.
 }

@@ -3,45 +3,49 @@
 import { PanObject } from './PanObject';
 
 /**
- * Enumeration of the types of addresses supported by the AddressObject.
- * Defines the various formats for network locations that can be used in address objects.
+ * Supported address formats for network locations used in address objects.
+ * @enum "ip-netmask" A network address in CIDR format.
+ * @enum "ip-range" A range of IP addresses.
+ * @enum "ip-wildcard" An IP address with a wildcard mask.
+ * @enum "fqdn" A fully qualified domain name.
  */
 export type AddressType = 'ip-netmask' | 'ip-range' | 'ip-wildcard' | 'fqdn';
 
 /**
- * Represents an address object within PAN-OS, derived from the PanObject.
- * Address objects are used for various firewall policy types and define the network location of interest.
+ * The `AddressObject` class represents network address configuration within PAN-OS,
+ * extending `PanObject` to include additional properties specific to network locations.
+ * These objects play a crucial role in defining rules and policies for the firewall system.
  */
 export class AddressObject extends PanObject {
   /**
-   * The network location value of the address object, format based on the `type`.
+   * The network address or range associated with this address object, formatted according to the specified `type`.
    */
   value: string;
 
   /**
-   * The type of the network location represented by the address object.
+   * Specifies the format of the address object's value, corresponding to one of the supported `AddressType` formats.
    */
   type: AddressType;
 
   /**
-   * Optional description of the address object for additional clarity.
+   * An optional human-readable description providing context about the purpose or usage of the address object.
    */
   description?: string;
 
   /**
-   * Optional tags for classifying or grouping the address object.
+   * Optional classification tags that may be used to organize address objects into groups or categories.
    */
   tag?: string[];
 
   /**
-   * Constructs a new instance of the AddressObject.
-   * Initializes the object with a name, network location value, and optional description and tags.
+   * Instantiates an `AddressObject` with the given properties, providing a name and network location details.
+   * Additional optional metadata like descriptions and tags can be included to enhance identification and organization.
    *
-   * @param name - Unique name of the address object.
-   * @param value - The network location value, which varies based on `type` (e.g., CIDR notation for 'ip-netmask').
-   * @param type - The type of address object; defaults to 'ip-netmask'.
-   * @param description - Optional description of the address object.
-   * @param tag - Optional list of tags associated with the address object.
+   * @param name The unique identifier for the address object within PAN-OS.
+   * @param value The network location value, such as an IP address or range.
+   * @param type Indicates the format of the address value (defaults to 'ip-netmask').
+   * @param description An optional descriptive text for the address object.
+   * @param tag Optional tags for sorting or annotation purposes.
    */
   constructor(
     name: string,
@@ -58,10 +62,9 @@ export class AddressObject extends PanObject {
   }
 
   /**
-   * Generates and returns the XML representation of the address object.
-   * The XML format follows the PAN-OS API requirements for address object definitions.
+   * Converts the `AddressObject` instance into its XML representation as required by the PAN-OS API.
    *
-   * @returns The address object in XML format as a string.
+   * @returns A string containing the XML configuration of the address object.
    */
   public toXml(): string {
     // XML generation logic specific to AddressObject

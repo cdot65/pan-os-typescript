@@ -1,17 +1,18 @@
 // tests/testCreateAddressObject.ts
 
 import dotenv from 'dotenv';
-import { BaseClient, FirewallService, AddressObject } from '../src/index';
-import { AddressType } from '../src/objects/AddressObject';
+import { Firewall, AddressObject, AddressType } from '../src/index';
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers'; // Required to help with parsing arguments passed via the command line
+import { hideBin } from 'yargs/helpers';
 
-// Load environment variables
+// Load the correct environment variables based on the NODE_ENV value.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Update the `Arguments` interface's `type` property to use `AddressType`
+/**
+ * Type for the command line arguments accepted by the script.
+ */
 interface Arguments {
   name: string;
   value: string;
@@ -20,46 +21,76 @@ interface Arguments {
   tag?: string[];
 }
 
-// Use 'yargs' to parse command line arguments
+// Parse command line arguments using yargs.
 const argv = yargs(hideBin(process.argv))
   .options({
-    name: { type: 'string', demandOption: true, alias: 'n' },
-    value: { type: 'string', demandOption: true, alias: 'v' },
-    type: { type: 'string', demandOption: true, alias: 't' },
-    description: { type: 'string', alias: 'd', default: undefined },
-    tag: { type: 'array', alias: 'g', default: undefined },
+    name: {
+      type: 'string',
+      demandOption: true,
+      alias: 'n',
+      description: 'Name of the address object',
+    },
+    value: {
+      type: 'string',
+      demandOption: true,
+      alias: 'v',
+      description: 'Value of the address object',
+    },
+    type: {
+      type: 'string',
+      demandOption: true,
+      choices: ['ip-netmask', 'ip-range', 'ip-wildcard', 'fqdn'],
+      alias: 't',
+    },
+    description: {
+      type: 'string',
+      alias: 'd',
+      default: undefined,
+      description: 'Description of the address object',
+    },
+    tag: {
+      type: 'array',
+      alias: 'g',
+      default: undefined,
+      description: 'Tags associated with the address object',
+    },
   })
   .parseSync() as Arguments;
 
+/**
+ * Test script to create an address object in PAN-OS using values from command line arguments.
+ * This test creates an address object by invoking the Firewall SDK methods.
+ */
 async function testCreateAddressObject() {
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-  const firewallService = new FirewallService(baseClient);
+
+  if (!apiKey) {
+    throw new Error('API key is not set in environment variables.');
+  }
+
+  // Initialize the firewall instance.
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    if (!apiKey) {
-      throw new Error('API key is not set in environment variables.');
-    }
-
-    // Create the Address Object based on the provided arguments
+    // Create the address object based on command line arguments.
     const addressObject = new AddressObject(argv.name, argv.value, argv.type);
     addressObject.description = argv.description;
     if (argv.tag) addressObject.tag = argv.tag;
 
-    // Create the Address Object using FirewallService
-    const response = await firewallService.createAddressObject(
-      apiKey,
-      addressObject,
-    );
+    // Attempt to create the address object on the PAN-OS device.
+    const response = await firewall.createAddressObject(addressObject);
 
-    // Log the response
+    // Log the response from the PAN-OS API.
     console.log(
       'Create Address Object Response:',
       JSON.stringify(response, null, 2),
     );
   } catch (error) {
+    // Log any errors encountered during address object creation.
     console.error('Error:', error);
   }
 }
 
+// Execute the test function.
 testCreateAddressObject();

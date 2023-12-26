@@ -1,49 +1,43 @@
 // tests/testShowResourceMonitor.ts
 
-// Import dotenv for environment variable management
 import dotenv from 'dotenv';
 
-// Configure dotenv based on the current environment
+// Load environment variables from the appropriate .env file, depending on the NODE_ENV value.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Import the necessary classes from the SDK
-import { BaseClient } from '../src/index';
-import { FirewallService } from '../src/index';
+import { Firewall } from '../src/index';
 
 /**
- * Test script for retrieving resource monitor information using the SDK's FirewallService.
- * This script demonstrates the use of the SDK to fetch resource monitoring data from a PAN-OS device.
+ * Executes the process of retrieving resource monitor information from a PAN-OS device using the SDK's Firewall class.
+ * The function demonstrates how to use the SDK for communication with the PAN-OS API to fetch resource utilization data.
+ * It prints out the resource monitor information to console or throws an error if API key is not set or request fails.
+ *
+ * @async
+ * @function testShowResourceMonitor
+ * @throws {Error} When the API key is not provided or the request to the firewall fails.
  */
 async function testShowResourceMonitor() {
-  // Retrieve the API key from the environment variables
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
-  // Initialize BaseClient with the PAN-OS device's base URL and the API key
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-  // Create an instance of FirewallService with the configured BaseClient
-  const firewallService = new FirewallService(baseClient);
+
+  // Ensure the API key is present, otherwise throw an error.
+  if (!apiKey) {
+    throw new Error('API key is not set in environment variables.');
+  }
+
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Check if the API key is available
-    if (!apiKey) {
-      throw new Error('API key is not set in environment variables.');
-    }
-
-    // Fetch resource monitor information using FirewallService
-    const resourceMonitorInfo =
-      await firewallService.showResourceMonitor(apiKey);
-
-    // Log the resource monitor information, formatted for readability
+    const resourceMonitorInfo = await firewall.showResourceMonitor();
     console.log(
       'Resource Monitor Info:',
       JSON.stringify(resourceMonitorInfo, null, 2),
     );
   } catch (error) {
-    // Handle and log any errors encountered during the retrieval of resource monitor information
-    console.error('Error:', error);
+    console.error('Error fetching resource monitor info:', error);
   }
 }
 
-// Execute the test function
 testShowResourceMonitor();

@@ -1,51 +1,55 @@
 // src/index.ts
 
 /**
- * Provides low-level HTTP client functionality for handling API requests and responses.
+ * The `ApiClient` class provides low-level HTTP client functionality essential for handling API requests and responses.
+ * It is responsible for setting up HTTP communication details such as base URLs, headers, and response types.
  *
- * @module BaseClient
+ * @module ApiClient
  */
-export { BaseClient } from './BaseClient';
+export { ApiClient } from './ApiClient';
 
 /**
- * The `Device` class extends `BaseService` to offer device-specific API operations.
- * It acts as a base for more specialized service classes like `FirewallService`.
+ * The `PanDevice` class extends from `BaseService` to provide device-specific API operations and properties.
+ * This class serves as the foundation for specialized service classes such as `Firewall`, by offering
+ * a common structure and behavior for device entities.
  *
+ * @examples Creating and managing device-specific settings and operations.
  * @module Device
  */
-export { Device } from './Device';
+export { PanDevice } from './objects/PanDevice';
 
 /**
- * The `FirewallService` class, building upon the `Device` class, provides methods
- * specifically tailored to interacting with PAN-OS firewalls. This includes:
- * - Resource monitoring
- * - System information retrieval
+ * The `Firewall` class extends the `PanDevice` class, delivering methods customized for interaction
+ * with devices running PAN-OS firewall software. The provided methods focus on essential firewall
+ * functionalities like resource monitoring and retrieving system information.
  *
- * @module services/FirewallService
+ * @module services/Firewall
  */
-export { FirewallService } from './services/FirewallService';
+export { Firewall } from './objects/Firewall';
 
 /**
- * The `PanObject` class serves as the base class for various PAN-OS object types,
- * providing common functionality like XML conversion and hierarchical relationships.
+ * Serves as the base class for multiple PAN-OS object types, `PanObject` provides foundational
+ * functionalities such as generating XML representations of objects and handling hierarchical
+ * relationships between different PAN-OS entities.
  *
  * @module objects/PanObject
  */
 export { PanObject } from './objects/PanObject';
 
 /**
- * The `AddressType` type defines the supported address formats in PAN-OS,
- * such as IP netmask, IP range, and fully qualified domain names (FQDN).
+ * Defines supported formats of network addresses in PAN-OS. This enumeration includes various
+ * types of network addresses such as IP netmask, IP range, and fully qualified domain names (FQDN).
  *
+ * @typedef AddressType
+ * @enum `AddressType` An enumeration of supported address formats in PAN-OS.
  * @module objects/AddressObject
  */
 export { AddressType } from './objects/AddressObject';
 
 /**
- * The `AddressObject` class abstracts the address object concept in PAN-OS
- * and provides methods to manipulate these objects. Usage examples include:
- * - Creating, updating, or deleting address objects
- * - Associating address objects with policies or other entities
+ * The `AddressObject` class encapsulates the concept of network address objects in PAN-OS,
+ * offering a set of methods to create, update, or delete address objects, and to associate
+ * them with different policies and entities in the system.
  *
  * @module objects/AddressObject
  */

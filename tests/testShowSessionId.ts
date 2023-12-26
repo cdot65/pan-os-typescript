@@ -1,56 +1,54 @@
 // tests/testShowSessionId.ts
 
-// Importing dotenv to manage environment variables
 import dotenv from 'dotenv';
 
-// Configuring environment variables based on the environment (production or development)
+// Load environment variables from the .env file according to the execution environment (development or production).
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Importing necessary classes from the SDK
-import { BaseClient } from '../src/BaseClient';
-import { FirewallService } from '../src/index'; // Importing FirewallService from the index
+import { Firewall } from '../src/index';
 
 /**
- * Test script to execute operational commands on a PAN-OS device.
- * This script demonstrates how to use the SDK's FirewallService to execute
- * operational commands and handle responses.
+ * Fetches and logs the information for a specific session on a PAN-OS device using a session ID.
+ * The script uses the Firewall class to interact with the device's API and performs error handling
+ * if the session information cannot be retrieved due to missing API key or request errors.
+ *
+ * @async
+ * @function testShowSessionId
+ * @throws {Error} When the API key is not available in the environment variables or when
+ *                 the request for the session ID information fails.
  */
 async function testShowSessionId() {
-  // Retrieve the API key from environment variables
+  // Retrieve the hostname and API key for the PAN-OS device from environment variables.
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
+
+  // Throw an error if the API key is missing from environment variables.
   if (!apiKey) {
     throw new Error('API key is not set in environment variables.');
   }
 
-  // Initialize BaseClient with the base URL and API key
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-
-  // Instantiate FirewallService with the configured BaseClient
-  const firewallService = new FirewallService(baseClient);
+  // Initialize a new instance of the Firewall class using the obtained hostname and API key.
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Retrieve the command line argument or use a default command
+    // Obtain the session ID from the command line arguments or default to '100'.
     const sessionId = process.argv[2] || '100';
 
-    // Execute the operational command using FirewallService
-    const sessionIdResponse = await firewallService.showSessionId(
-      apiKey,
-      sessionId,
-    );
+    // Request session information for the provided session ID using the Firewall class.
+    const sessionIdResponse = await firewall.showSessionId(sessionId);
 
-    // Log the command and its response for verification
+    // Log the session information to the console.
     console.log(
-      'Session `$(sessionId):',
-      '\n',
+      `Session ID ${sessionId} Response:`,
       JSON.stringify(sessionIdResponse, null, 2),
     );
   } catch (error) {
-    // Handle and log any errors during command execution
-    console.error('Error executing operational command:', error);
+    // Log any errors encountered during the retrieval of session information.
+    console.error('Error executing operational command for session ID:', error);
   }
 }
 
-// Execute the test function
+// Run the test function to attempt retrieval of the session information.
 testShowSessionId();

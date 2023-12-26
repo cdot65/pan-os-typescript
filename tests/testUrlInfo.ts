@@ -1,49 +1,53 @@
 // tests/testUrlInfo.ts
 
-// Importing dotenv to manage environment variables
 import dotenv from 'dotenv';
 
-// Configuring environment variables based on the environment (production or development)
+// Load environment variables from the .env file based on the current NODE_ENV environment variable.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Importing necessary classes from the SDK
-import { BaseClient } from '../src/BaseClient';
-import { FirewallService } from '../src/index'; // Importing FirewallService from the index
+import { Firewall } from '../src/index';
 
 /**
- * Test script to execute operational commands on a PAN-OS device.
- * This script demonstrates how to use the SDK's FirewallService to execute
- * operational commands and handle responses.
+ * Fetches and logs the URL information from a PAN-OS device for a given or default URL.
+ * Utilizes the Firewall class to demonstrate how to issue a URL information test command,
+ * handling both the response and any errors that may occur.
+ *
+ * @async
+ * @function testUrlInfo
+ * @throws {Error} When API key is not set in environment variables or when executing the
+ * operational command fails due to API interaction issues.
  */
 async function testUrlInfo() {
-  // Retrieve the API key from environment variables
+  // Retrieve the PAN-OS hostname and API key from environment variables.
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
+
+  // Ensure the API key is present, or throw an error.
   if (!apiKey) {
     throw new Error('API key is not set in environment variables.');
   }
 
-  // Initialize BaseClient with the base URL and API key
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-
-  // Instantiate FirewallService with the configured BaseClient
-  const firewallService = new FirewallService(baseClient);
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Retrieve the command line argument or use a default command
-    const url = process.argv[2] || '100';
+    // Use a URL provided by a command line argument or a default value.
+    const url = process.argv[2] || 'www.example.com';
 
-    // Execute the operational command using FirewallService
-    const urlInfoResponse = await firewallService.testUrlInfo(apiKey, url);
+    // Request URL information from the PAN-OS device using the provided URL or the default one.
+    const urlInfoResponse = await firewall.testUrlInfo(url);
 
-    // Log the command and its response for verification
-    console.log('URL `$(url):', '\n', JSON.stringify(urlInfoResponse, null, 2));
+    // Log the fetched URL information to the console for inspection.
+    console.log(
+      `URL Info for ${url}:`,
+      JSON.stringify(urlInfoResponse, null, 2),
+    );
   } catch (error) {
-    // Handle and log any errors during command execution
-    console.error('Error executing operational command:', error);
+    // Log an error message if there is a failure in executing the operational command.
+    console.error('Error executing URL info command:', error);
   }
 }
 
-// Execute the test function
+// Run the URL information test function.
 testUrlInfo();

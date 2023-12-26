@@ -1,48 +1,48 @@
-// tests/testShowJobsId.ts
-
-// Import dotenv for environment variable management.
 import dotenv from 'dotenv';
 
-// Configure dotenv based on the current environment.
+// Load and configure environment variables from the .env file based on the current NODE_ENV setting.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Import necessary classes from the SDK.
-import { BaseClient } from '../src/index';
-import { FirewallService } from '../src/index';
+import { Firewall } from '../src/index';
 
 /**
- * Test script for retrieving system information using the SDK's FirewallService.
- * Demonstrates how to use the SDK to fetch system information from a PAN-OS device.
+ * Demonstrates fetching and logging the status of a job from a PAN-OS device by its job ID.
+ * This script uses environment variables for the hostname and API key and accepts a job ID as a command-line argument.
+ *
+ * @async
+ * @function testShowJobsId
+ * @throws Throws an error if the API key is not set in the environment variables,
+ *         or if there is an issue retrieving the job status.
  */
 async function testShowJobsId() {
-  // Retrieve API key from environment variables.
+  // Use environment variables to set up the firewall connection details.
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
-  // Initialize BaseClient with the base URL of the PAN-OS device and the API key.
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-  // Create an instance of FirewallService using the configured BaseClient.
-  const firewallService = new FirewallService(baseClient);
+
+  // Ensure the presence of an API key; otherwise, throw an error.
+  if (!apiKey) {
+    throw new Error('API key is not set in environment variables.');
+  }
+
+  // Create an instance of the Firewall class using the hostname and API key.
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Verify that the API key is set.
-    if (!apiKey) {
-      throw new Error('API key is not set in environment variables.');
-    }
-
-    // Retrieve the command line argument or use a default jobId
+    // Get the job ID either from the command line argument or default to '45'.
     const jobId = process.argv[2] || '45';
 
-    // Fetch job result by using FirewallService and passing a job id.
-    const jobsIdResult = await firewallService.showJobsId(apiKey, jobId);
+    // Use the Firewall instance to fetch the status of the specified job ID.
+    const jobsIdResult = await firewall.showJobsId(jobId);
 
-    // Log the retrieved job result, formatted for readability.
+    // Print the job status result.
     console.log('Job Result:', JSON.stringify(jobsIdResult, null, 2));
   } catch (error) {
-    // Handle and log any errors encountered during the retrieval of job status.
+    // Log any errors encountered when fetching the job status.
     console.error('Error:', error);
   }
 }
 
-// Execute the test function.
+// Run the function to test job status retrieval.
 testShowJobsId();

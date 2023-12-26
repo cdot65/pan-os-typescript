@@ -1,45 +1,43 @@
 // tests/testShowRoutingRoute.ts
 
-// Import dotenv for environment variable management
 import dotenv from 'dotenv';
 
-// Configure dotenv based on the current environment
+// Load and configure environment variables from the .env file based on the current environment.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Import the necessary classes from the SDK
-import { BaseClient } from '../src/index';
-import { FirewallService } from '../src/index';
+import { Firewall } from '../src/index';
 
 /**
- * Test script for retrieving resource monitor information using the SDK's FirewallService.
- * This script demonstrates the use of the SDK to fetch resource monitoring data from a PAN-OS device.
+ * Fetches and logs the routing table information from a PAN-OS device.
+ * This script demonstrates how to utilize the Firewall class from the SDK for retrieving routing route details.
+ * It uses the environment variables for the device's hostname and API key and expects successful log output
+ * of routing information or throws an error if the API key is not configured or the retrieval fails.
+ *
+ * @async
+ * @function testShowRoutingRoute
+ * @throws Will throw an error if the API key is not found in the environment variables or if an error occurs during
+ * the request to the PAN-OS device for routing route information.
  */
 async function testShowRoutingRoute() {
-  // Retrieve the API key from the environment variables
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
-  // Initialize BaseClient with the PAN-OS device's base URL and the API key
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-  // Create an instance of FirewallService with the configured BaseClient
-  const firewallService = new FirewallService(baseClient);
+
+  // Ensure the API key is set in the environment before attempting the request.
+  if (!apiKey) {
+    throw new Error('API key is not set in environment variables.');
+  }
+
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Check if the API key is available
-    if (!apiKey) {
-      throw new Error('API key is not set in environment variables.');
-    }
-
-    // Fetch route table information using FirewallService
-    const routingRouteInfo = await firewallService.showRoutingRoute(apiKey);
-
-    // Log the route table information, formatted for readability
+    const routingRouteInfo = await firewall.showRoutingRoute();
     console.log('Route Table:', JSON.stringify(routingRouteInfo, null, 2));
   } catch (error) {
-    // Handle and log any errors encountered during the retrieval of the route table
-    console.error('Error:', error);
+    // Log an error if the API call was unsuccessful.
+    console.error('Error fetching route table:', error);
   }
 }
 
-// Execute the test function
 testShowRoutingRoute();
