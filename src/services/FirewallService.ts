@@ -1,6 +1,6 @@
 // src/services/FirewallService.ts
 
-import { DeviceService } from './DeviceService';
+import { Device } from '../Device';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
 import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 import { SessionAllResponse } from '../interfaces/SessionAllResponse';
@@ -10,17 +10,17 @@ import { SessionResponse } from '../interfaces/SessionResponse';
 import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
 
 /**
- * `FirewallService` is a subclass of `DeviceService` dedicated to providing methods
+ * `FirewallService` is a subclass of `Device` dedicated to providing methods
  * specifically tailored for interacting with firewall functionalities in PAN-OS.
  */
-export class FirewallService extends DeviceService {
+export class FirewallService extends Device {
   /**
    * Fetches resource monitoring data from a PAN-OS firewall. This method is instrumental
    * in retrieving critical performance metrics like CPU usage, memory load, and more.
    *
    * The method simplifies the process of fetching this data by constructing the necessary
    * command in a format understood by PAN-OS devices. It leverages the `executeOperationalCommand`
-   * method from `DeviceService` to handle the command execution and response parsing.
+   * method from `Device` to handle the command execution and response parsing.
    *
    * The returned data conforms to the `ResourceMonitorResponse` interface, ensuring a structured
    * and consistent format for the resource monitoring metrics.
@@ -34,7 +34,7 @@ export class FirewallService extends DeviceService {
   ): Promise<ResourceMonitorResponse> {
     const cmd = 'show running resource-monitor minute';
 
-    // Using executeOperationalCommand from DeviceService to handle the command execution.
+    // Using executeOperationalCommand from Device to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
   }
 
@@ -49,7 +49,7 @@ export class FirewallService extends DeviceService {
   public async showRoutingRoute(apiKey: string): Promise<RoutingRouteResponse> {
     const cmd = 'show routing route';
 
-    // Using executeOperationalCommand from DeviceService to handle the command execution.
+    // Using executeOperationalCommand from Device to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
   }
 
@@ -64,7 +64,7 @@ export class FirewallService extends DeviceService {
   public async showSessionAll(apiKey: string): Promise<SessionAllResponse> {
     const cmd = 'show session all';
 
-    // Using executeOperationalCommand from DeviceService to handle the command execution.
+    // Using executeOperationalCommand from Device to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
   }
 
@@ -112,7 +112,7 @@ export class FirewallService extends DeviceService {
    * This method executes the 'show session info' command on the firewall and returns detailed session configuration and statistics.
    *
    * The method simplifies the interaction with the PAN-OS API by abstracting the command details. It leverages the `executeOperationalCommand`
-   * method from `DeviceService` for command execution and handling the response.
+   * method from `Device` for command execution and handling the response.
    *
    * The returned data conforms to the `SessionInfoResponse` interface, ensuring a structured and consistent format for session information.
    *
@@ -123,7 +123,7 @@ export class FirewallService extends DeviceService {
   public async showSessionInfo(apiKey: string): Promise<SessionInfoResponse> {
     const cmd = 'show session info';
 
-    // Using executeOperationalCommand from DeviceService to handle the command execution.
+    // Using executeOperationalCommand from Device to handle the command execution.
     return this.executeOperationalCommand(apiKey, cmd);
   }
 
