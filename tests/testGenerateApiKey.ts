@@ -1,50 +1,47 @@
-// tests/testGenerateApiKey.ts
-
-// Import dotenv for managing environment variables
 import dotenv from 'dotenv';
 
-// Configure dotenv to load environment variables based on the current environment
+// Load environment configuration based on the NODE_ENV setting
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Import necessary classes from the SDK
-import { BaseClient } from '../src/index';
-import { FirewallService } from '../src/index';
+import { Firewall } from '../src/index';
 
 /**
- * Test script for generating an API key using the SDK's FirewallService.
- * This script demonstrates how to use the SDK to programmatically generate
- * an API key required for authenticating further API requests.
+ * A test function to generate an API key for a PAN-OS device.
+ * It uses environment variables for configuration and credential details,
+ * and demonstrates generating an API key using the Firewall class.
  */
 async function testGenerateApiKey() {
-  // Retrieve PAN-OS username and password from environment variables
+  // Retrieve PAN-OS hostname, username, and password from environment variables
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const username = process.env.PANOS_USERNAME || '';
   const password = process.env.PANOS_PASSWORD || '';
 
-  // Initialize BaseClient with the PAN-OS device's base URL
-  const baseClient = new BaseClient('https://datacenter.cdot.io');
-  // Create an instance of FirewallService with the configured BaseClient
-  const firewallService = new FirewallService(baseClient);
+  // Ensure username and password are provided; otherwise, throw an error
+  if (!username || !password) {
+    throw new Error(
+      'Username or password is not set in environment variables.',
+    );
+  }
+
+  // Initialize the Firewall class without an initial API key
+  const firewall = new Firewall(hostname, '');
 
   try {
-    // Check if username and password are set
-    if (!username || !password) {
-      throw new Error(
-        'Username or password is not set in environment variables.',
-      );
-    }
+    // Attempt to generate an API key using the provided credentials
+    const apiKeyResponse = await firewall.generateApiKey(username, password);
 
-    // Use the FirewallService instance to generate an API key
-    const apiKey = await firewallService.generateApiKey(username, password);
+    // Extract the API key from the response
+    const apiKey = apiKeyResponse.key;
 
-    // Log the generated API key
+    // Log the generated API key to the console
     console.log('Generated API Key:', apiKey);
   } catch (error) {
-    // Handle and log any errors encountered during API key generation
+    // Handle and log any errors that occur during the API key generation
     console.error('Error:', error);
   }
 }
 
-// Execute the test function
+// Execute the test function to generate an API key
 testGenerateApiKey();

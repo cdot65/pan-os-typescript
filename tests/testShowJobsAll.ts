@@ -1,45 +1,46 @@
-// tests/testShowJobsAll.ts
-
-// Import dotenv for environment variable management.
 import dotenv from 'dotenv';
 
-// Configure dotenv based on the current environment.
+// Load the appropriate environment configuration based on the NODE_ENV setting.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Import necessary classes from the SDK.
-import { BaseClient } from '../src/index';
-import { FirewallService } from '../src/index';
+import { Firewall } from '../src/index';
 
 /**
- * Test script for retrieving system information using the SDK's FirewallService.
- * Demonstrates how to use the SDK to fetch system information from a PAN-OS device.
+ * Tests the `showJobsAll` function of the `Firewall` class which fetches all job results
+ * from a PAN-OS device. Demonstrates the sequence to instantiate a `Firewall` object,
+ * execute the job retrieval function, and handle the response or error.
+ *
+ * @async
+ * @function testShowJobsAll
+ * @throws {Error} Throws an error if the API key is not available in the environment variables,
+ *                 or if the function fails to retrieve job results.
  */
 async function testShowJobsAll() {
-  // Retrieve API key from environment variables.
+  // Define the PAN-OS hostname and API key using environment variables.
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
-  // Initialize BaseClient with the base URL of the PAN-OS device and the API key.
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-  // Create an instance of FirewallService using the configured BaseClient.
-  const firewallService = new FirewallService(baseClient);
+
+  // Ensure that the API key is available; otherwise, throw an error.
+  if (!apiKey) {
+    throw new Error('API key is not set in environment variables.');
+  }
+
+  // Create an instance of the Firewall class configured with the hostname and API key.
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Verify that the API key is set.
-    if (!apiKey) {
-      throw new Error('API key is not set in environment variables.');
-    }
+    // Perform the action to retrieve all job results via the Firewall instance.
+    const jobsAll = await firewall.showJobsAll();
 
-    // Fetch all job results using FirewallService.
-    const jobsAll = await firewallService.showJobsAll(apiKey);
-
-    // Log the retrieved all job results, formatted for readability.
+    // Output the job results to the console.
     console.log('All Job Results:', JSON.stringify(jobsAll, null, 2));
   } catch (error) {
-    // Handle and log any errors encountered during the retrieval of jobs.
+    // Handle any errors that occur during job retrieval and log them.
     console.error('Error:', error);
   }
 }
 
-// Execute the test function.
+// Invoke the test function to retrieve and display job results.
 testShowJobsAll();

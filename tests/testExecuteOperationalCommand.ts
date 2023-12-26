@@ -1,56 +1,49 @@
 // tests/testExecuteOperationalCommand.ts
 
-// Importing dotenv to manage environment variables
 import dotenv from 'dotenv';
 
-// Configuring environment variables based on the environment (production or development)
+// Configure environment variables
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-// Importing necessary classes from the SDK
-import { BaseClient } from '../src/BaseClient';
-import { FirewallService } from '../src/index'; // Importing FirewallService from the index
+import { Firewall } from '../src/index'; // Importing Firewall from the index
 
 /**
- * Test script to execute operational commands on a PAN-OS device.
- * This script demonstrates how to use the SDK's FirewallService to execute
- * operational commands and handle responses.
+ * Executes an operational command on the Firewall and logs the response.
+ * The command to be executed is the second command-line argument or defaults to showing the "management" interface.
  */
 async function testExecuteOperationalCommand() {
-  // Retrieve the API key from environment variables
+  // Define the PAN-OS hostname and API key from environment variables
+  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
+
+  // Throw an error if the API key is not provided.
   if (!apiKey) {
     throw new Error('API key is not set in environment variables.');
   }
 
-  // Initialize BaseClient with the base URL and API key
-  const baseClient = new BaseClient('https://datacenter.cdot.io', apiKey);
-
-  // Instantiate FirewallService with the configured BaseClient
-  const firewallService = new FirewallService(baseClient);
+  // Create an instance of the Firewall class with the specified hostname and API key.
+  const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Retrieve the command line argument or use a default command
+    // Get the CLI command from the command-line arguments or use a default command.
     const cliCmd = process.argv[2] || 'show interface "management"';
 
-    // Execute the operational command using FirewallService
-    const cliCommandResponse = await firewallService.executeOperationalCommand(
-      apiKey,
-      cliCmd,
-    );
+    // Execute the operational CLI command on the PAN-OS device.
+    const cliCommandResponse = await firewall.executeOperationalCommand(cliCmd);
 
-    // Log the command and its response for verification
+    // Log the CLI command and its response.
     console.log(
       'CLI Command: ' + cliCmd,
       '\n',
       JSON.stringify(cliCommandResponse, null, 2),
     );
   } catch (error) {
-    // Handle and log any errors during command execution
+    // Catch and log any errors that occur during the execution of the operational command.
     console.error('Error executing operational command:', error);
   }
 }
 
-// Execute the test function
+// Invoke the test function to execute the operational command.
 testExecuteOperationalCommand();
