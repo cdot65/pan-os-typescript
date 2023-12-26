@@ -1,9 +1,13 @@
 // src/interfaces/ApiKeyResponse.ts
 
 /**
- * `ApiKeyResponse` defines the structure for the response received after
- * successfully generating an API key. It encapsulates the key as a string.
+ * Defines the structure for the response received from PAN-OS after
+ * successfully generating an API key.
  */
 export interface ApiKeyResponse {
-  key: string; // The API key as a string.
+  /**
+   * The generated API key as a string. This key is used to authenticate subsequent
+   * requests to the PAN-OS API.
+   */
+  key: string;
 }

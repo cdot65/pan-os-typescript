@@ -1,11 +1,22 @@
 // src/interfaces/SessionInfoResponse.ts
 
 /**
- * Represents the structure of the session information response from the PAN-OS API.
+ * Describes the structure of the session information response from the PAN-OS API,
+ * containing various metrics and statuses related to sessions.
  */
 export interface SessionInfoResponse {
+  /**
+   * Contains the status of the request and the result payload with session information.
+   */
   response: {
+    /**
+     * Indicates if the request to fetch session information was successful ('success') or not ('error').
+     */
     status: string;
+
+    /**
+     * The parent element containing various session metrics and statuses.
+     */
     result: {
       'age-accel-en': string;
       'age-accel-thresh': string;

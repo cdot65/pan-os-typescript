@@ -1,10 +1,19 @@
 // src/interfaces/ErrorResponse.ts
 
 /**
- * `ErrorResponse` represents the structure of an error response received from
- * the API. It includes error code and a descriptive error message.
+ * Represents the structure of an error response received from the API,
+ * including both an error code and a descriptive message.
  */
 export interface ErrorResponse {
-  errorCode: number; // Numeric code representing the type of error.
-  errorMessage: string; // Detailed description of the error.
+  /**
+   * A numeric code that represents the type of error encountered.
+   * This can be used to programmatically identify specific error conditions.
+   */
+  errorCode: number;
+
+  /**
+   * A detailed description of the error, providing additional context
+   * and information to the user on what went wrong.
+   */
+  errorMessage: string;
 }

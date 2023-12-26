@@ -1,37 +1,60 @@
 // src/interfaces/SessionIdResponse.ts
 
 /**
- * Represents the structure of the direction of the session, client to server or server to client.
+ * Describes the details of a session's traffic direction, including origin and destination, protocol, and state for a particular session direction, either client-to-server or server-to-client.
  */
 export interface SessionDirection {
+  /** The source IP address for this direction of the traffic. */
   source: string;
+  /** The destination IP address for this direction of the traffic. */
   dst: string;
+  /** The protocol used in this direction of the traffic. */
   proto: string;
+  /** The source port number used in this direction of the traffic. */
   sport: string;
+  /** The destination port number used in this direction of the traffic. */
   dport: string;
+  /** The session type for this direction of the traffic. */
   type: string;
+  /** The state of this particular direction of the session. */
   state: string;
+  /** The IP version used by the session. */
   ipver: string;
+  /** The source zone for this direction of the traffic. */
   'source-zone': string;
+  /** The user associated with the source of the traffic in this direction. */
   'src-user': string;
+  /** The user associated with the destination of the traffic in this direction. */
   'dst-user': string;
 }
 
 /**
- * Represents the structure of the session info response for a specific session ID from the PAN-OS API.
+ * Describes the response structure for session details corresponding to a specific session ID as returned by the PAN-OS API.
  */
 export interface SessionIdResponse {
+  /** The response wrapper that contains the status and result details for the session ID request. */
   response: {
+    /** Indicates if the session ID request was successful ('success') or encountered an error ('error'). */
     status: string;
+    /** Contains the detailed session information for the specific session ID queried. */
     result: {
+      /** The slot on the firewall where this session is located. */
       slot: string;
+      /** The CPU identifier processing this session. */
       cpu: string;
+      /** Details of the client-to-server (c2s) session direction. */
       c2s: SessionDirection;
+      /** Details of the server-to-client (s2c) session direction. */
       s2c: SessionDirection;
+      /** The start time when the session was established. */
       'start-time': string;
+      /** The virtual system (vsys) associated with the session. */
       vsys: string;
+      /** The application associated with the session. */
       application: string;
+      /** The identifier for the firewall where the session exists. */
       firewall: string;
+      /** The reason why the session was terminated. */
       'end-reason': string;
       'pktlog-up': string;
       'pansys-up': string;

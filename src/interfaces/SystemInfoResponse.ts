@@ -1,15 +1,35 @@
 // src/interfaces/SystemInfoResponse.ts
 
 /**
- * `SystemInfoResponse` provides a structured representation of the system information
- * response from a PAN-OS device. It includes basic details like hostname, IP
- * configuration, serial number, and other relevant system-level information.
+ * Represents the system information response structure from a PAN-OS device.
+ * It encapsulates key system details such as the hostname, IP configuration,
+ * serial number, and other relevant information.
  */
 export interface SystemInfoResponse {
-  hostname: string; // Hostname of the PAN-OS device.
-  ipAddress: string; // IP address of the device.
-  netmask: string; // Subnet mask of the device's network.
-  defaultGateway: string; // Default gateway for the device.
-  serialNumber: string; // Serial number of the PAN-OS device.
-  // Additional system information fields can be included.
+  /**
+   * The hostname of the PAN-OS device.
+   */
+  hostname: string;
+
+  /**
+   * The IP address of the PAN-OS device.
+   */
+  ipAddress: string;
+
+  /**
+   * The subnet mask of the device's network.
+   */
+  netmask: string;
+
+  /**
+   * The default gateway address for the PAN-OS device.
+   */
+  defaultGateway: string;
+
+  /**
+   * The serial number of the PAN-OS device.
+   */
+  serialNumber: string;
+
+  // Additional fields can be added here with appropriate documentation.
 }

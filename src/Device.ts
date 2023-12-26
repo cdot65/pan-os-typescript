@@ -8,22 +8,33 @@ import { LicenseInfoResponse } from './interfaces/LicenseInfoResponse';
 import { SystemInfoResponse } from './interfaces/SystemInfoResponse';
 import { parseStringPromise } from 'xml2js';
 
+/**
+ * Abstract base class representing a PAN-OS device providing common API request methods.
+ */
 export abstract class Device {
+  /**
+   * HTTP client handling low-level API interactions.
+   * @protected
+   */
   protected baseClient: BaseClient;
 
+  /**
+   * Initializes a new instance of the Device class with a given BaseClient.
+   * @param baseClient - The BaseClient instance for HTTP communication.
+   */
   constructor(baseClient: BaseClient) {
     this.baseClient = baseClient;
   }
 
   /**
-   * Performs an API request with automated XML parsing.
-   * This method is intended to be used by sub classing services for API interactions.
-   *
-   * @param apiKey - The API key for authenticating the request.
-   * @param endpoint - The API endpoint to send the request to.
+   * Performs an API request and automatically parses the XML response.
+   * Designed to be used by derived services for API interactions.
+   * @protected
+   * @param apiKey - The API key for request authentication.
+   * @param endpoint - The API endpoint for the request.
    * @param params - Optional parameters for the request.
    * @returns A promise resolving to the parsed response in JSON format.
-   * @throws An error if the API request or XML parsing fails.
+   * @throws An error if the request or XML parsing fails.
    */
   protected async makeApiRequest(
     apiKey: string,
@@ -31,14 +42,18 @@ export abstract class Device {
     params?: object,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
-    // Retrieve XML response from the API
     const responseXml = await this.baseClient.get(endpoint, apiKey, params);
-
-    // Parse the XML response into JSON format
     const parsedResponse = await parseStringPromise(responseXml);
     return parsedResponse;
   }
 
+  /**
+   * Parses an API response from XML to a formatted ApiResponse object.
+   * @protected
+   * @param responseXml - The XML string to be parsed.
+   * @returns A promise resolving to the ApiResponse object.
+   * @throws An error if the parsing fails.
+   */
   protected async parseApiResponse(responseXml: string): Promise<ApiResponse> {
     try {
       const parsedResponse = await parseStringPromise(responseXml, {
@@ -58,12 +73,11 @@ export abstract class Device {
   }
 
   /**
-   * Generates an API key using provided credentials or defaults to environment variables.
-   * This method is crucial for authentication in subsequent API interactions with PAN-OS devices.
-   *
-   * @param username - Optional. Username for the PAN-OS user account, defaults to the environment variable PANOS_USERNAME.
-   * @param password - Optional. Password for the PAN-OS user account, defaults to the environment variable PANOS_PASSWORD.
-   * @returns A promise resolving to an ApiKeyResponse object containing the newly generated API key.
+   * Generates an API key using provided credentials or defaults from environment variables.
+   * This key is essential for authenticating future API requests to PAN-OS devices.
+   * @param username - Optional username for the PAN-OS user account (defaults to PANOS_USERNAME env var).
+   * @param password - Optional password for the PAN-OS user account (defaults to PANOS_PASSWORD env var).
+   * @returns A promise resolving to an object containing the new API key.
    * @throws An error if the API key generation request fails.
    */
   public async generateApiKey(
@@ -82,12 +96,12 @@ export abstract class Device {
   }
 
   /**
-   * Converts a command in CLI format to an XML string format.
-   * This utility method allows for easier interaction with the PAN-OS API by converting user-friendly
-   * CLI commands into the required XML format for API requests.
-   *
-   * @param cliCmd - The command in CLI format.
-   * @returns The command converted to XML format.
+   * Converts a command in CLI format to an XML string.
+   * This method enables compatibility with the PAN-OS API by converting
+   * CLI-formatted commands into the XML format required for API requests.
+   * @private
+   * @param cliCmd - The command string in CLI format.
+   * @returns The converted command string in XML format.
    */
   private convertCliToXml(cliCmd: string): string {
     const quote = '"';
@@ -118,13 +132,12 @@ export abstract class Device {
   }
 
   /**
-   * Executes an operational command on a PAN-OS device. It supports commands in both XML and CLI-like formats,
-   * converting the latter into XML using the convertCliToXml method.
-   *
-   * @param apiKey - The API key used for authentication.
-   * @param command - The command to execute, either in XML or CLI-like format.
-   * @returns A promise resolving to the response from the device.
-   * @throws An error if executing the command fails.
+   * Executes an operational command on a PAN-OS device.
+   * Commands can be in both XML and CLI-like format, and the latter is converted to XML format.
+   * @param apiKey - The API key for authentication.
+   * @param command - The operational command to be executed (in XML or CLI-like format).
+   * @returns A promise resolving to the response from the execution of the command.
+   * @throws An error if the execution of the command fails.
    */
   public async executeOperationalCommand(
     apiKey: string,
@@ -148,12 +161,11 @@ export abstract class Device {
   }
 
   /**
-   * Requests license information from the PAN-OS device.
-   * This method executes the 'request license info' command and returns detailed license information.
-   *
-   * @param apiKey - The API key for authenticating the request.
+   * Retrieves license information from the PAN-OS device.
+   * Sends a command to the device and returns detailed license information.
+   * @param apiKey - The API key for request authentication.
    * @returns A promise resolving to the device's license information.
-   * @throws An error if the request fails or the response format is unexpected.
+   * @throws An error if the request fails or the response is unexpected.
    */
   public async requestLicenseInfo(
     apiKey: string,
@@ -164,12 +176,9 @@ export abstract class Device {
   }
 
   /**
-   * Retrieves all jobs from the PAN-OS device.
-   *
-   * This method sends a command to the PAN-OS device to retrieve details of all jobs.
-   * It parses the XML response and returns a structured representation of job details.
-   *
-   * @param apiKey - The API key for authenticating the request.
+   * Retrieves the details of all jobs on the PAN-OS device.
+   * Sends a command to the device and returns a structured view of all job details.
+   * @param apiKey - The API key for request authentication.
    * @returns A promise resolving to a structured representation of all jobs.
    * @throws An error if the request or parsing fails.
    */
@@ -180,14 +189,11 @@ export abstract class Device {
   }
 
   /**
-   * Retrieves all jobs from the PAN-OS device.
-   *
-   * This method sends a command to the PAN-OS device to retrieve details of all jobs.
-   * It parses the XML response and returns a structured representation of job details.
-   *
-   * @param apiKey - The API key for authenticating the request.
-   * @param jobId - The ID of the job for the request.
-   * @returns A promise resolving to a structured representation of all jobs.
+   * Retrieves details for a specific job ID from the PAN-OS device.
+   * Sends a command to the device and returns structured details for the specified job.
+   * @param apiKey - The API key for request authentication.
+   * @param jobId - The job ID for which to retrieve details.
+   * @returns A promise resolving to the job details.
    * @throws An error if the request or parsing fails.
    */
   public async showJobsId(
@@ -200,11 +206,10 @@ export abstract class Device {
   }
 
   /**
-   * Retrieves system information from a PAN-OS device, such as hostname, IP address, and software version.
-   * This method abstracts the details of sending a system information request and processing the response.
-   *
+   * Retrieves system information from the PAN-OS device, such as hostname and software version.
+   * Sends a system information request and processes the structured response.
    * @param apiKey - The API key for authentication.
-   * @returns A promise resolving to the system information in a structured format.
+   * @returns A promise resolving to structured system information.
    * @throws An error if retrieving the information fails.
    */
   public async showSystemInfoResponse(
@@ -215,6 +220,16 @@ export abstract class Device {
     return response;
   }
 
+  /**
+   * Sends a configuration request to the PAN-OS device for actions like set, edit, or delete.
+   * @protected
+   * @param apiKey - The API key for request authentication.
+   * @param xpath - The XPath expression selecting the configuration to manipulate.
+   * @param element - The XML element defining the configuration to apply.
+   * @param action - The action to perform on the configuration ('set', 'edit', 'delete').
+   * @returns A promise resolving to the XML response string.
+   * @throws An error if the configuration request fails.
+   */
   protected async sendConfigRequest(
     apiKey: string,
     xpath: string,

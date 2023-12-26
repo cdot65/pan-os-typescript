@@ -12,24 +12,17 @@ import { SessionResponse } from '../interfaces/SessionResponse';
 import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
 
 /**
- * `FirewallService` is a subclass of `Device` dedicated to providing methods
- * specifically tailored for interacting with firewall functionalities in PAN-OS.
+ * Provides services and operations specifically tailored for interacting with firewall functionalities in PAN-OS.
+ * This class extends from `Device` and encapsulates firewall-specific operations, such as monitoring resources,
+ * managing sessions, and providing information about routing and URLs.
  */
 export class FirewallService extends Device {
   /**
-   * Fetches resource monitoring data from a PAN-OS firewall. This method is instrumental
-   * in retrieving critical performance metrics like CPU usage, memory load, and more.
+   * Fetches resource monitoring data from a PAN-OS firewall, including performance metrics such as CPU usage and memory load.
    *
-   * The method simplifies the process of fetching this data by constructing the necessary
-   * command in a format understood by PAN-OS devices. It leverages the `executeOperationalCommand`
-   * method from `Device` to handle the command execution and response parsing.
-   *
-   * The returned data conforms to the `ResourceMonitorResponse` interface, ensuring a structured
-   * and consistent format for the resource monitoring metrics.
-   *
-   * @param apiKey - The API key utilized for authenticating the request to the firewall.
-   * @returns A promise that resolves to the firewall's resource monitoring data in a structured format.
-   * @throws An error if the request to fetch the resource monitoring data fails or if the response format is not as expected.
+   * @param apiKey - The API key used for authenticating the request to the firewall.
+   * @returns A promise resolving to a `ResourceMonitorResponse` object representing the firewall's resource monitoring data.
+   * @throws An error if the request to fetch resource monitoring data fails or if the response format is not as expected.
    */
   public async showResourceMonitor(
     apiKey: string,
@@ -41,11 +34,10 @@ export class FirewallService extends Device {
   }
 
   /**
-   * Retrieves routing information from the firewall.
-   * This method executes the 'show routing route' command and returns the routing table.
+   * Retrieves the routing table information from the firewall.
    *
    * @param apiKey - The API key for authenticating the request.
-   * @returns A promise resolving to the firewall's routing table information.
+   * @returns A promise resolving to a `RoutingRouteResponse` object representing the firewall's routing table information.
    * @throws An error if the request fails or the response format is unexpected.
    */
   public async showRoutingRoute(apiKey: string): Promise<RoutingRouteResponse> {
@@ -57,10 +49,9 @@ export class FirewallService extends Device {
 
   /**
    * Retrieves a list of all active sessions on the PAN-OS device.
-   * This method executes the 'show session all' command and returns detailed session information.
    *
    * @param apiKey - The API key for authenticating the request.
-   * @returns A promise resolving to the active session information.
+   * @returns A promise resolving to a `SessionAllResponse` object representing the active session information.
    * @throws An error if the request fails or the response format is unexpected.
    */
   public async showSessionAll(apiKey: string): Promise<SessionAllResponse> {
@@ -148,6 +139,14 @@ export class FirewallService extends Device {
     return response;
   }
 
+  /**
+   * Creates an address object on the PAN-OS device.
+   *
+   * @param apiKey - The API key for authenticating the request.
+   * @param addressObject - The `AddressObject` to be created on the PAN-OS device.
+   * @returns A promise resolving to an `ApiResponse` object representing the result of the address object creation.
+   * @throws An error if the address object creation request fails or if the response format is not as expected.
+   */
   public async createAddressObject(
     apiKey: string,
     addressObject: AddressObject,

@@ -1,7 +1,21 @@
 // src/interfaces/ApiResponse.ts
 
+/**
+ * Represents a generic response from the PAN-OS API, capturing the overall status and potential error messaging.
+ */
 export interface ApiResponse {
-  status: string; // 'success' or 'error'
-  code?: number; // API response code
-  message?: string; // Message from the API
+  /**
+   * The status of the API response, typically indicated as either 'success' or 'error'.
+   */
+  status: string;
+
+  /**
+   * The numerical response code provided by the API, which may be useful for programmatically handling different scenarios.
+   */
+  code?: number;
+
+  /**
+   * A descriptive message accompanying the API response, which may provide additional context or information about the result or any encountered errors.
+   */
+  message?: string;
 }
