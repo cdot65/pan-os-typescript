@@ -30,3 +30,10 @@ export { FirewallService } from './services/FirewallService';
 //  * allowing users to manage and control Panorama instances through the SDK.
 //  */
 // export { PanoramaService } from './services/PanoramaService';
+
+/**
+ * AddressObject, building on Device, provides methods tailored to
+ * interacting with PAN-OS firewalls, facilitating operations like
+ * resource monitoring and system info retrieval.
+ */
+export { AddressObject } from './objects/AddressObject';

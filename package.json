@@ -37,8 +37,10 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@types/yargs": "^17.0.32",
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
-    "xml2js": "^0.6.2"
+    "xml2js": "^0.6.2",
+    "yargs": "^17.7.2"
   }
 }

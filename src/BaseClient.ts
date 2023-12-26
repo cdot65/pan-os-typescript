@@ -43,7 +43,7 @@ export class BaseClient {
    * @returns A promise that resolves to the raw response data as a string, typically in XML format.
    * @throws An error is thrown if the request encounters any issues, providing insight into what went wrong.
    */
-  public async getWithApiKey(
+  public async get(
     endpoint: string,
     apiKey: string,
     params?: object,
@@ -58,6 +58,39 @@ export class BaseClient {
       return response.data;
     } catch (error) {
       console.error('Error in GET request:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Executes a POST request to a specified API endpoint using the provided API key for authentication.
+   * This method is designed for sending XML data to the PAN-OS API, with the API key included in the request headers.
+   *
+   * @param endpoint - The specific endpoint to which the POST request is made.
+   * @param apiKey - The API key used for authenticating the request.
+   * @param data - The XML data to be sent in the request body.
+   * @returns A promise that resolves to the raw response data as a string.
+   * @throws An error is thrown if the request encounters any issues.
+   */
+  public async post(
+    endpoint: string,
+    apiKey: string,
+    data: string,
+  ): Promise<string> {
+    try {
+      // Sending POST request using axiosInstance
+      const response = await this.axiosInstance.post(endpoint, data, {
+        headers: {
+          'X-PAN-KEY': apiKey,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        responseType: 'text', // Expecting response in text format
+      });
+
+      // Returning the response data as a string
+      return response.data;
+    } catch (error) {
+      console.error('Error in POST request:', error);
       throw error;
     }
   }

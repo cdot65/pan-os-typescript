@@ -1,6 +1,8 @@
 // src/services/FirewallService.ts
 
 import { Device } from '../Device';
+import { ApiResponse } from '../interfaces/ApiResponse';
+import { AddressObject } from '../objects/AddressObject';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
 import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 import { SessionAllResponse } from '../interfaces/SessionAllResponse';
@@ -144,5 +146,22 @@ export class FirewallService extends Device {
     const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;
+  }
+
+  public async createAddressObject(
+    apiKey: string,
+    addressObject: AddressObject,
+  ): Promise<ApiResponse> {
+    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
+    const element = addressObject.toXml();
+    const responseXml = await this.sendConfigRequest(
+      apiKey,
+      xpath,
+      element,
+      'set',
+    );
+
+    // Parse and return response as ApiResponse
+    return this.parseApiResponse(responseXml);
   }
 }

@@ -1,6 +1,7 @@
 // src/Device.ts
 
 import { BaseClient } from './BaseClient';
+import { ApiResponse } from './interfaces/ApiResponse';
 import { ApiKeyResponse } from './interfaces/ApiKeyResponse';
 import { JobsResponse } from './interfaces/JobsResponse';
 import { LicenseInfoResponse } from './interfaces/LicenseInfoResponse';
@@ -16,7 +17,7 @@ export abstract class Device {
 
   /**
    * Performs an API request with automated XML parsing.
-   * This method is intended to be used by subclassing services for API interactions.
+   * This method is intended to be used by sub classing services for API interactions.
    *
    * @param apiKey - The API key for authenticating the request.
    * @param endpoint - The API endpoint to send the request to.
@@ -31,15 +32,29 @@ export abstract class Device {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     // Retrieve XML response from the API
-    const responseXml = await this.baseClient.getWithApiKey(
-      endpoint,
-      apiKey,
-      params,
-    );
+    const responseXml = await this.baseClient.get(endpoint, apiKey, params);
 
     // Parse the XML response into JSON format
     const parsedResponse = await parseStringPromise(responseXml);
     return parsedResponse;
+  }
+
+  protected async parseApiResponse(responseXml: string): Promise<ApiResponse> {
+    try {
+      const parsedResponse = await parseStringPromise(responseXml, {
+        explicitArray: false,
+        ignoreAttrs: false,
+      });
+      const response = parsedResponse.response;
+      return {
+        status: response.$.status,
+        code: parseInt(response.$.code, 10),
+        message: response.msg || 'No message',
+      };
+    } catch (error) {
+      console.error('Error parsing API response:', error);
+      throw error;
+    }
   }
 
   /**
@@ -198,5 +213,30 @@ export abstract class Device {
     const xmlCmd = '<show><system><info/></system></show>';
     const response = await this.executeOperationalCommand(apiKey, xmlCmd);
     return response;
+  }
+
+  protected async sendConfigRequest(
+    apiKey: string,
+    xpath: string,
+    element: string,
+    action: 'set' | 'edit' | 'delete',
+  ): Promise<string> {
+    const data = new URLSearchParams();
+    data.append('type', 'config');
+    data.append('action', action);
+    data.append('key', apiKey);
+    data.append('xpath', xpath);
+    if (action !== 'delete') {
+      data.append('element', element);
+    }
+
+    try {
+      // The post method of BaseClient returns the XML response as a string,
+      // so we can return it directly without accessing .data
+      return await this.baseClient.post('/api/', apiKey, data.toString());
+    } catch (error) {
+      console.error('Error in config request:', error);
+      throw error;
+    }
   }
 }
