@@ -1,8 +1,8 @@
 // src/models/Firewall.ts
 
 import { PanDevice } from './PanDevice';
-import { ApiResponse } from '../interfaces/ApiResponse';
 import { AddressObject } from './AddressObject';
+import { ApiResponse } from '../interfaces/ApiResponse';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
 import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 import { SessionAllResponse } from '../interfaces/SessionAllResponse';
