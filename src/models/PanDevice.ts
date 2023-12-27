@@ -28,9 +28,9 @@ export class PanDevice extends PanObject {
 
   /**
    * Axios instance responsible for sending requests to the PAN-OS device.
-   * @private
+   * @protected
    */
-  private apiClient: ApiClient;
+  protected apiClient: ApiClient;
 
   /**
    * Constructs a new `PanDevice` instance.
@@ -46,23 +46,6 @@ export class PanDevice extends PanObject {
   }
 
   /**
-   * Sends an API request to the PAN-OS device.
-   * @protected
-   * @param endpoint - The API endpoint to send the request to.
-   * @param params - Optional parameters for the request.
-   * @returns The parsed response from the device.
-   */
-  protected async sendApiRequest(
-    endpoint: string,
-    params?: object,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    const responseXml = await this.apiClient.get(endpoint, params);
-    const parsedResponse = await parseStringPromise(responseXml);
-    return parsedResponse;
-  }
-
-  /**
    * Generates an API key using the provided credentials.
    * @param username - Username for the PAN-OS device. Defaults to the environment variable value.
    * @param password - Password for the PAN-OS device. Defaults to the environment variable value.
@@ -72,15 +55,14 @@ export class PanDevice extends PanObject {
     username: string = process.env.PANOS_USERNAME || '',
     password: string = process.env.PANOS_PASSWORD || '',
   ): Promise<ApiKeyResponse> {
-    const response = await this.sendApiRequest('/api/', {
+    const response = await this.apiClient.sendApiRequest('/api/', {
       type: 'keygen',
       user: username,
       password: password,
     });
-    const apiKeyResponse: ApiKeyResponse = {
+    return {
       key: response?.response?.result?.[0]?.key?.[0],
     };
-    return apiKeyResponse;
   }
 
   /**
@@ -146,7 +128,7 @@ export class PanDevice extends PanObject {
    * @param command - The operational command in XML or CLI-like format.
    * @returns The response from executing the command.
    */
-  public async executeOperationalCommand(
+  public async op(
     command: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
@@ -159,7 +141,7 @@ export class PanDevice extends PanObject {
     }
 
     const encodedCmd = encodeURIComponent(xmlCmd);
-    const response = await this.sendApiRequest(
+    const response = await this.apiClient.sendApiRequest(
       `/api/?type=op&cmd=${encodedCmd}`,
       { key: this.apiKey }, // Use the stored apiKey
     );
@@ -172,7 +154,7 @@ export class PanDevice extends PanObject {
    */
   public async requestLicenseInfo(): Promise<LicenseInfoResponse> {
     const xmlCmd = '<request><license><info/></license></request>';
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -182,7 +164,7 @@ export class PanDevice extends PanObject {
    */
   public async showJobsAll(): Promise<JobsResponse> {
     const xmlCmd = '<show><jobs><all/></jobs></show>';
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -193,7 +175,7 @@ export class PanDevice extends PanObject {
    */
   public async showJobsId(jobId: string): Promise<JobsResponse> {
     const xmlCmd = `<show><jobs><id>${jobId}</id></jobs></show>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -203,40 +185,7 @@ export class PanDevice extends PanObject {
    */
   public async showSystemInfoResponse(): Promise<SystemInfoResponse> {
     const xmlCmd = '<show><system><info/></system></show>';
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
-  }
-
-  /**
-   * Sends a configuration request to the PAN-OS device.
-   * @protected
-   * @param xpath - XPath expression selecting the configuration context.
-   * @param element - XML element defining the configuration change.
-   * @param action - The action to perform ('set', 'edit', 'delete').
-   * @returns The XML response string from the device.
-   */
-  protected async sendConfigRequest(
-    apiKey: string,
-    xpath: string,
-    element: string,
-    action: 'set' | 'edit' | 'delete',
-  ): Promise<string> {
-    const data = new URLSearchParams();
-    data.append('type', 'config');
-    data.append('action', action);
-    data.append('key', apiKey);
-    data.append('xpath', xpath);
-    if (action !== 'delete') {
-      data.append('element', element);
-    }
-
-    try {
-      // The post method of ApiClient returns the XML response as a string,
-      // so we can return it directly without accessing .data
-      return await this.apiClient.post('/api/', data.toString());
-    } catch (error) {
-      console.error('Error in config request:', error);
-      throw error;
-    }
   }
 }

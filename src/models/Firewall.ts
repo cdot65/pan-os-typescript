@@ -35,8 +35,8 @@ export class Firewall extends PanDevice {
   public async showResourceMonitor(): Promise<ResourceMonitorResponse> {
     const cmd = 'show running resource-monitor minute';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -48,8 +48,8 @@ export class Firewall extends PanDevice {
   public async showRoutingRoute(): Promise<RoutingRouteResponse> {
     const cmd = 'show routing route';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -61,8 +61,8 @@ export class Firewall extends PanDevice {
   public async showSessionAll(): Promise<SessionAllResponse> {
     const cmd = 'show session all';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -78,7 +78,7 @@ export class Firewall extends PanDevice {
     sourceIp: string,
   ): Promise<SessionResponse> {
     const xmlCmd = `<show><session><all><filter><source>${sourceIp}</source><destination>${destinationIp}</destination></filter></all></session></show>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -92,7 +92,7 @@ export class Firewall extends PanDevice {
    */
   public async showSessionId(sessionId: string): Promise<SessionIdResponse> {
     const xmlCmd = `<show><session><id>${sessionId}</id></session></show>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -100,8 +100,8 @@ export class Firewall extends PanDevice {
    * Retrieves session information from a PAN-OS device.
    * This method executes the 'show session info' command on the firewall and returns detailed session configuration and statistics.
    *
-   * The method simplifies the interaction with the PAN-OS API by abstracting the command details. It leverages the `executeOperationalCommand`
-   * method from `Device` for command execution and handling the response.
+   * The method simplifies the interaction with the PAN-OS API by abstracting the command details. It leverages the `op`
+   * method from `PanDevice` for command execution and handling the response.
    *
    * The returned data conforms to the `SessionInfoResponse` interface, ensuring a structured and consistent format for session information.
    *
@@ -111,8 +111,8 @@ export class Firewall extends PanDevice {
   public async showSessionInfo(): Promise<SessionInfoResponse> {
     const cmd = 'show session info';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -126,7 +126,7 @@ export class Firewall extends PanDevice {
    */
   public async testUrlInfo(url: string): Promise<TestUrlInfoResponse> {
     const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -142,11 +142,13 @@ export class Firewall extends PanDevice {
   ): Promise<ApiResponse> {
     const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
     const element = addressObject.toXml();
-    const responseXml = await this.sendConfigRequest(
-      this.apiKey, // use the apiKey from the class instance
+
+    // Using sendConfigRequest from ApiClient through inherited apiClient
+    const responseXml = await this.apiClient.sendConfigRequest(
       xpath,
       element,
       'set',
+      this.apiKey,
     );
 
     return this.parseApiResponse(responseXml);

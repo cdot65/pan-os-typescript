@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { parseStringPromise } from 'xml2js';
 
 export class ApiClient {
   private axiosInstance: AxiosInstance;
@@ -60,5 +61,38 @@ export class ApiClient {
     }
   }
 
-  // ... other methods like sendApiRequest, sendConfigRequest etc.
+  public async sendApiRequest(
+    endpoint: string,
+    params?: object,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> {
+    const responseXml = await this.get(endpoint, params);
+    return parseStringPromise(responseXml);
+  }
+
+  /**
+   * Sends a configuration request to the PAN-OS device.
+   * @protected
+   * @param xpath - XPath expression selecting the configuration context.
+   * @param element - XML element defining the configuration change.
+   * @param action - The action to perform ('set', 'edit', 'delete').
+   * @returns The XML response string from the device.
+   */
+  public async sendConfigRequest(
+    xpath: string,
+    element: string,
+    action: 'set' | 'edit' | 'delete',
+    apiKey: string,
+  ): Promise<string> {
+    const data = new URLSearchParams();
+    data.append('type', 'config');
+    data.append('action', action);
+    data.append('key', apiKey);
+    data.append('xpath', xpath);
+    if (action !== 'delete') {
+      data.append('element', element);
+    }
+
+    return this.post('/api/', data.toString());
+  }
 }
