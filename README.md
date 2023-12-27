@@ -1,7 +1,7 @@
 # 🌐 Panos TypeScript SDK
 
 ![Stage](https://img.shields.io/badge/stage-alpha-blue.svg)
-![Version](https://img.shields.io/badge/version-0.0.5-blue.svg)
+![Version](https://img.shields.io/badge/version-0.0.6-blue.svg)
 ![Language](https://img.shields.io/github/languages/top/cdot65/pan-os-typescript?color=blue&label=TypeScript)
 
 ## 🚀 Introduction
