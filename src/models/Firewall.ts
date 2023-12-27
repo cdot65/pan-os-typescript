@@ -153,4 +153,23 @@ export class Firewall extends PanDevice {
 
     return this.parseApiResponse(responseXml);
   }
+
+  public async editAddressObject(
+    addressObject: AddressObject,
+    fields: Array<keyof AddressObject> = [],
+  ): Promise<ApiResponse> {
+    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${addressObject.name}']`;
+    const element = addressObject.toEditableXml(fields);
+
+    // Send the edit request using the apiClient
+    const responseXml = await this.apiClient.postConfig(
+      xpath,
+      element,
+      'edit',
+      this.apiKey, // Use the apiKey from the class instance
+    );
+
+    // Parse and return the response
+    return this.parseApiResponse(responseXml);
+  }
 }
