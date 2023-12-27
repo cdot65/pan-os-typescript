@@ -12,9 +12,8 @@ import { SessionResponse } from '../interfaces/SessionResponse';
 import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
 
 /**
- * Extends the `PanDevice` class to provide functionality specific to firewall operations within PAN-OS.
- * It includes methods for monitoring resources, routing information, session details, and more,
- * offering a convenient interface for these operations.
+ * `Firewall` extends `PanDevice` to provide specific functionalities for managing PAN-OS firewalls.
+ * It includes methods for resource monitoring, session management, and routing details, enhancing the base device capabilities.
  */
 export class Firewall extends PanDevice {
   /**
