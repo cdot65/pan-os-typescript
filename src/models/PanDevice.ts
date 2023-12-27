@@ -32,6 +32,13 @@ export class PanDevice extends PanObject {
    */
   protected apiClient: ApiClient;
 
+  // Add properties to store system information
+  public systemHostname?: string;
+  public systemIpAddress?: string;
+  public systemNetmask?: string;
+  public systemDefaultGateway?: string;
+  public systemSerialNumber?: string;
+
   /**
    * Constructs a new `PanDevice` instance.
    *
@@ -187,5 +194,23 @@ export class PanDevice extends PanObject {
     const xmlCmd = '<show><system><info/></system></show>';
     const response = await this.op(xmlCmd);
     return response;
+  }
+
+  /**
+   * Refreshes the system information for the PAN-OS device.
+   * This method updates the class properties with the latest system information.
+   * @returns A promise that resolves to the updated SystemInfoResponse object.
+   */
+  public async refreshSystemInfo(): Promise<SystemInfoResponse> {
+    const systemInfo = await this.showSystemInfoResponse();
+
+    // Update class properties with fetched data
+    this.systemHostname = systemInfo.hostname;
+    this.systemIpAddress = systemInfo.ipAddress;
+    this.systemNetmask = systemInfo.netmask;
+    this.systemDefaultGateway = systemInfo.defaultGateway;
+    this.systemSerialNumber = systemInfo.serialNumber;
+
+    return systemInfo;
   }
 }
