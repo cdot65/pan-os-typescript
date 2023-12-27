@@ -1,6 +1,6 @@
 // src/objects/AddressObject.ts
 
-import { PanObject } from './PanObject';
+import { VersionedPanObject } from './VersionedPanObject';
 
 /**
  * Supported address formats for network locations used in address objects.
@@ -16,7 +16,7 @@ export type AddressType = 'ip-netmask' | 'ip-range' | 'ip-wildcard' | 'fqdn';
  * extending `PanObject` to include additional properties specific to network locations.
  * These objects play a crucial role in defining rules and policies for the firewall system.
  */
-export class AddressObject extends PanObject {
+export class AddressObject extends VersionedPanObject {
   /**
    * The network address or range associated with this address object, formatted according to the specified `type`.
    */

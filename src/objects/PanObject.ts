@@ -57,15 +57,4 @@ export abstract class PanObject {
       child.parent = null;
     }
   }
-
-  /**
-   * Converts the object into its XML string representation.
-   * Implementing classes must override this method to provide the specific XML structure required by PAN-OS.
-   *
-   * @returns A string representing the XML format of the PAN-OS object.
-   * @abstract
-   */
-  public abstract toXml(): string;
-
-  // Additional methods and properties can be defined here as needed.
 }

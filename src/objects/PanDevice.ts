@@ -1,5 +1,6 @@
 // src/PanDevice.ts
 
+import { PanObject } from './PanObject';
 import { ApiClient } from '../ApiClient';
 import { ApiResponse } from '../interfaces/ApiResponse';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
@@ -13,7 +14,7 @@ import { parseStringPromise } from 'xml2js';
  * This class encapsulates functionalities such as generating API keys,
  * executing operational commands, and retrieving system information.
  */
-export class PanDevice {
+export class PanDevice extends PanObject {
   /**
    * Hostname or IP address of the PAN-OS device.
    * @protected
@@ -38,6 +39,7 @@ export class PanDevice {
    * @param apiKey - API key for authenticating requests.
    */
   constructor(hostname: string, apiKey: string) {
+    super(hostname); // Call the constructor of PanObject
     this.hostname = hostname;
     this.apiKey = apiKey;
     this.baseClient = new ApiClient(`https://${hostname}`);
