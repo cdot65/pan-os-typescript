@@ -1,4 +1,4 @@
-// src/objects/AddressObject.ts
+// src/models/AddressObject.ts
 
 import { VersionedPanObject } from './VersionedPanObject';
 

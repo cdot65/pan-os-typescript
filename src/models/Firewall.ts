@@ -1,4 +1,4 @@
-// src/objects/Firewall.ts
+// src/models/Firewall.ts
 
 import { PanDevice } from './PanDevice';
 import { ApiResponse } from '../interfaces/ApiResponse';

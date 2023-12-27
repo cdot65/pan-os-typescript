@@ -1,5 +1,10 @@
 {
-  "entryPoints": ["src/index.ts", "src/interfaces/*.ts", "src/objects/*.ts"],
+  "entryPoints": [
+    "src/index.ts",
+    "src/interfaces/*.ts",
+    "src/models/*.ts",
+    "src/services/*.ts"
+  ],
   "out": "docs",
   "exclude": ["**/node_modules/**"],
   "entryPointStrategy": "expand",

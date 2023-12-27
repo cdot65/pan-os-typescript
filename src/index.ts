@@ -9,7 +9,7 @@
  * `Firewall` specializes `PanDevice` for interacting with PAN-OS firewall devices. It includes methods for firewall-specific
  * functionalities like resource monitoring and system information retrieval.
  */
-export { Firewall } from './objects/Firewall';
+export { Firewall } from './models/Firewall';
 
 /**
  * `AddressObject` represents network address configurations in PAN-OS. It provides methods for managing address objects
@@ -17,4 +17,4 @@ export { Firewall } from './objects/Firewall';
  *
  * `AddressType` defines the supported formats of network addresses in PAN-OS, including IP netmask, IP range, and FQDN.
  */
-export { AddressObject, AddressType } from './objects/AddressObject';
+export { AddressObject, AddressType } from './models/AddressObject';
