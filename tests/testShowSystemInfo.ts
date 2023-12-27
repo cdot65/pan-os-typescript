@@ -33,7 +33,7 @@ async function testShowSystemInfoResponse() {
 
   try {
     // Fetch the system information from the PAN-OS device using the Firewall class's method.
-    const systemInfo = await firewall.showSystemInfoResponse();
+    const systemInfo = await firewall.refreshSystemInfo();
 
     // Log the retrieved system information to the console for verification.
     console.log('System Info:', JSON.stringify(systemInfo, null, 2));

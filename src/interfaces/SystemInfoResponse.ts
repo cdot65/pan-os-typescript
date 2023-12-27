@@ -31,5 +31,23 @@ export interface SystemInfoResponse {
    */
   serialNumber: string;
 
-  // Additional fields can be added here with appropriate documentation.
+  /**
+   * The MAC address of the PAN-OS device.
+   */
+  macAddress: string;
+
+  /**
+   * The PAN-OS device's uptime.
+   */
+  uptime: string;
+
+  /**
+   * The model of the PAN-OS device.
+   */
+  model: string;
+
+  /**
+   * The software version of the PAN-OS device.
+   */
+  softwareVersion: string;
 }

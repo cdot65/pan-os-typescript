@@ -197,19 +197,39 @@ export class PanDevice extends PanObject {
   }
 
   /**
-   * Refreshes the system information for the PAN-OS device.
-   * This method updates the class properties with the latest system information.
-   * @returns A promise that resolves to the updated SystemInfoResponse object.
+   * Refreshes and retrieves updated system information from the PAN-OS device.
+   * @returns A promise that resolves to the SystemInfoResponse object.
+   * @throws An error if the request fails or if the response format is unexpected.
    */
   public async refreshSystemInfo(): Promise<SystemInfoResponse> {
-    const systemInfo = await this.showSystemInfoResponse();
+    const xmlCmd = '<show><system><info/></system></show>';
+    const response = await this.op(xmlCmd);
 
-    // Update class properties with fetched data
-    this.systemHostname = systemInfo.hostname;
-    this.systemIpAddress = systemInfo.ipAddress;
-    this.systemNetmask = systemInfo.netmask;
-    this.systemDefaultGateway = systemInfo.defaultGateway;
-    this.systemSerialNumber = systemInfo.serialNumber;
+    // Check if the response is successful and contains the expected data
+    if (
+      response?.response?.$?.status !== 'success' ||
+      !response?.response?.result?.[0]?.system?.[0]
+    ) {
+      throw new Error(
+        'Failed to retrieve system info or unexpected response format',
+      );
+    }
+
+    // Extract the system info from the response
+    const systemInfoData = response.response.result[0].system[0];
+
+    // Construct the SystemInfoResponse object
+    const systemInfo: SystemInfoResponse = {
+      hostname: systemInfoData.hostname?.[0],
+      ipAddress: systemInfoData['ip-address']?.[0],
+      netmask: systemInfoData.netmask?.[0],
+      defaultGateway: systemInfoData['default-gateway']?.[0],
+      serialNumber: systemInfoData.serial?.[0],
+      macAddress: systemInfoData['mac-address']?.[0],
+      uptime: systemInfoData.uptime?.[0],
+      model: systemInfoData.model?.[0],
+      softwareVersion: systemInfoData['sw-version']?.[0],
+    };
 
     return systemInfo;
   }
