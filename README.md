@@ -4,6 +4,19 @@
 ![Version](https://img.shields.io/badge/version-0.0.6-blue.svg)
 ![Language](https://img.shields.io/github/languages/top/cdot65/pan-os-typescript?color=blue&label=TypeScript)
 
+- [🌐 Panos TypeScript SDK](#-panos-typescript-sdk)
+  - [🚀 Introduction](#-introduction)
+  - [🌟 Features](#-features)
+  - [📦 Installation](#-installation)
+  - [📖 Detailed Documentation](#-detailed-documentation)
+  - [📚 Quick Examples](#-quick-examples)
+    - [Generating an API key](#generating-an-api-key)
+    - [Creating an Address Object](#creating-an-address-object)
+    - [Running a 'show' command](#running-a-show-command)
+  - [🤝 Contributing](#-contributing)
+  - [📄 License](#-license)
+  - [✉️ Contact](#️-contact)
+
 ## 🚀 Introduction
 
 Panos TypeScript SDK is a modern library tailored for interacting with Palo Alto Networks firewalls and Panorama appliances. It facilitates task automation, configuration management, and data retrieval from PAN-OS devices with a focus on ease of use and modularity.
@@ -27,7 +40,7 @@ For comprehensive API documentation, including usage examples, configuration det
 
 ## 📚 Quick Examples
 
-**Generating an API key:**
+### Generating an API key
 
 ```typescript
 import dotenv from 'dotenv';
@@ -86,7 +99,7 @@ ts-node tests/testGenerateApiKey.ts
 Generated API Key: LUFRPT0vMGkvbXRlVE82VDM1TitmQmo4a0g5VFVXNDg9N2dxVE1qdUZFM0FROE40Tm9WVFRLSmx5QWRCdnlKRnduQ3dDZUxPek5hMXpJcGJnVVU5R1lMMEUvckdRSHg2d3Y1Z000Q1k4K3RYemNQczlTVVdZTnc9PQ==
 ```
 
-**Creating an Address Object:**
+### Creating an Address Object
 
 ```typescript
 // tests/testCreateAddressObject.ts
@@ -198,7 +211,7 @@ Create Address Object Response: {
 }
 ```
 
-**Running a 'show' command**
+### Running a 'show' command
 
 ```typescript
 // tests/testExecuteOperationalCommand.ts
