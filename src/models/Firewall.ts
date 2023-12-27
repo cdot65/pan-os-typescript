@@ -3,13 +3,13 @@
 import { PanDevice } from './PanDevice';
 import { AddressObject } from './AddressObject';
 import { ApiResponse } from '../interfaces/ApiResponse';
-import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
-import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
-import { SessionAllResponse } from '../interfaces/SessionAllResponse';
-import { SessionIdResponse } from '../interfaces/SessionIdResponse';
-import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
 import { SessionResponse } from '../interfaces/SessionResponse';
+import { SessionIdResponse } from '../interfaces/SessionIdResponse';
+import { SessionAllResponse } from '../interfaces/SessionAllResponse';
+import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
 import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
+import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
+import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
 
 /**
  * `Firewall` extends `PanDevice` to provide specific functionalities for managing PAN-OS firewalls.

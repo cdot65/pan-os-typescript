@@ -1,13 +1,13 @@
 // src/PanDevice.ts
 
-import { ApiClient } from '../services/ApiClient';
 import { PanObject } from './PanObject';
-import { ApiResponse } from '../interfaces/ApiResponse';
-import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
-import { JobsResponse } from '../interfaces/JobsResponse';
-import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
-import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 import { parseStringPromise } from 'xml2js';
+import { ApiClient } from '../services/ApiClient';
+import { ApiResponse } from '../interfaces/ApiResponse';
+import { JobsResponse } from '../interfaces/JobsResponse';
+import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
+import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
+import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
 
 /**
  * `PanDevice` extends `PanObject` to interact with PAN-OS devices. It encapsulates API key management,

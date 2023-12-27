@@ -1,5 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
 import { parseStringPromise } from 'xml2js';
+import axios, { AxiosInstance } from 'axios';
 
 export class ApiClient {
   private axiosInstance: AxiosInstance;
