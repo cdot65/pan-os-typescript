@@ -31,7 +31,7 @@ async function testExecuteOperationalCommand() {
     const cliCmd = process.argv[2] || 'show interface "management"';
 
     // Execute the operational CLI command on the PAN-OS device.
-    const cliCommandResponse = await firewall.executeOperationalCommand(cliCmd);
+    const cliCommandResponse = await firewall.op(cliCmd);
 
     // Log the CLI command and its response.
     console.log(

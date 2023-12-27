@@ -1,23 +1,25 @@
-// src/objects/Firewall.ts
+// src/models/Firewall.ts
 
 import { PanDevice } from './PanDevice';
-import { ApiResponse } from '../interfaces/ApiResponse';
 import { AddressObject } from './AddressObject';
-import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
-import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
-import { SessionAllResponse } from '../interfaces/SessionAllResponse';
-import { SessionIdResponse } from '../interfaces/SessionIdResponse';
-import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
+import { ApiResponse } from '../interfaces/ApiResponse';
 import { SessionResponse } from '../interfaces/SessionResponse';
+import { SessionIdResponse } from '../interfaces/SessionIdResponse';
+import { SessionAllResponse } from '../interfaces/SessionAllResponse';
+import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
 import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
+import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
+import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
 
 /**
- * `Firewall` extends `PanDevice` to provide specific functionalities for managing PAN-OS firewalls.
- * It includes methods for resource monitoring, session management, and routing details, enhancing the base device capabilities.
+ * The `Firewall` class extends `PanDevice` to specialize in managing PAN-OS firewalls. It provides
+ * a suite of methods to interact with firewall-specific functionalities such as resource monitoring,
+ * session management, routing information, and URL category testing. This class also enables managing
+ * address objects, including creation, editing, and deletion.
  */
 export class Firewall extends PanDevice {
   /**
-   * Initializes a new instance of a Firewall with the specified hostname and API key for PAN-OS.
+   * Constructs a new instance of a Firewall, initializing with the specified hostname and API key.
    *
    * @param hostname - The hostname or IP address of the PAN-OS device.
    * @param apiKey - The API key for authenticating to the PAN-OS device.
@@ -35,8 +37,8 @@ export class Firewall extends PanDevice {
   public async showResourceMonitor(): Promise<ResourceMonitorResponse> {
     const cmd = 'show running resource-monitor minute';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -48,8 +50,8 @@ export class Firewall extends PanDevice {
   public async showRoutingRoute(): Promise<RoutingRouteResponse> {
     const cmd = 'show routing route';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -61,8 +63,8 @@ export class Firewall extends PanDevice {
   public async showSessionAll(): Promise<SessionAllResponse> {
     const cmd = 'show session all';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -78,7 +80,7 @@ export class Firewall extends PanDevice {
     sourceIp: string,
   ): Promise<SessionResponse> {
     const xmlCmd = `<show><session><all><filter><source>${sourceIp}</source><destination>${destinationIp}</destination></filter></all></session></show>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -92,7 +94,7 @@ export class Firewall extends PanDevice {
    */
   public async showSessionId(sessionId: string): Promise<SessionIdResponse> {
     const xmlCmd = `<show><session><id>${sessionId}</id></session></show>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -100,8 +102,8 @@ export class Firewall extends PanDevice {
    * Retrieves session information from a PAN-OS device.
    * This method executes the 'show session info' command on the firewall and returns detailed session configuration and statistics.
    *
-   * The method simplifies the interaction with the PAN-OS API by abstracting the command details. It leverages the `executeOperationalCommand`
-   * method from `Device` for command execution and handling the response.
+   * The method simplifies the interaction with the PAN-OS API by abstracting the command details. It leverages the `op`
+   * method from `PanDevice` for command execution and handling the response.
    *
    * The returned data conforms to the `SessionInfoResponse` interface, ensuring a structured and consistent format for session information.
    *
@@ -111,8 +113,8 @@ export class Firewall extends PanDevice {
   public async showSessionInfo(): Promise<SessionInfoResponse> {
     const cmd = 'show session info';
 
-    // Using executeOperationalCommand from Device to handle the command execution.
-    return this.executeOperationalCommand(cmd);
+    // Using op from PanDevice to handle the command execution.
+    return this.op(cmd);
   }
 
   /**
@@ -126,29 +128,85 @@ export class Firewall extends PanDevice {
    */
   public async testUrlInfo(url: string): Promise<TestUrlInfoResponse> {
     const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
   /**
-   * Creates a new address object on the firewall by posting the XML configuration.
+   * Creates an address object on the PAN-OS firewall. The method posts the XML configuration
+   * of the address object to the device.
    *
    * @param addressObject - An instance of `AddressObject` representing the network address to create.
-   * @returns A promise that resolves to an `ApiResponse` indicating the result of the operation.
-   * @throws When address object creation request fails or response does not match expected format.
+   * @returns A promise resolving to an ApiResponse indicating the result of the operation.
+   * @throws An error if the address object creation request fails or if the response format is unexpected.
    */
   public async createAddressObject(
     addressObject: AddressObject,
   ): Promise<ApiResponse> {
     const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
     const element = addressObject.toXml();
-    const responseXml = await this.sendConfigRequest(
-      this.apiKey, // use the apiKey from the class instance
+
+    // Using postConfig from ApiClient through inherited apiClient
+    const responseXml = await this.apiClient.postConfig(
       xpath,
       element,
       'set',
+      this.apiKey,
     );
 
+    return this.parseApiResponse(responseXml);
+  }
+
+  /**
+   * Edits an existing address object on the PAN-OS firewall. This method allows selective updating
+   * of the address object's fields such as value, type, description, and tags.
+   *
+   * @param addressObject - The `AddressObject` instance with updated properties.
+   * @param fields - An array specifying which fields of the address object to edit.
+   * @returns A promise resolving to an ApiResponse indicating the result of the operation.
+   * @throws An error if the edit request fails or if the response format is unexpected.
+   */
+  public async editAddressObject(
+    addressObject: AddressObject,
+    fields: Array<keyof AddressObject> = [],
+  ): Promise<ApiResponse> {
+    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${addressObject.name}']`;
+    const element = addressObject.toEditableXml(fields);
+
+    // Send the edit request using the apiClient
+    const responseXml = await this.apiClient.postConfig(
+      xpath,
+      element,
+      'edit',
+      this.apiKey, // Use the apiKey from the class instance
+    );
+
+    // Parse and return the response
+    return this.parseApiResponse(responseXml);
+  }
+
+  /**
+   * Deletes an address object from the PAN-OS firewall. This method requires only the name of the
+   * address object to remove it from the device's configuration.
+   *
+   * @param addressObjectName - The name of the address object to delete.
+   * @returns A promise resolving to the ApiResponse indicating the result of the operation.
+   * @throws An error if the deletion request fails or if the response format is unexpected.
+   */
+  public async deleteAddressObject(
+    addressObjectName: string,
+  ): Promise<ApiResponse> {
+    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${addressObjectName}']`;
+
+    // Send the delete request using the apiClient
+    const responseXml = await this.apiClient.postConfig(
+      xpath,
+      '',
+      'delete',
+      this.apiKey, // Use the apiKey from the class instance
+    );
+
+    // Parse and return the response
     return this.parseApiResponse(responseXml);
   }
 }

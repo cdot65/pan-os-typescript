@@ -1,4 +1,4 @@
-// src/objects/AddressObject.ts
+// src/models/AddressObject.ts
 
 import { VersionedPanObject } from './VersionedPanObject';
 
@@ -73,6 +73,43 @@ export class AddressObject extends VersionedPanObject {
       xml += '</tag>';
     }
     xml += '</entry>';
+    return xml;
+  }
+
+  /**
+   * Generates the XML representation of the address object for PAN-OS API compatibility.
+   * Includes only the fields that are being edited.
+   * @param fields - Fields to include in the XML. If empty, include all fields.
+   * @returns XML string representing the editable fields of the address object.
+   */
+  public toEditableXml(fields: Array<keyof AddressObject> = []): string {
+    let xml = `<entry name="${this.name}">`;
+
+    // Include only specified fields or all fields if none are specified
+    if (
+      fields.length === 0 ||
+      fields.includes('type') ||
+      fields.includes('value')
+    ) {
+      xml += `<${this.type}>${this.value}</${this.type}>`;
+    }
+    if (
+      (fields.length === 0 || fields.includes('description')) &&
+      this.description
+    ) {
+      xml += `<description>${this.description}</description>`;
+    }
+    if (
+      (fields.length === 0 || fields.includes('tag')) &&
+      this.tag &&
+      this.tag.length > 0
+    ) {
+      xml += '<tag>';
+      this.tag.forEach((t) => (xml += `<member>${t}</member>`));
+      xml += '</tag>';
+    }
+    xml += '</entry>';
+
     return xml;
   }
 }

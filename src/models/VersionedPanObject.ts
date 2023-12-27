@@ -1,4 +1,4 @@
-// src/objects/VersionedPanObject.ts
+// src/models/VersionedPanObject.ts
 import { PanObject } from './PanObject';
 
 /**

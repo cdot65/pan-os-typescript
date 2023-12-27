@@ -1,7 +1,7 @@
 # 🌐 Panos TypeScript SDK
 
 ![Stage](https://img.shields.io/badge/stage-alpha-blue.svg)
-![Version](https://img.shields.io/badge/version-0.0.5-blue.svg)
+![Version](https://img.shields.io/badge/version-0.0.6-blue.svg)
 ![Language](https://img.shields.io/github/languages/top/cdot65/pan-os-typescript?color=blue&label=TypeScript)
 
 ## 🚀 Introduction
@@ -234,7 +234,7 @@ async function testExecuteOperationalCommand() {
     const cliCmd = process.argv[2] || 'show interface "management"';
 
     // Execute the operational CLI command on the PAN-OS device.
-    const cliCommandResponse = await firewall.executeOperationalCommand(cliCmd);
+    const cliCommandResponse = await firewall.op(cliCmd);
 
     // Log the CLI command and its response.
     console.log(

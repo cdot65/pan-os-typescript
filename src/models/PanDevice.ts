@@ -1,13 +1,13 @@
 // src/PanDevice.ts
 
 import { PanObject } from './PanObject';
-import { ApiResponse } from '../interfaces/ApiResponse';
-import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
-import { JobsResponse } from '../interfaces/JobsResponse';
-import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
-import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 import { parseStringPromise } from 'xml2js';
-import axios, { AxiosInstance } from 'axios';
+import { ApiClient } from '../services/ApiClient';
+import { ApiResponse } from '../interfaces/ApiResponse';
+import { JobsResponse } from '../interfaces/JobsResponse';
+import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
+import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
+import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
 
 /**
  * `PanDevice` extends `PanObject` to interact with PAN-OS devices. It encapsulates API key management,
@@ -28,9 +28,9 @@ export class PanDevice extends PanObject {
 
   /**
    * Axios instance responsible for sending requests to the PAN-OS device.
-   * @private
+   * @protected
    */
-  private axiosInstance: AxiosInstance;
+  protected apiClient: ApiClient;
 
   /**
    * Constructs a new `PanDevice` instance.
@@ -39,96 +39,10 @@ export class PanDevice extends PanObject {
    * @param apiKey - The API key for authenticating requests to the PAN-OS device.
    */
   constructor(hostname: string, apiKey: string) {
-    super(hostname); // Call the constructor of PanObject
+    super(hostname);
     this.hostname = hostname;
     this.apiKey = apiKey;
-
-    // Initialize Axios instance
-    this.axiosInstance = axios.create({
-      baseURL: `https://${hostname}`,
-      headers: {
-        Accept: 'application/xml',
-        'Content-Type': 'application/xml',
-        ...(apiKey && { 'X-PAN-KEY': apiKey }),
-      },
-    });
-  }
-
-  /**
-   * Executes an authenticated GET HTTP request to an API endpoint and returns the response as a string.
-   * This generic method can be used to fetch data from various API endpoints that return XML responses.
-   *
-   * @param endpoint The specific API endpoint to target in the GET request.
-   * @param apiKey The API key used to authenticate the request.
-   * @param params Optional query parameters to include in the request URL.
-   * @returns A promise that resolves to the response data as a raw string, which is expected to be in XML format.
-   * @throws An error when the GET request fails, including axios-related error information.
-   */
-  public async get(
-    endpoint: string,
-    apiKey: string,
-    params?: object,
-  ): Promise<string> {
-    try {
-      const response = await this.axiosInstance.get(endpoint, {
-        headers: { 'X-PAN-KEY': apiKey },
-        params: params,
-        responseType: 'text', // Handles the response as a text string (XML data)
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Error in GET request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Sends an authenticated POST HTTP request to an API endpoint with XML data in the request body.
-   * This method is suited for operations that require sending data to the API, such as creating or updating resources.
-   *
-   * @param endpoint The specific API endpoint to target in the POST request.
-   * @param apiKey The API key for authenticating the request.
-   * @param data The XML-formatted string to send in the body of the POST request.
-   * @returns A promise that resolves to the response data as a raw string.
-   * @throws An error if the POST request fails or the body data is not formatted correctly.
-   */
-  public async post(
-    endpoint: string,
-    apiKey: string,
-    data: string,
-  ): Promise<string> {
-    try {
-      const response = await this.axiosInstance.post(endpoint, data, {
-        headers: {
-          'X-PAN-KEY': apiKey,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        responseType: 'text', // Expects the response to be in text format (not JSON)
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Error in POST request:', error);
-      throw error; // Re-throw the error to let calling functions handle it
-    }
-  }
-
-  /**
-   * Sends an API request to the PAN-OS device.
-   * @protected
-   * @param endpoint - The API endpoint to send the request to.
-   * @param params - Optional parameters for the request.
-   * @returns The parsed response from the device.
-   */
-  protected async sendApiRequest(
-    endpoint: string,
-    params?: object,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    const responseXml = await this.get(endpoint, this.apiKey, params);
-    const parsedResponse = await parseStringPromise(responseXml);
-    return parsedResponse;
+    this.apiClient = new ApiClient(hostname, apiKey);
   }
 
   /**
@@ -141,15 +55,14 @@ export class PanDevice extends PanObject {
     username: string = process.env.PANOS_USERNAME || '',
     password: string = process.env.PANOS_PASSWORD || '',
   ): Promise<ApiKeyResponse> {
-    const response = await this.sendApiRequest('/api/', {
+    const response = await this.apiClient.getData('/api/', {
       type: 'keygen',
       user: username,
       password: password,
     });
-    const apiKeyResponse: ApiKeyResponse = {
+    return {
       key: response?.response?.result?.[0]?.key?.[0],
     };
-    return apiKeyResponse;
   }
 
   /**
@@ -215,7 +128,7 @@ export class PanDevice extends PanObject {
    * @param command - The operational command in XML or CLI-like format.
    * @returns The response from executing the command.
    */
-  public async executeOperationalCommand(
+  public async op(
     command: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
@@ -228,7 +141,7 @@ export class PanDevice extends PanObject {
     }
 
     const encodedCmd = encodeURIComponent(xmlCmd);
-    const response = await this.sendApiRequest(
+    const response = await this.apiClient.getData(
       `/api/?type=op&cmd=${encodedCmd}`,
       { key: this.apiKey }, // Use the stored apiKey
     );
@@ -241,7 +154,7 @@ export class PanDevice extends PanObject {
    */
   public async requestLicenseInfo(): Promise<LicenseInfoResponse> {
     const xmlCmd = '<request><license><info/></license></request>';
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -251,7 +164,7 @@ export class PanDevice extends PanObject {
    */
   public async showJobsAll(): Promise<JobsResponse> {
     const xmlCmd = '<show><jobs><all/></jobs></show>';
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -262,7 +175,7 @@ export class PanDevice extends PanObject {
    */
   public async showJobsId(jobId: string): Promise<JobsResponse> {
     const xmlCmd = `<show><jobs><id>${jobId}</id></jobs></show>`;
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
   }
 
@@ -272,40 +185,7 @@ export class PanDevice extends PanObject {
    */
   public async showSystemInfoResponse(): Promise<SystemInfoResponse> {
     const xmlCmd = '<show><system><info/></system></show>';
-    const response = await this.executeOperationalCommand(xmlCmd);
+    const response = await this.op(xmlCmd);
     return response;
-  }
-
-  /**
-   * Sends a configuration request to the PAN-OS device.
-   * @protected
-   * @param xpath - XPath expression selecting the configuration context.
-   * @param element - XML element defining the configuration change.
-   * @param action - The action to perform ('set', 'edit', 'delete').
-   * @returns The XML response string from the device.
-   */
-  protected async sendConfigRequest(
-    apiKey: string,
-    xpath: string,
-    element: string,
-    action: 'set' | 'edit' | 'delete',
-  ): Promise<string> {
-    const data = new URLSearchParams();
-    data.append('type', 'config');
-    data.append('action', action);
-    data.append('key', apiKey);
-    data.append('xpath', xpath);
-    if (action !== 'delete') {
-      data.append('element', element);
-    }
-
-    try {
-      // The post method of ApiClient returns the XML response as a string,
-      // so we can return it directly without accessing .data
-      return await this.post('/api/', apiKey, data.toString());
-    } catch (error) {
-      console.error('Error in config request:', error);
-      throw error;
-    }
   }
 }

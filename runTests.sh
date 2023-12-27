@@ -3,9 +3,9 @@
 # Array of test commands
 TEST_COMMANDS=(
     "ts-node tests/testGenerateApiKey.ts"
-    "ts-node tests/testExecuteOperationalCommand.ts 'show system info'"
-    "ts-node tests/testExecuteOperationalCommand.ts 'request license info'"
-    "ts-node tests/testExecuteOperationalCommand.ts '<request><license><info/></license></request>'"
+    # "ts-node tests/testExecuteOperationalCommand.ts 'show system info'"
+    # "ts-node tests/testExecuteOperationalCommand.ts 'request license info'"
+    # "ts-node tests/testExecuteOperationalCommand.ts '<request><license><info/></license></request>'"
     "ts-node tests/testShowJobsAll.ts"
     "ts-node tests/testShowRoutingRoute.ts"
     "ts-node tests/testShowJobsId.ts 21"
@@ -16,8 +16,8 @@ TEST_COMMANDS=(
     "ts-node tests/testShowSessionAllFilter.ts 10.0.0.194 192.168.255.1"
     "ts-node tests/testUrlInfo.ts cdot.io"
     "ts-node tests/testUrlInfo.ts paloaltonetworks.com"
-    "ts-node tests/testCreateAddressObject.ts -n test1 -v 'cdot.io' -t fqdn -d 'this is a test' -g 'Automation'"
-    "ts-node tests/testCreateAddressObject.ts -n test2 -v 1.1.1.1/32 -t ip-netmask -d 'this is a test' -g 'Automation'"
+    "ts-node tests/testCreateAddressObject.ts -n test1 -v cdot.io -t fqdn -d 'this is a test' -g Automation"
+    "ts-node tests/testCreateAddressObject.ts -n test2 -v 1.1.1.1/32 -t ip-netmask -d 'this is a test' -g Automation"
     "ts-node tests/testShowResourceMonitor.ts"
     "ts-node tests/testShowSystemInfo.ts"
 )

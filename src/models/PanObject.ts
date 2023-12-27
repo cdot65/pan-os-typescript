@@ -1,4 +1,4 @@
-// src/objects/PanObject.ts
+// src/models/PanObject.ts
 
 /**
  * Abstract base class for objects within the PAN-OS ecosystem. `PanObject` provides common functionalities like
