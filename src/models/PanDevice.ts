@@ -55,7 +55,7 @@ export class PanDevice extends PanObject {
     username: string = process.env.PANOS_USERNAME || '',
     password: string = process.env.PANOS_PASSWORD || '',
   ): Promise<ApiKeyResponse> {
-    const response = await this.apiClient.sendApiRequest('/api/', {
+    const response = await this.apiClient.getData('/api/', {
       type: 'keygen',
       user: username,
       password: password,
@@ -141,7 +141,7 @@ export class PanDevice extends PanObject {
     }
 
     const encodedCmd = encodeURIComponent(xmlCmd);
-    const response = await this.apiClient.sendApiRequest(
+    const response = await this.apiClient.getData(
       `/api/?type=op&cmd=${encodedCmd}`,
       { key: this.apiKey }, // Use the stored apiKey
     );

@@ -61,7 +61,7 @@ export class ApiClient {
     }
   }
 
-  public async sendApiRequest(
+  public async getData(
     endpoint: string,
     params?: object,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,7 +78,7 @@ export class ApiClient {
    * @param action - The action to perform ('set', 'edit', 'delete').
    * @returns The XML response string from the device.
    */
-  public async sendConfigRequest(
+  public async postConfig(
     xpath: string,
     element: string,
     action: 'set' | 'edit' | 'delete',

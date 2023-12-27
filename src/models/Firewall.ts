@@ -143,8 +143,8 @@ export class Firewall extends PanDevice {
     const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
     const element = addressObject.toXml();
 
-    // Using sendConfigRequest from ApiClient through inherited apiClient
-    const responseXml = await this.apiClient.sendConfigRequest(
+    // Using postConfig from ApiClient through inherited apiClient
+    const responseXml = await this.apiClient.postConfig(
       xpath,
       element,
       'set',
