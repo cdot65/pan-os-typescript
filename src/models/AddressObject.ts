@@ -2,14 +2,30 @@
 
 import { VersionedPanObject } from './VersionedPanObject';
 
+/**
+ * Represents the supported address types in the PAN-OS platform.
+ */
 export type AddressType = 'ip-netmask' | 'ip-range' | 'ip-wildcard' | 'fqdn';
 
+/**
+ * The `AddressObject` class extends `VersionedPanObject` to model network address entities
+ * in the PAN-OS device's configuration.
+ */
 export class AddressObject extends VersionedPanObject {
   value: string;
   type: AddressType;
   description?: string;
   tag?: string[];
 
+  /**
+   * Instantiates a new `AddressObject`.
+   *
+   * @param name The name of the address object.
+   * @param value The value of the address object (e.g., '192.168.1.1').
+   * @param type The type of address object (e.g., 'ip-netmask').
+   * @param description An optional description for the address object.
+   * @param tag Optional tags associated with the address object.
+   */
   constructor(
     name: string,
     value: string,
@@ -24,17 +40,23 @@ export class AddressObject extends VersionedPanObject {
     this.tag = tag;
   }
 
+  /**
+   * Constructs the XPath for the address object targeting the PAN-OS configuration XML structure.
+   *
+   * @returns The XPath as a string.
+   */
   public getXpath(): string {
     // Example XPath, adjust based on your schema
     return `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${this.name}']`;
   }
 
   /**
-   * Generates the XML representation of the address object for PAN-OS API compatibility.
-   * @returns XML string representing the address object.
+   * Creates the XML representation of the address object suitable for the PAN-OS API.
+   *
+   * @returns XML string of the address object.
    */
   public toXml(): string {
-    // The XML generation logic is unchanged. TypeDoc does not require any specific code changes.
+    // Implement your XML generation logic
     let xml = `<entry name="${this.name}">`;
     xml += `<${this.type}>${this.value}</${this.type}>`;
     if (this.description) {
@@ -50,15 +72,15 @@ export class AddressObject extends VersionedPanObject {
   }
 
   /**
-   * Generates the XML representation of the address object for PAN-OS API compatibility.
-   * Includes only the fields that are being edited.
-   * @param fields - Fields to include in the XML. If empty, include all fields.
-   * @returns XML string representing the editable fields of the address object.
+   * Creates the partial XML representation of modifiable fields in an address object for the
+   * PAN-OS API.
+   *
+   * @param fields Fields of the `AddressObject` to include in the XML. If empty, all fields will be included.
+   * @returns XML string of the editable fields of the address object.
    */
   public toEditableXml(fields: Array<keyof AddressObject> = []): string {
     let xml = `<entry name="${this.name}">`;
 
-    // Include only specified fields or all fields if none are specified
     if (
       fields.length === 0 ||
       fields.includes('type') ||

@@ -3,34 +3,48 @@
 import axios, { AxiosInstance } from 'axios';
 import { parseStringPromise } from 'xml2js';
 
+/**
+ * The `ApiClient` class provides methods for making API calls to the PAN-OS device.
+ * It uses Axios for HTTP requests and xml2js for processing XML data.
+ */
 export class ApiClient {
   private axiosInstance: AxiosInstance;
-  private apiKey: string; // Define the apiKey property
+  private apiKey: string; // API key for authenticating against the PAN-OS device.
 
+  /**
+   * Instantiates the `ApiClient` with a specified hostname and API key.
+   *
+   * @param hostname The hostname or IP address of the PAN-OS device.
+   * @param apiKey The API key for authenticating requests.
+   */
   constructor(hostname: string, apiKey: string) {
-    this.apiKey = apiKey; // Initialize apiKey
+    this.apiKey = apiKey;
     this.axiosInstance = axios.create({
       baseURL: `https://${hostname}`,
       headers: {
         Accept: 'application/xml',
         'Content-Type': 'application/xml',
-        'X-PAN-KEY': apiKey, // Use apiKey for authentication
+        'X-PAN-KEY': apiKey,
       },
     });
   }
 
+  /**
+   * Retrieves the API key used for requests.
+   *
+   * @returns The API key as a string.
+   */
   public getApiKey(): string {
     return this.apiKey;
   }
 
   /**
-   * Performs a GET HTTP request to a specified API endpoint. This method is primarily used
-   * to retrieve data from the PAN-OS device. It handles XML response formats.
+   * Executes a GET request against a specified API endpoint.
    *
-   * @param endpoint - The API endpoint for the GET request.
-   * @param params - (Optional) Query parameters to include in the request.
-   * @returns A promise resolving to the response data as a raw XML string.
-   * @throws An error if the GET request fails, with details of the failure.
+   * @param endpoint The API endpoint for the GET request.
+   * @param params Optional query parameters to include in the request.
+   * @returns A promise resolving to the response data in raw XML format.
+   * @throws An error if the GET request fails.
    */
   public async get(endpoint: string, params?: object): Promise<string> {
     try {
@@ -46,13 +60,12 @@ export class ApiClient {
   }
 
   /**
-   * Performs a POST HTTP request to a specified API endpoint. This method is used for operations
-   * that require sending data, like creating or updating resources on the PAN-OS device.
+   * Executes a POST request to a specified API endpoint with an XML-formatted request body.
    *
-   * @param endpoint - The API endpoint for the POST request.
-   * @param data - The XML-formatted string to be sent in the request body.
-   * @returns A promise resolving to the response data as a raw XML string.
-   * @throws An error if the POST request fails or if the body data is incorrectly formatted.
+   * @param endpoint The API endpoint for the POST request.
+   * @param data The XML-formatted string to be sent in the request body.
+   * @returns A promise resolving to the response data in raw XML format.
+   * @throws An error if the POST request fails, including incorrect data format.
    */
   public async post(endpoint: string, data: string): Promise<string> {
     try {
@@ -68,12 +81,12 @@ export class ApiClient {
   }
 
   /**
-   * Fetches data from a specified API endpoint and parses the XML response into a JavaScript object.
-   * This method combines the GET request and XML parsing functionality.
+   * Fetches and parses the XML data from an API endpoint into a JavaScript object.
    *
-   * @param endpoint - The API endpoint to send the GET request to.
-   * @param params - (Optional) Parameters for the request.
-   * @returns A promise resolving to the parsed JavaScript object from the XML response.
+   * @param endpoint The API endpoint to send the GET request to.
+   * @param params Optional parameters for the request.
+   * @param parse Whether to parse the XML response to JavaScript object. Defaults to true.
+   * @returns A promise resolving to the parsed JavaScript object or raw XML string.
    */
   public async getData(
     endpoint: string,
@@ -81,6 +94,7 @@ export class ApiClient {
     parse: boolean = true,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
+    // TypeDoc will infer any from the method signature
     const responseXml = await this.get(endpoint, params);
     if (!parse) {
       return responseXml;
@@ -89,20 +103,19 @@ export class ApiClient {
   }
 
   /**
-   * Sends a configuration command to the PAN-OS device. This method is used for 'set', 'edit',
-   * and 'delete' operations on the device's configuration.
+   * Sends a configuration command to the PAN-OS device such as 'set', 'edit', or 'delete'.
    *
-   * @param xpath - The XPath expression selecting the configuration context.
-   * @param element - The XML element defining the configuration change. Required for 'set' and 'edit' actions.
-   * @param action - The configuration action to perform ('set', 'edit', 'delete').
-   * @param apiKey - The API key for authenticating the request.
+   * @param xpath The XPath expression selecting the configuration context.
+   * @param element The XML element defining the configuration change. Required for 'set' and 'edit' actions.
+   * @param action The configuration action to perform ('set', 'edit', 'delete').
+   * @param apiKey The API key for authenticating the request. Uses the instance's API key by default.
    * @returns A promise resolving to the XML response string from the device.
    */
   public async postConfig(
     xpath: string,
     element: string,
     action: 'set' | 'edit' | 'delete',
-    apiKey: string,
+    apiKey: string = this.apiKey,
   ): Promise<string> {
     const data = new URLSearchParams();
     data.append('type', 'config');
@@ -116,14 +129,14 @@ export class ApiClient {
     return this.post('/api/', data.toString());
   }
 
+  /**
+   * Shortcut for sending a 'set' configuration command to the PAN-OS device.
+   *
+   * @param xpath The XPath location for where the configuration change should take effect.
+   * @param element The XML element describing the configuration to be set.
+   * @returns A promise resolving to the response from the device in XML format.
+   */
   public async setConfig(xpath: string, element: string): Promise<string> {
-    const data = new URLSearchParams();
-    data.append('type', 'config');
-    data.append('action', 'set');
-    data.append('key', this.apiKey); // The API key is part of the instance
-    data.append('xpath', xpath);
-    data.append('element', element);
-
-    return this.post('/api/', data.toString());
+    return this.postConfig(xpath, element, 'set', this.apiKey);
   }
 }
