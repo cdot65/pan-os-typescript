@@ -9,57 +9,49 @@ import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
 import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
 
-/**
- * `PanDevice` extends `PanObject` to interact with PAN-OS devices. It encapsulates API key management,
- * command execution, and system information retrieval. Integrated HTTP request methods facilitate direct communication with the device.
- */
 export class PanDevice extends PanObject {
-  /**
-   * The hostname or IP address of the targeted PAN-OS device.
-   * @protected
-   */
   protected hostname: string;
 
-  /**
-   * The API key used for authenticating requests made to the PAN-OS device.
-   * @protected
-   */
-  protected apiKey: string;
-
-  /**
-   * Axios instance responsible for sending requests to the PAN-OS device.
-   * @protected
-   */
-  protected apiClient: ApiClient;
-
-  /**
-   * Constructs a new `PanDevice` instance.
-   *
-   * @param hostname - The hostname or IP address of the PAN-OS device.
-   * @param apiKey - The API key for authenticating requests to the PAN-OS device.
-   */
-  constructor(hostname: string, apiKey: string) {
-    super(hostname);
+  constructor(hostname: string, apiClient?: ApiClient) {
+    super(hostname, apiClient); // Correctly pass the arguments
     this.hostname = hostname;
-    this.apiKey = apiKey;
-    this.apiClient = new ApiClient(hostname, apiKey);
+  }
+
+  protected getApiKey(): string {
+    return this.apiClient.getApiKey(); // Assuming getApiKey() is a method in ApiClient
+  }
+
+  public getXpath(): string {
+    // Implement the getXpath logic specific to PanDevice
+    // Return a string representing the XPath
+    return '';
+  }
+
+  public toXml(): string {
+    // Implement the toXml logic specific to PanDevice
+    // Return a string representing the XML
+    return '';
   }
 
   /**
    * Generates an API key using the provided credentials.
-   * @param username - Username for the PAN-OS device. Defaults to the environment variable value.
-   * @param password - Password for the PAN-OS device. Defaults to the environment variable value.
+   * @param username - Username for the PAN-OS device.
+   * @param password - Password for the PAN-OS device.
    * @returns The generated API key response.
    */
   public async generateApiKey(
-    username: string = process.env.PANOS_USERNAME || '',
-    password: string = process.env.PANOS_PASSWORD || '',
+    username: string,
+    password: string,
   ): Promise<ApiKeyResponse> {
-    const response = await this.apiClient.getData('/api/', {
+    // Create a temporary ApiClient instance for API key generation
+    const tempApiClient = new ApiClient(this.hostname, '');
+    const response = await tempApiClient.getData('/api/', {
       type: 'keygen',
       user: username,
       password: password,
     });
+
+    // Extract and return the API key from the response
     return {
       key: response?.response?.result?.[0]?.key?.[0],
     };
@@ -123,6 +115,10 @@ export class PanDevice extends PanObject {
     return xmlCmd;
   }
 
+  public getApiClient(): ApiClient {
+    return this.apiClient;
+  }
+
   /**
    * Executes an operational command on the PAN-OS device.
    * @param command - The operational command in XML or CLI-like format.
@@ -130,6 +126,7 @@ export class PanDevice extends PanObject {
    */
   public async op(
     command: string,
+    parse: boolean = true,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     let xmlCmd: string;
@@ -143,7 +140,8 @@ export class PanDevice extends PanObject {
     const encodedCmd = encodeURIComponent(xmlCmd);
     const response = await this.apiClient.getData(
       `/api/?type=op&cmd=${encodedCmd}`,
-      { key: this.apiKey }, // Use the stored apiKey
+      { key: this.getApiKey() }, // Use getApiKey()
+      parse,
     );
     return response;
   }

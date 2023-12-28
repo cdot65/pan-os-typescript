@@ -1,39 +1,32 @@
 // src/models/PanObject.ts
 
-/**
- * Abstract base class for objects within the PAN-OS ecosystem. `PanObject` provides common functionalities like
- * managing child objects and maintaining hierarchical relationships, serving as a foundational component for device and configuration representation.
- */
+import { ApiClient } from '../services/ApiClient';
+
 export abstract class PanObject {
-  /**
-   * The parent of this object within the PAN-OS hierarchy, if it exists.
-   *
-   * @protected
-   */
   protected parent: PanObject | null;
-
-  /**
-   * The list of child objects within the PAN-OS hierarchy.
-   *
-   * @protected
-   */
   protected children: PanObject[];
-
-  /**
-   * The unique identifier for the PAN-OS object.
-   */
   public name: string;
+  protected _apiClient: ApiClient | null;
 
-  /**
-   * Constructs a new instance of a PanObject with a given name.
-   *
-   * @param name - The unique name to assign to this PAN-OS object.
-   */
-  constructor(name: string) {
+  constructor(name: string, apiClient?: ApiClient) {
     this.name = name;
     this.parent = null;
     this.children = [];
+    this._apiClient = apiClient || null;
   }
+
+  public get apiClient(): ApiClient {
+    if (this._apiClient) {
+      return this._apiClient;
+    }
+    if (this.parent) {
+      return this.parent.apiClient;
+    }
+    throw new Error('ApiClient is not set in the object hierarchy.');
+  }
+
+  public abstract getXpath(): string;
+  public abstract toXml(): string; // Abstract method toXml
 
   /**
    * Adds a child object to this object's hierarchy, setting this object as the parent.
@@ -56,5 +49,42 @@ export abstract class PanObject {
       this.children.splice(index, 1);
       child.parent = null;
     }
+  }
+
+  /**
+   * Provides read-only access to the child objects of this PanObject.
+   *
+   * @returns An array of child PanObject instances.
+   */
+  public getChildren(): ReadonlyArray<PanObject> {
+    return this.children;
+  }
+
+  /**
+   * Finds a child object by its name.
+   *
+   * @param name - The name of the child object to find.
+   * @returns The found PanObject instance or null if not found.
+   */
+  public findChildByName(name: string): PanObject | null {
+    return this.children.find((child) => child.name === name) || null;
+  }
+
+  /**
+   * Checks if a child object exists in this object's hierarchy.
+   *
+   * @param child - The PanObject instance to check.
+   * @returns True if the child exists, false otherwise.
+   */
+  public hasChild(child: PanObject): boolean {
+    return this.children.includes(child);
+  }
+
+  public async create(): Promise<void> {
+    const xpath = this.getXpath();
+    const element = this.toXml();
+    await this.apiClient.setConfig(xpath, element);
+
+    // Optionally, mark the configuration as changed
   }
 }

@@ -2,46 +2,14 @@
 
 import { VersionedPanObject } from './VersionedPanObject';
 
-/**
- * Supported address formats for network locations used in PAN-OS address objects.
- */
 export type AddressType = 'ip-netmask' | 'ip-range' | 'ip-wildcard' | 'fqdn';
 
-/**
- * `AddressObject` extends `VersionedPanObject` to manage network address configurations in PAN-OS.
- * It facilitates defining rules and policies by encapsulating properties specific to network locations.
- */
 export class AddressObject extends VersionedPanObject {
-  /**
-   * The network address, range, or other value based on `type`.
-   */
   value: string;
-
-  /**
-   * The format type of the `value`.
-   */
   type: AddressType;
-
-  /**
-   * An optional description of the address object.
-   */
   description?: string;
-
-  /**
-   * Optional tags for administrative purposes.
-   */
   tag?: string[];
 
-  /**
-   * Constructs a new `AddressObject` instance with a name, address value and type. You can optionally
-   * include a description and tags for additional context or organization.
-   *
-   * @param name - The name of the address object.
-   * @param value - The network address or range value for the object.
-   * @param type - The format of the address value (default is 'ip-netmask').
-   * @param description - An optional description of the address object.
-   * @param tag - Optional array of tags for the object.
-   */
   constructor(
     name: string,
     value: string,
@@ -54,6 +22,11 @@ export class AddressObject extends VersionedPanObject {
     this.type = type;
     this.description = description;
     this.tag = tag;
+  }
+
+  public getXpath(): string {
+    // Example XPath, adjust based on your schema
+    return `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${this.name}']`;
   }
 
   /**

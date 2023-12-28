@@ -1,4 +1,4 @@
-// tests/testDeleteAddressObject.ts
+// tests/testAddressObjectDelete.ts
 
 import dotenv from 'dotenv';
 import { Firewall } from '../src/index';

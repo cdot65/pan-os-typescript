@@ -16,8 +16,9 @@ TEST_COMMANDS=(
     "ts-node tests/testShowSessionAllFilter.ts 10.0.0.194 192.168.255.1"
     "ts-node tests/testUrlInfo.ts cdot.io"
     "ts-node tests/testUrlInfo.ts paloaltonetworks.com"
-    "ts-node tests/testCreateAddressObject.ts -n test1 -v cdot.io -t fqdn -d 'this is a test' -g Automation"
-    "ts-node tests/testCreateAddressObject.ts -n test2 -v 1.1.1.1/32 -t ip-netmask -d 'this is a test' -g Automation"
+    "ts-node tests/testAddressObjectCreate.ts -n test1 -v cdot.io -t fqdn -d 'this is a test' -g Automation"
+    "ts-node tests/testAddressObjectCreate.ts -n test2 -v 1.1.1.1/32 -t ip-netmask -d 'this is a test' -g Automation"
+    "ts-node tests/testAddressObjectGetList.ts"
     "ts-node tests/testShowResourceMonitor.ts"
     "ts-node tests/testShowSystemInfo.ts"
 )

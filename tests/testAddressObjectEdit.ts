@@ -1,4 +1,4 @@
-// tests/testEditAddressObject.ts
+// tests/testAddressObjectEdit.ts
 
 import dotenv from 'dotenv';
 import { Firewall, AddressObject, AddressType } from '../src/index';

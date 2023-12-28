@@ -1,29 +1,26 @@
-import { parseStringPromise } from 'xml2js';
-import axios, { AxiosInstance } from 'axios';
+// src/services/ApiClient.ts
 
-/**
- * The `ApiClient` class provides a wrapper around Axios HTTP client for making API calls to a PAN-OS device.
- * It abstracts the complexities of making HTTP GET and POST requests, handling XML responses, and sending
- * configuration commands to the device.
- */
+import axios, { AxiosInstance } from 'axios';
+import { parseStringPromise } from 'xml2js';
+
 export class ApiClient {
   private axiosInstance: AxiosInstance;
+  private apiKey: string; // Define the apiKey property
 
-  /**
-   * Constructs a new ApiClient instance, initializing the Axios client with base URL and headers.
-   *
-   * @param hostname - The hostname or IP address of the PAN-OS device.
-   * @param apiKey - The API key used for authenticating requests to the PAN-OS device.
-   */
   constructor(hostname: string, apiKey: string) {
+    this.apiKey = apiKey; // Initialize apiKey
     this.axiosInstance = axios.create({
       baseURL: `https://${hostname}`,
       headers: {
         Accept: 'application/xml',
         'Content-Type': 'application/xml',
-        ...(apiKey && { 'X-PAN-KEY': apiKey }),
+        'X-PAN-KEY': apiKey, // Use apiKey for authentication
       },
     });
+  }
+
+  public getApiKey(): string {
+    return this.apiKey;
   }
 
   /**
@@ -81,9 +78,13 @@ export class ApiClient {
   public async getData(
     endpoint: string,
     params?: object,
+    parse: boolean = true,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const responseXml = await this.get(endpoint, params);
+    if (!parse) {
+      return responseXml;
+    }
     return parseStringPromise(responseXml);
   }
 
@@ -111,6 +112,17 @@ export class ApiClient {
     if (action !== 'delete') {
       data.append('element', element);
     }
+
+    return this.post('/api/', data.toString());
+  }
+
+  public async setConfig(xpath: string, element: string): Promise<string> {
+    const data = new URLSearchParams();
+    data.append('type', 'config');
+    data.append('action', 'set');
+    data.append('key', this.apiKey); // The API key is part of the instance
+    data.append('xpath', xpath);
+    data.append('element', element);
 
     return this.post('/api/', data.toString());
   }

@@ -2,6 +2,7 @@
 
 import { PanDevice } from './PanDevice';
 import { AddressObject } from './AddressObject';
+import { ApiClient } from '../services/ApiClient';
 import { ApiResponse } from '../interfaces/ApiResponse';
 import { SessionResponse } from '../interfaces/SessionResponse';
 import { SessionIdResponse } from '../interfaces/SessionIdResponse';
@@ -10,6 +11,8 @@ import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
 import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
 import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
+import { AddressObjectEntry } from '../interfaces/AddressObjectResponse';
+import { parseStringPromise } from 'xml2js';
 
 /**
  * The `Firewall` class extends `PanDevice` to specialize in managing PAN-OS firewalls. It provides
@@ -18,14 +21,25 @@ import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
  * address objects, including creation, editing, and deletion.
  */
 export class Firewall extends PanDevice {
-  /**
-   * Constructs a new instance of a Firewall, initializing with the specified hostname and API key.
-   *
-   * @param hostname - The hostname or IP address of the PAN-OS device.
-   * @param apiKey - The API key for authenticating to the PAN-OS device.
-   */
-  constructor(hostname: string, apiKey: string) {
-    super(hostname, apiKey);
+  constructor(hostname: string, apiKey?: string) {
+    let apiClient;
+    if (apiKey) {
+      apiClient = new ApiClient(hostname, apiKey);
+    }
+    super(hostname, apiClient); // Pass the hostname and apiClient
+    this.hostname = hostname;
+  }
+
+  public getXpath(): string {
+    // Implement the getXpath logic specific to PanDevice
+    // Return a string representing the XPath
+    return '';
+  }
+
+  public toXml(): string {
+    // Implement the toXml logic specific to PanDevice
+    // Return a string representing the XML
+    return '';
   }
 
   /**
@@ -132,6 +146,41 @@ export class Firewall extends PanDevice {
     return response;
   }
 
+  public async addressObjectGetList(): Promise<AddressObjectEntry[]> {
+    const xmlCmd = `<show><config><running><xpath>devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address</xpath></running></config></show>`;
+    const responseXml = await this.op(xmlCmd, false);
+
+    // Parse the XML response
+    const parsedResponse = await parseStringPromise(responseXml, {
+      explicitArray: false,
+    });
+
+    // Check if the response is successful
+    const addressEntries = parsedResponse?.response?.result?.address?.entry;
+    if (!addressEntries) {
+      throw new Error(
+        'Failed to retrieve address objects or unexpected response format',
+      );
+    }
+
+    // Normalize the data structure and map to the interface
+    const normalizedEntries = Array.isArray(addressEntries)
+      ? addressEntries
+      : [addressEntries];
+    return normalizedEntries.map((entry) => ({
+      name: entry.$.name,
+      'ip-netmask': entry['ip-netmask'],
+      'ip-range': entry['ip-range'],
+      fqdn: entry.fqdn,
+      description: entry.description,
+      tag: entry.tag?.member
+        ? Array.isArray(entry.tag.member)
+          ? entry.tag.member
+          : [entry.tag.member]
+        : [],
+    }));
+  }
+
   /**
    * Creates an address object on the PAN-OS firewall. The method posts the XML configuration
    * of the address object to the device.
@@ -151,7 +200,7 @@ export class Firewall extends PanDevice {
       xpath,
       element,
       'set',
-      this.apiKey,
+      this.getApiKey(),
     );
 
     return this.parseApiResponse(responseXml);
@@ -178,7 +227,7 @@ export class Firewall extends PanDevice {
       xpath,
       element,
       'edit',
-      this.apiKey, // Use the apiKey from the class instance
+      this.getApiKey(),
     );
 
     // Parse and return the response
@@ -203,7 +252,7 @@ export class Firewall extends PanDevice {
       xpath,
       '',
       'delete',
-      this.apiKey, // Use the apiKey from the class instance
+      this.getApiKey(),
     );
 
     // Parse and return the response
