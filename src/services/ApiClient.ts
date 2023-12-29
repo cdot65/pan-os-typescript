@@ -76,7 +76,10 @@ export class ApiClient {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         responseType: 'text',
       });
-      // console.log(`Response from POST request to '${endpoint}':`, response.data);
+      // console.log(
+      //   `Response from POST request to '${endpoint}':`,
+      //   response.data,
+      // );
       return response.data;
     } catch (error) {
       console.error('Error in POST request:', error);
@@ -142,5 +145,33 @@ export class ApiClient {
    */
   public async setConfig(xpath: string, element: string): Promise<string> {
     return this.postConfig(xpath, element, 'set', this.apiKey);
+  }
+
+  /**
+   * Sends an 'edit' configuration command to the PAN-OS device.
+   *
+   * @param xpath - The base XPath expression selecting the configuration context.
+   * @param entryName - The name of the specific entry to be edited (optional).
+   * @param element - The XML element defining the configuration change.
+   * @returns A promise resolving to the XML response string from the device.
+   */
+  public async editConfig(
+    xpath: string,
+    element: string,
+    entryName?: string,
+  ): Promise<string> {
+    let fullPath = xpath;
+    if (entryName) {
+      fullPath += `/entry[@name='${entryName}']`;
+    }
+
+    const data = new URLSearchParams();
+    data.append('type', 'config');
+    data.append('action', 'edit');
+    data.append('key', this.apiKey);
+    data.append('xpath', fullPath);
+    data.append('element', element);
+
+    return this.post('/api/', data.toString());
   }
 }

@@ -1,9 +1,7 @@
 // src/models/Firewall.ts
 
 import { PanDevice } from './PanDevice';
-import { AddressObject } from './AddressObject';
 import { ApiClient } from '../services/ApiClient';
-import { ApiResponse } from '../interfaces/ApiResponse';
 import { SessionResponse } from '../interfaces/SessionResponse';
 import { SessionIdResponse } from '../interfaces/SessionIdResponse';
 import { SessionAllResponse } from '../interfaces/SessionAllResponse';
@@ -167,71 +165,11 @@ export class Firewall extends PanDevice {
   }
 
   /**
-   * Creates a new address object on the PAN-OS firewall.
-   * @param addressObject - The AddressObject instance representing the network address to create.
-   * @returns A promise resolved with an ApiResponse indicating the result.
-   */
-  public async createAddressObject(
-    addressObject: AddressObject,
-  ): Promise<ApiResponse> {
-    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
-    const element = addressObject.toXml();
-
-    // Using postConfig from ApiClient through inherited apiClient
-    const responseXml = await this.apiClient.postConfig(
-      xpath,
-      element,
-      'set',
-      this.getApiKey(),
-    );
-
-    return this.parseApiResponse(responseXml);
-  }
-
-  /**
    * Edits an existing address object on the PAN-OS firewall.
-   * @param addressObject - The AddressObject instance that holds updated properties to be saved.
-   * @param fields - Optional array of fields to be updated; when omitted, all fields are updated.
-   * @returns A promise resolved with an ApiResponse indicating the result.
    */
-  public async editAddressObject(
-    addressObject: AddressObject,
-    fields: Array<keyof AddressObject> = [],
-  ): Promise<ApiResponse> {
-    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${addressObject.name}']`;
-    const element = addressObject.toEditableXml(fields);
-
-    // Send the edit request using the apiClient
-    const responseXml = await this.apiClient.postConfig(
-      xpath,
-      element,
-      'edit',
-      this.getApiKey(),
-    );
-
-    // Parse and return the response
-    return this.parseApiResponse(responseXml);
-  }
-
-  /**
-   * Deletes an existing address object from the PAN-OS firewall.
-   * @param addressObjectName - The name of the address object to delete.
-   * @returns A promise resolved with an ApiResponse indicating the result.
-   */
-  public async deleteAddressObject(
-    addressObjectName: string,
-  ): Promise<ApiResponse> {
-    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${addressObjectName}']`;
-
-    // Send the delete request using the apiClient
-    const responseXml = await this.apiClient.postConfig(
-      xpath,
-      '',
-      'delete',
-      this.getApiKey(),
-    );
-
-    // Parse and return the response
-    return this.parseApiResponse(responseXml);
+  public override async apply(): Promise<void> {
+    const xpath = this.getXpath();
+    const element = this.toXml();
+    await this.apiClient.editConfig(xpath, element);
   }
 }
