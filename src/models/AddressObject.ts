@@ -76,7 +76,11 @@ export class AddressObject extends VersionedPanObject {
     }
     if (this.tag && this.tag.length > 0) {
       xml += '<tag>';
-      this.tag.forEach((t) => (xml += `<member>${t}</member>`));
+      this.tag.forEach((t) => {
+        if (t) {
+          xml += `<member>${t}</member>`;
+        }
+      });
       xml += '</tag>';
     }
     xml += '</entry>';
