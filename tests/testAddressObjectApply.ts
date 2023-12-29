@@ -66,37 +66,33 @@ async function testAddressObjectApply() {
   console.log(`Creating a Firewall instance with hostname: ${hostname}`);
   const firewall = new Firewall(hostname, apiKey);
 
-  console.log('Attempting to find existing AddressObject by name...');
-  const existingObject = firewall.find('test123', AddressObject);
+  console.log(`Creating an AddressObject with name: ${argv.name}`);
+  const addressObject = new AddressObject(
+    argv.name,
+    argv.value,
+    argv.type,
+    argv.description,
+    argv.tag ? argv.tag.filter((t) => t !== undefined) : undefined,
+  );
 
-  if (!existingObject || !(existingObject instanceof AddressObject)) {
-    console.error(
-      `AddressObject '${argv.name}' not found or is of incorrect type.`,
-    );
-    return;
+  console.log('Adding AddressObject to the Firewall object...');
+  firewall.addChild(addressObject);
+
+  // Verifying if the AddressObject is successfully added
+  if (firewall.hasChild(addressObject)) {
+    console.log(`AddressObject '${argv.name}' added to Firewall.`);
+  } else {
+    throw new Error(`Failed to add AddressObject '${argv.name}' to Firewall.`);
   }
 
-  console.log(`Updating AddressObject '${argv.name}' with new values...`);
-  existingObject.value = argv.value;
-  existingObject.type = argv.type;
-  existingObject.description = argv.description;
-  existingObject.tag = argv.tag
-    ? argv.tag.filter((t) => t !== undefined)
-    : undefined;
-
   try {
+    console.log('Attempting to apply AddressObject on the PAN-OS device...');
+    await addressObject.apply();
     console.log(
-      'Attempting to apply changes to the AddressObject on the PAN-OS device...',
-    );
-    await existingObject.apply();
-    console.log(
-      `AddressObject '${argv.name}' updated successfully on PAN-OS device.`,
+      `Address Object '${argv.name}' applied successfully on PAN-OS device.`,
     );
   } catch (error) {
-    console.error(
-      'Error in applying changes to address object on PAN-OS device:',
-      error,
-    );
+    console.error('Error in applying address object on PAN-OS device:', error);
   }
 }
 
