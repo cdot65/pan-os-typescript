@@ -1,7 +1,7 @@
 # 🌐 Panos TypeScript SDK
 
 ![Stage](https://img.shields.io/badge/stage-alpha-blue.svg)
-![Version](https://img.shields.io/badge/version-0.0.6-blue.svg)
+![Version](https://img.shields.io/badge/version-0.0.7-blue.svg)
 ![Language](https://img.shields.io/github/languages/top/cdot65/pan-os-typescript?color=blue&label=TypeScript)
 
 - [🌐 Panos TypeScript SDK](#-panos-typescript-sdk)
@@ -102,21 +102,18 @@ Generated API Key: LUFRPT0vMGkvbXRlVE82VDM1TitmQmo4a0g5VFVXNDg9N2dxVE1qdUZFM0FRO
 ### Creating an Address Object
 
 ```typescript
-// tests/testCreateAddressObject.ts
+// tests/testAddressObjectCreate.ts
 
 import dotenv from 'dotenv';
 import { Firewall, AddressObject, AddressType } from '../src/index';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-// Load the correct environment variables based on the NODE_ENV value.
+// Load environment variables.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-/**
- * Type for the command line arguments accepted by the script.
- */
 interface Arguments {
   name: string;
   value: string;
@@ -125,7 +122,6 @@ interface Arguments {
   tag?: string[];
 }
 
-// Parse command line arguments using yargs.
 const argv = yargs(hideBin(process.argv))
   .options({
     name: {
@@ -161,11 +157,9 @@ const argv = yargs(hideBin(process.argv))
   })
   .parseSync() as Arguments;
 
-/**
- * Test script to create an address object in PAN-OS using values from command line arguments.
- * This test creates an address object by invoking the Firewall SDK methods.
- */
 async function testCreateAddressObject() {
+  console.log('Initializing test for creating an address object...');
+
   const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
 
@@ -173,37 +167,46 @@ async function testCreateAddressObject() {
     throw new Error('API key is not set in environment variables.');
   }
 
-  // Initialize the firewall instance.
+  console.log(`Creating a Firewall instance with hostname: ${hostname}`);
   const firewall = new Firewall(hostname, apiKey);
 
+  console.log(`Creating an AddressObject with name: ${argv.name}`);
+  const addressObject = new AddressObject(
+    argv.name,
+    argv.value,
+    argv.type,
+    argv.description,
+    argv.tag,
+  );
+
+  console.log('Adding AddressObject to the Firewall object...');
+  firewall.addChild(addressObject);
+
+  // Verifying if the AddressObject is successfully added
+  if (firewall.hasChild(addressObject)) {
+    console.log(`AddressObject '${argv.name}' added to Firewall.`);
+  } else {
+    throw new Error(`Failed to add AddressObject '${argv.name}' to Firewall.`);
+  }
+
   try {
-    // Create the address object based on command line arguments.
-    const addressObject = new AddressObject(argv.name, argv.value, argv.type);
-    addressObject.description = argv.description;
-    if (argv.tag) addressObject.tag = argv.tag;
-
-    // Attempt to create the address object on the PAN-OS device.
-    const response = await firewall.createAddressObject(addressObject);
-
-    // Log the response from the PAN-OS API.
+    console.log('Attempting to create AddressObject on the PAN-OS device...');
+    await addressObject.create();
     console.log(
-      'Create Address Object Response:',
-      JSON.stringify(response, null, 2),
+      `Address Object '${argv.name}' created successfully on PAN-OS device.`,
     );
   } catch (error) {
-    // Log any errors encountered during address object creation.
-    console.error('Error:', error);
+    console.error('Error in creating address object on PAN-OS device:', error);
   }
 }
 
-// Execute the test function.
 testCreateAddressObject();
 ```
 
 Execute with `ts-node`:
 
 ```bash
-ts-node tests/testCreateAddressObject.ts -n test1 -v 1.1.1.1/32 -t ip-netmask -d 'this is a test' -g 'Automation'
+ts-node tests/testAddressObjectCreate.ts -n testxyz -v text.xyz.com -t fqdn -d test -g Automation
 Create Address Object Response: {
   "status": "success",
   "code": 20,

@@ -1,46 +1,59 @@
-import { parseStringPromise } from 'xml2js';
+// src/services/ApiClient.ts
+
 import axios, { AxiosInstance } from 'axios';
+import { parseStringPromise } from 'xml2js';
 
 /**
- * The `ApiClient` class provides a wrapper around Axios HTTP client for making API calls to a PAN-OS device.
- * It abstracts the complexities of making HTTP GET and POST requests, handling XML responses, and sending
- * configuration commands to the device.
+ * Represents an API client for making HTTP requests to a PAN-OS device.
+ * Utilizes Axios for HTTP requests and xml2js for XML processing.
  */
 export class ApiClient {
   private axiosInstance: AxiosInstance;
+  private apiKey: string; // API key for authenticating against the PAN-OS device.
 
   /**
-   * Constructs a new ApiClient instance, initializing the Axios client with base URL and headers.
+   * Constructs a new ApiClient instance.
    *
    * @param hostname - The hostname or IP address of the PAN-OS device.
-   * @param apiKey - The API key used for authenticating requests to the PAN-OS device.
+   * @param apiKey - The API key for authenticating the requests.
    */
   constructor(hostname: string, apiKey: string) {
+    this.apiKey = apiKey;
     this.axiosInstance = axios.create({
       baseURL: `https://${hostname}`,
       headers: {
         Accept: 'application/xml',
         'Content-Type': 'application/xml',
-        ...(apiKey && { 'X-PAN-KEY': apiKey }),
+        'X-PAN-KEY': apiKey,
       },
     });
   }
 
   /**
-   * Performs a GET HTTP request to a specified API endpoint. This method is primarily used
-   * to retrieve data from the PAN-OS device. It handles XML response formats.
+   * Retrieves the API key used for making requests.
    *
-   * @param endpoint - The API endpoint for the GET request.
-   * @param params - (Optional) Query parameters to include in the request.
-   * @returns A promise resolving to the response data as a raw XML string.
-   * @throws An error if the GET request fails, with details of the failure.
+   * @returns The API key as a string.
+   */
+  public getApiKey(): string {
+    return this.apiKey;
+  }
+
+  /**
+   * Performs an HTTP GET request to a specified API endpoint.
+   *
+   * @param endpoint - The endpoint URL for the GET request.
+   * @param params - Optional query parameters to include in the request.
+   * @returns A promise that resolves to the response data in raw XML format.
+   * @throws An error if the GET request fails.
    */
   public async get(endpoint: string, params?: object): Promise<string> {
+    // console.log(`Sending GET request to '${endpoint}' with params:`, params); // Log request details
     try {
       const response = await this.axiosInstance.get(endpoint, {
         params: params,
         responseType: 'text',
       });
+      // console.log(`Response from GET request to '${endpoint}':`, response.data); // Log response
       return response.data;
     } catch (error) {
       console.error('Error in GET request:', error);
@@ -49,20 +62,21 @@ export class ApiClient {
   }
 
   /**
-   * Performs a POST HTTP request to a specified API endpoint. This method is used for operations
-   * that require sending data, like creating or updating resources on the PAN-OS device.
+   * Executes an HTTP POST request to a specified API endpoint with XML-formatted data.
    *
-   * @param endpoint - The API endpoint for the POST request.
+   * @param endpoint - The endpoint URL for the POST request.
    * @param data - The XML-formatted string to be sent in the request body.
-   * @returns A promise resolving to the response data as a raw XML string.
-   * @throws An error if the POST request fails or if the body data is incorrectly formatted.
+   * @returns A promise that resolves to the response data in raw XML format.
+   * @throws An error if the POST request fails or if the data format is incorrect.
    */
   public async post(endpoint: string, data: string): Promise<string> {
+    // console.log(`Sending POST request to '${endpoint}' with data:`, data);
     try {
       const response = await this.axiosInstance.post(endpoint, data, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         responseType: 'text',
       });
+      // console.log(`Response from POST request to '${endpoint}':`, response.data);
       return response.data;
     } catch (error) {
       console.error('Error in POST request:', error);
@@ -71,37 +85,41 @@ export class ApiClient {
   }
 
   /**
-   * Fetches data from a specified API endpoint and parses the XML response into a JavaScript object.
-   * This method combines the GET request and XML parsing functionality.
+   * Fetches data from a PAN-OS API endpoint and optionally parses the XML response.
    *
    * @param endpoint - The API endpoint to send the GET request to.
-   * @param params - (Optional) Parameters for the request.
-   * @returns A promise resolving to the parsed JavaScript object from the XML response.
+   * @param params - Optional parameters for the request.
+   * @param parse - Flag indicating whether to parse the XML response. Defaults to true.
+   * @returns A promise resolving to either the parsed JavaScript object or the raw XML string.
    */
   public async getData(
     endpoint: string,
     params?: object,
+    parse: boolean = true,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
+    // TypeDoc will infer any from the method signature
     const responseXml = await this.get(endpoint, params);
+    if (!parse) {
+      return responseXml;
+    }
     return parseStringPromise(responseXml);
   }
 
   /**
-   * Sends a configuration command to the PAN-OS device. This method is used for 'set', 'edit',
-   * and 'delete' operations on the device's configuration.
+   * Sends a configuration command (set, edit, delete) to the PAN-OS device.
    *
    * @param xpath - The XPath expression selecting the configuration context.
-   * @param element - The XML element defining the configuration change. Required for 'set' and 'edit' actions.
-   * @param action - The configuration action to perform ('set', 'edit', 'delete').
-   * @param apiKey - The API key for authenticating the request.
+   * @param element - The XML element defining the configuration change (required for 'set' and 'edit').
+   * @param action - The configuration action to perform (set, edit, delete).
+   * @param apiKey - The API key for request authentication. Defaults to the instance's API key.
    * @returns A promise resolving to the XML response string from the device.
    */
   public async postConfig(
     xpath: string,
     element: string,
     action: 'set' | 'edit' | 'delete',
-    apiKey: string,
+    apiKey: string = this.apiKey,
   ): Promise<string> {
     const data = new URLSearchParams();
     data.append('type', 'config');
@@ -113,5 +131,16 @@ export class ApiClient {
     }
 
     return this.post('/api/', data.toString());
+  }
+
+  /**
+   * Simplified method for sending a 'set' configuration command to the PAN-OS device.
+   *
+   * @param xpath - The XPath for the configuration change location.
+   * @param element - The XML element describing the configuration to set.
+   * @returns A promise resolving to the response from the device in XML format.
+   */
+  public async setConfig(xpath: string, element: string): Promise<string> {
+    return this.postConfig(xpath, element, 'set', this.apiKey);
   }
 }

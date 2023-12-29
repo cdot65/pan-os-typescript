@@ -1,46 +1,44 @@
-// src/models/AddressObject.ts
-
 import { VersionedPanObject } from './VersionedPanObject';
 
 /**
- * Supported address formats for network locations used in PAN-OS address objects.
+ * Represents the types of network addresses in PAN-OS.
  */
 export type AddressType = 'ip-netmask' | 'ip-range' | 'ip-wildcard' | 'fqdn';
 
 /**
- * `AddressObject` extends `VersionedPanObject` to manage network address configurations in PAN-OS.
- * It facilitates defining rules and policies by encapsulating properties specific to network locations.
+ * The `AddressObject` class models network address entities for PAN-OS configuration.
+ * This class extends `VersionedPanObject` and encapsulates properties like value, type,
+ * description, and associated tags for an address object.
  */
 export class AddressObject extends VersionedPanObject {
   /**
-   * The network address, range, or other value based on `type`.
+   * The value of the address object, such as an IP address or range.
    */
   value: string;
 
   /**
-   * The format type of the `value`.
+   * The type of the address object, indicating its format.
    */
   type: AddressType;
 
   /**
-   * An optional description of the address object.
+   * An optional description for the address object.
    */
   description?: string;
 
   /**
-   * Optional tags for administrative purposes.
+   * Optional tags associated with the address object.
    */
   tag?: string[];
 
   /**
-   * Constructs a new `AddressObject` instance with a name, address value and type. You can optionally
-   * include a description and tags for additional context or organization.
+   * Constructs an `AddressObject` instance.
    *
-   * @param name - The name of the address object.
-   * @param value - The network address or range value for the object.
-   * @param type - The format of the address value (default is 'ip-netmask').
+   * @param name - The unique name identifying this address object.
+   * @param value - The address or range this object represents.
+   * @param type - The type of the address, determining its format.
    * @param description - An optional description of the address object.
-   * @param tag - Optional array of tags for the object.
+   * @param tag - An optional array of tags associated with the address object.
    */
   constructor(
     name: string,
@@ -57,13 +55,22 @@ export class AddressObject extends VersionedPanObject {
   }
 
   /**
-   * Generates the XML representation of the address object for PAN-OS API compatibility.
-   * @returns XML string representing the address object.
+   * Generates the XPath referencing this address object in the PAN-OS configuration.
+   * Adjust as per your PAN-OS schema.
+   *
+   * @returns The XPath as a string.
+   */
+  public getXpath(): string {
+    return `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
+  }
+
+  /**
+   * Creates the XML representation of this address object for PAN-OS API interactions.
+   *
+   * @returns The XML string representing this address object.
    */
   public toXml(): string {
-    // The XML generation logic is unchanged. TypeDoc does not require any specific code changes.
-    let xml = `<entry name="${this.name}">`;
-    xml += `<${this.type}>${this.value}</${this.type}>`;
+    let xml = `<entry name="${this.name}"><${this.type}>${this.value}</${this.type}>`;
     if (this.description) {
       xml += `<description>${this.description}</description>`;
     }
@@ -77,15 +84,15 @@ export class AddressObject extends VersionedPanObject {
   }
 
   /**
-   * Generates the XML representation of the address object for PAN-OS API compatibility.
-   * Includes only the fields that are being edited.
-   * @param fields - Fields to include in the XML. If empty, include all fields.
-   * @returns XML string representing the editable fields of the address object.
+   * Generates an XML representation of the editable fields of this address object.
+   * Only includes specified fields, or all fields if none are specified.
+   *
+   * @param fields - Fields of the `AddressObject` to include in the XML. If empty, includes all fields.
+   * @returns The XML string representing the editable fields of the address object.
    */
   public toEditableXml(fields: Array<keyof AddressObject> = []): string {
     let xml = `<entry name="${this.name}">`;
 
-    // Include only specified fields or all fields if none are specified
     if (
       fields.length === 0 ||
       fields.includes('type') ||

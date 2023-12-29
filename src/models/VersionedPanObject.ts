@@ -2,14 +2,19 @@
 import { PanObject } from './PanObject';
 
 /**
- * Abstract base class for version-specific objects in PAN-OS. `VersionedPanObject` extends `PanObject`,
- * requiring derived classes to implement the `toXml` method for XML representation, supporting PAN-OS API interactions.
+ * An abstract class that extends `PanObject` to provide version-specific
+ * features for PAN-OS objects. Subclasses must implement the `toXml` method
+ * that converts the object state to its corresponding XML representation
+ * for compatibility with PAN-OS API requests.
  */
 export abstract class VersionedPanObject extends PanObject {
   /**
-   * Converts the object to its XML string representation that can be used in PAN-OS API requests.
-   *
-   * @returns The XML format of the object as a string.
+   * Abstract method that converts the object into its corresponding XML representation.
+   * This representation is used when interacting with the PAN-OS API.
+   * Implementing classes should provide the specific XML conversion logic
+   * that matches their version-specific PAN-OS requirements.
+   * @abstract
+   * @returns The XML string representation of the versioned object.
    */
   public abstract toXml(): string;
 }
