@@ -29,6 +29,20 @@ export class ApiClient {
     });
   }
 
+  // Method for parsing XML
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async parseXml(xml: string): Promise<any> {
+    try {
+      return await parseStringPromise(xml, {
+        explicitArray: false,
+        ignoreAttrs: false,
+      });
+    } catch (error) {
+      console.error('Error parsing XML:', error);
+      throw error;
+    }
+  }
+
   /**
    * Retrieves the API key used for making requests.
    *
@@ -173,5 +187,36 @@ export class ApiClient {
     data.append('element', element);
 
     return this.post('/api/', data.toString());
+  }
+
+  /**
+   * Retrieves the specified configuration section from the PAN-OS device.
+   *
+   * @param xpath - The XPath expression for the configuration section.
+   * @param parse - Flag indicating whether to parse the XML response. Defaults to true.
+   * @returns A promise resolving to the configuration data, either as raw XML or a parsed object.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async getConfig(xpath: string, parse: boolean = true): Promise<any> {
+    const params = {
+      type: 'config',
+      action: 'get',
+      key: this.apiKey,
+      xpath: encodeURIComponent(xpath),
+    };
+
+    try {
+      const responseXml = await this.get('/api/', { params });
+      if (!parse) {
+        return responseXml;
+      }
+      return parseStringPromise(responseXml, {
+        explicitArray: false,
+        ignoreAttrs: false,
+      });
+    } catch (error) {
+      console.error('Error in getConfig:', error);
+      throw error;
+    }
   }
 }

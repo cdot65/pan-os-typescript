@@ -121,6 +121,19 @@ export abstract class PanObject {
   }
 
   /**
+   * Fetches the configuration for this object type from the device.
+   *
+   * @param xpath - The XPath specific to the object type.
+   * @param parse - Optional flag to parse the XML response. Defaults to true.
+   * @returns A promise resolving to the configuration data, either as raw XML or a parsed object.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async fetchConfig(xpath: string, parse: boolean = true): Promise<any> {
+    const apiClient = this.apiClient; // Retrieve the ApiClient instance
+    return apiClient.getConfig(xpath, parse);
+  }
+
+  /**
    * Creates the PAN-OS configuration object on the device by sending an API request.
    * This method calls the API to create the object based on its XPath and XML representation.
    * @returns A promise that resolves once the creation API call completes.
