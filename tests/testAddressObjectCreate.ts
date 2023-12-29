@@ -87,7 +87,7 @@ async function testCreateAddressObject() {
 
   try {
     console.log('Attempting to create AddressObject on the PAN-OS device...');
-    await firewall.createAddressObject(addressObject);
+    await addressObject.create();
     console.log(
       `Address Object '${argv.name}' created successfully on PAN-OS device.`,
     );
