@@ -102,6 +102,25 @@ export abstract class PanObject {
   }
 
   /**
+   * Finds a child PanObject within the configuration tree by name and optionally by type.
+   * @param name - The name of the child object to find.
+   * @param classType - The constructor of the class type to match.
+   * @returns The found PanObject instance or null if no child is found with the given name and type.
+   */
+  public find<ObjectType extends PanObject>(
+    name: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    classType?: new (...args: any[]) => ObjectType,
+  ): ObjectType | null {
+    for (const child of this.children) {
+      if (child.name === name && (!classType || child instanceof classType)) {
+        return child as ObjectType;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Creates the PAN-OS configuration object on the device by sending an API request.
    * This method calls the API to create the object based on its XPath and XML representation.
    * @returns A promise that resolves once the creation API call completes.
@@ -113,5 +132,17 @@ export abstract class PanObject {
 
     // Optionally, mark the configuration as changed
     // Additional implementation details for marking the configuration...
+  }
+
+  /**
+   * Applies the PAN-OS configuration object on the device by sending an API request.
+   * This method calls the API to replace the object based on its XPath and XML representation.
+   * @returns A promise that resolves once the apply API call completes.
+   */
+  public async apply(): Promise<void> {
+    const xpath = this.getXpath();
+    const element = this.toXml();
+    const entryName = this.name;
+    await this.apiClient.editConfig(xpath, element, entryName);
   }
 }
