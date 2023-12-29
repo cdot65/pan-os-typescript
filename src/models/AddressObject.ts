@@ -55,13 +55,16 @@ export class AddressObject extends VersionedPanObject {
   }
 
   /**
-   * Generates the XPath referencing this address object in the PAN-OS configuration.
-   * Adjust as per your PAN-OS schema.
+   * Static method to generate the XPath referencing address objects in the PAN-OS configuration.
    *
    * @returns The XPath as a string.
    */
+  public static getXpath(): string {
+    return "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address";
+  }
+
   public getXpath(): string {
-    return `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
+    return AddressObject.getXpath();
   }
 
   /**
@@ -85,15 +88,5 @@ export class AddressObject extends VersionedPanObject {
     }
     xml += '</entry>';
     return xml;
-  }
-
-  /**
-   * Fetches the configuration for this address object from the device.
-   * @returns A promise resolving to the configuration data, either as raw XML or a parsed object.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async fetchAddressObjectConfig(): Promise<any> {
-    const xpath = this.getXpath();
-    return this.fetchConfig(xpath, true); // Using true to parse the response by default
   }
 }

@@ -20,36 +20,20 @@ async function testFetchAddressObjectConfig() {
     throw new Error('API key is not set in environment variables.');
   }
 
-  console.log(`Creating a Firewall instance with hostname: ${hostname}`);
+  console.log('Initializing test for fetching address objects...');
+
   const firewall = new Firewall(hostname, apiKey);
 
-  // Using a predefined name for the address object for testing purposes.
-  const testAddressObjectName = 'TestAddressObject';
-  console.log(`Creating an AddressObject with name: ${testAddressObjectName}`);
-  const addressObject = new AddressObject(
-    testAddressObjectName,
-    '192.168.1.0/24', // Example IP range
-    'ip-netmask',
-  );
-
-  console.log('Adding AddressObject to the Firewall object...');
-  firewall.addChild(addressObject);
-
   try {
-    console.log('Attempting to apply AddressObject on the PAN-OS device...');
-    await addressObject.apply();
     console.log(
-      `AddressObject '${testAddressObjectName}' applied successfully on PAN-OS device.`,
+      'Attempting to retrieve AddressObject configuration from the PAN-OS device...',
     );
-
+    const xpath = AddressObject.getXpath(); // Static method in AddressObject to get XPath
+    const addressObjectConfig = await firewall.fetchConfig(xpath);
     console.log(
-      'Fetching AddressObject configuration from the PAN-OS device...',
+      'AddressObject configuration:',
+      JSON.stringify(addressObjectConfig, null, 2),
     );
-    const config = await addressObject.fetchAddressObjectConfig();
-    console.log('AddressObject configuration:', config);
-
-    // Add additional logic to validate the fetched configuration, if needed.
-    // For example, checking if the fetched configuration matches the expected values.
   } catch (error) {
     console.error('Error during the test:', error);
   }

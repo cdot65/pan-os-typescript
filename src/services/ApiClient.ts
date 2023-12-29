@@ -198,19 +198,28 @@ export class ApiClient {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async getConfig(xpath: string, parse: boolean = true): Promise<any> {
+    // console.log(`Fetching config for '${xpath}'`);
     const params = {
       type: 'config',
       action: 'get',
-      key: this.apiKey,
-      xpath: encodeURIComponent(xpath),
+      // key: this.apiKey,
+      xpath: xpath,
     };
 
     try {
-      const responseXml = await this.get('/api/', { params });
+      const response = await this.axiosInstance.get('/api/', {
+        params,
+        responseType: 'text',
+      });
+
+      // Extract the data from the response and trim it
+      const responseXml = response.data.trim();
+      console.log('Trimmed API response:', responseXml); // Log the trimmed response
+
       if (!parse) {
         return responseXml;
       }
-      return parseStringPromise(responseXml, {
+      return await parseStringPromise(responseXml, {
         explicitArray: false,
         ignoreAttrs: false,
       });
