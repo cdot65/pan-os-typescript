@@ -1,9 +1,7 @@
 // src/PanDevice.ts
 
 import { PanObject } from './PanObject';
-import { parseStringPromise } from 'xml2js';
 import { ApiClient } from '../services/ApiClient';
-import { ApiResponse } from '../interfaces/ApiResponse';
 import { JobsResponse } from '../interfaces/JobsResponse';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
 import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
@@ -73,30 +71,6 @@ export class PanDevice extends PanObject {
   public async fetchConfig(xpath: string): Promise<any> {
     const apiClient = this.apiClient; // Retrieve the ApiClient instance
     return apiClient.getConfig(xpath);
-  }
-
-  /**
-   * Parses an XML response into a structured ApiResponse object.
-   * @param responseXml - The XML string to parse.
-   * @protected
-   * @returns A promise resolved with the parsed ApiResponse object.
-   */
-  protected async parseApiResponse(responseXml: string): Promise<ApiResponse> {
-    try {
-      const parsedResponse = await parseStringPromise(responseXml, {
-        explicitArray: false,
-        ignoreAttrs: false,
-      });
-      const response = parsedResponse.response;
-      return {
-        status: response.$.status,
-        code: parseInt(response.$.code, 10),
-        message: response.msg || 'No message',
-      };
-    } catch (error) {
-      console.error('Error parsing API response:', error);
-      throw error;
-    }
   }
 
   /**
