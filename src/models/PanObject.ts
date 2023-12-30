@@ -3,9 +3,9 @@
 import { ApiClient } from '../services/ApiClient';
 
 /**
- * An abstract class representing a PAN-OS configuration object.
- * This class provides the structure and common functionality for derived configuration objects
- * such as address objects, service objects, and security policies.
+ * Abstract base class for representing a configuration object in PAN-OS.
+ * This class serves as the foundational structure for derived configuration
+ * objects such as address objects, service objects, and security policies.
  */
 export abstract class PanObject {
   protected parent: PanObject | null;
@@ -14,9 +14,11 @@ export abstract class PanObject {
   protected _apiClient: ApiClient | null;
 
   /**
-   * Constructs a new PanObject with a given name and, optionally, an ApiClient instance.
-   * @param name - The name of the object.
-   * @param apiClient - An optional ApiClient for making API requests (will be inherited if not provided).
+   * Initializes a new instance of `PanObject`.
+   *
+   * @param name - The name of this configuration object.
+   * @param apiClient - An optional `ApiClient` for performing API requests.
+   *                    If not provided, it will be inherited from the hierarchy.
    */
   constructor(name: string, apiClient?: ApiClient) {
     this.name = name;
@@ -26,9 +28,10 @@ export abstract class PanObject {
   }
 
   /**
-   * Retrieves the ApiClient instance from the object or its hierarchy.
-   * @returns The ApiClient instance associated with this object.
-   * @throws An error if the ApiClient instance is not set.
+   * Acquires the `ApiClient` from the current instance or its parent hierarchy.
+   *
+   * @returns The `ApiClient` associated with this object.
+   * @throws If the `ApiClient` instance is not found in the hierarchy.
    */
   public get apiClient(): ApiClient {
     if (this._apiClient) {
@@ -41,8 +44,9 @@ export abstract class PanObject {
   }
 
   /**
-   * Adds a child PanObject to the current object, setting the current object as the parent.
-   * @param child - The PanObject instance to be added as a child.
+   * Appends a `PanObject` as a child to the current object, establishing a parent-child relationship.
+   *
+   * @param child - The `PanObject` to add as a child of this object.
    */
   public addChild(child: PanObject): void {
     child.parent = this;
@@ -50,8 +54,9 @@ export abstract class PanObject {
   }
 
   /**
-   * Removes a child PanObject from the current object's children and clears its parent reference.
-   * @param child - The PanObject instance to be removed from the children list.
+   * Detaches a `PanObject` from the current object's children, severing the parent-child relationship.
+   *
+   * @param child - The `PanObject` to remove from this object's children.
    */
   public removeChild(child: PanObject): void {
     const index = this.children.indexOf(child);
@@ -62,41 +67,44 @@ export abstract class PanObject {
   }
 
   /**
-   * Provides read-only access to the child PanObjects of the current object.
-   * @returns An array of PanObject instances that are children of this object.
+   * Retrieves the child `PanObject` instances of the current object.
+   *
+   * @returns An array of `PanObject` representing the children of this object.
    */
   public getChildren(): ReadonlyArray<PanObject> {
     return this.children;
   }
 
   /**
-   * Finds a child PanObject within the current object's children by name.
-   * @param name - The name of the child object to find.
-   * @returns The found PanObject instance or null if no child is found with the given name.
+   * Searches for a child `PanObject` by its name.
+   *
+   * @param name - The name of the child object to locate.
+   * @returns The `PanObject` found, or `null` if no match is found.
    */
   public findChildByName(name: string): PanObject | null {
     return this.children.find((child) => child.name === name) || null;
   }
 
   /**
-   * Checks whether the given PanObject is a child of the current object.
-   * @param child - The PanObject instance to check for in the children list.
-   * @returns True if the object is a child, false otherwise.
+   * Determines if a given `PanObject` is a child of the current object.
+   *
+   * @param child - The `PanObject` to verify as a child of this object.
+   * @returns `true` if the `PanObject` is a child, otherwise `false`.
    */
   public hasChild(child: PanObject): boolean {
     return this.children.includes(child);
   }
 
   /**
-   * Finds a child PanObject within the configuration tree by name and optionally by type.
-   * @param name - The name of the child object to find.
-   * @param classType - The constructor of the class type to match.
-   * @returns The found PanObject instance or null if no child is found with the given name and type.
+   * Locates a child `PanObject` within the configuration tree by name, and optionally by type.
+   *
+   * @param name - The name of the object to search for.
+   * @param classType - Optionally, the class constructor to match instances against.
+   * @returns The matching `PanObject` instance, or `null` if not found.
    */
   public find<ObjectType extends PanObject>(
     name: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    classType?: new (...args: any[]) => ObjectType,
+    classType?: new (...args: unknown[]) => ObjectType,
   ): ObjectType | null {
     for (const child of this.children) {
       if (child.name === name && (!classType || child instanceof classType)) {
