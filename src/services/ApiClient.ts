@@ -221,7 +221,7 @@ export class ApiClient {
       }
       return await parseStringPromise(responseXml, {
         explicitArray: false,
-        ignoreAttrs: false,
+        ignoreAttrs: true,
       });
     } catch (error) {
       console.error('Error in getConfig:', error);
