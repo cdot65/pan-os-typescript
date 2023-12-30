@@ -59,7 +59,7 @@ async function testDeleteAddressObject() {
     const response = await firewall.deleteAddressObject(argv.name);
 
     // Log the response from the PAN-OS API.
-    logger.info(
+    logger.debug(
       'Delete Address Object Response:',
       JSON.stringify(response, null, 2),
     );

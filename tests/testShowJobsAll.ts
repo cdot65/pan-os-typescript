@@ -55,7 +55,7 @@ async function testShowJobsAll() {
     const jobsAll = await firewall.showJobsAll();
 
     // Output the job results to the console.
-    logger.info('All Job Results:', JSON.stringify(jobsAll, null, 2));
+    logger.debug('All Job Results:', JSON.stringify(jobsAll, null, 2));
   } catch (error) {
     // Handle any errors that occur during job retrieval and log them.
     console.error('Error:', error);

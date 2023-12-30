@@ -30,7 +30,7 @@ const argv = yargs(hideBin(process.argv))
 logger.level = argv.logLevel;
 
 async function testFetchAddressObjectConfig() {
-  logger.info(
+  logger.debug(
     'Initializing test for fetching an address object configuration...',
   );
 
@@ -41,17 +41,17 @@ async function testFetchAddressObjectConfig() {
     throw new Error('API key is not set in environment variables.');
   }
 
-  logger.info('Initializing test for fetching address objects...');
+  logger.debug('Initializing test for fetching address objects...');
 
   const firewall = new Firewall(hostname, apiKey);
 
   try {
-    logger.info(
+    logger.debug(
       'Attempting to retrieve AddressObject configuration from the PAN-OS device...',
     );
     const xpath = AddressObject.getXpath(); // Static method in AddressObject to get XPath
     const addressObjectConfig = await firewall.fetchConfig(xpath);
-    logger.info(
+    logger.debug(
       'AddressObject configuration:',
       JSON.stringify(addressObjectConfig, null, 2),
     );

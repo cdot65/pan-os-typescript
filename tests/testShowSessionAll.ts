@@ -55,7 +55,7 @@ async function testShowSessionAllResponse() {
     const showSessionAll = await firewall.showSessionAll();
 
     // Log the retrieved session data, formatted for better readability.
-    logger.info('Session Info:', JSON.stringify(showSessionAll, null, 2));
+    logger.debug('Session Info:', JSON.stringify(showSessionAll, null, 2));
   } catch (error) {
     // Log any errors encountered during the information retrieval.
     console.error('Error fetching session info:', error);

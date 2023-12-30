@@ -56,7 +56,7 @@ async function testGenerateApiKey() {
     const apiKey = apiKeyResponse.key;
 
     // Log the generated API key to the console
-    logger.info(apiKey);
+    logger.debug(apiKey);
   } catch (error) {
     // Handle and log any errors that occur during the API key generation
     console.error('Error:', error);

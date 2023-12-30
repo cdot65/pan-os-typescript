@@ -57,7 +57,7 @@ async function testShowJobsId() {
     const jobsIdResult = await firewall.showJobsId(jobId);
 
     // Print the job status result.
-    logger.info('Job Result:', JSON.stringify(jobsIdResult, null, 2));
+    logger.debug('Job Result:', JSON.stringify(jobsIdResult, null, 2));
   } catch (error) {
     // Log any errors encountered when fetching the job status.
     console.error('Error:', error);

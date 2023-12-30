@@ -60,7 +60,7 @@ async function testShowSessionId() {
     const sessionIdResponse = await firewall.showSessionId(sessionId);
 
     // Log the session information to the console.
-    logger.info(
+    logger.debug(
       `Session ID ${sessionId} Response:`,
       JSON.stringify(sessionIdResponse, null, 2),
     );

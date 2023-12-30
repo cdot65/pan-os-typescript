@@ -55,7 +55,7 @@ async function testExecuteOperationalCommand() {
     const cliCommandResponse = await firewall.apiClient.op(cliCmd);
 
     // Log the CLI command and its response.
-    logger.info(
+    logger.debug(
       'CLI Command: ' + cliCmd,
       '\n',
       JSON.stringify(cliCommandResponse, null, 2),

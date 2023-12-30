@@ -53,7 +53,7 @@ async function testShowRoutingRoute() {
 
   try {
     const routingRouteInfo = await firewall.showRoutingRoute();
-    logger.info('Route Table:', JSON.stringify(routingRouteInfo, null, 2));
+    logger.debug('Route Table:', JSON.stringify(routingRouteInfo, null, 2));
   } catch (error) {
     // Log an error if the API call was unsuccessful.
     console.error('Error fetching route table:', error);

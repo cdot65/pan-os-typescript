@@ -34,16 +34,15 @@ export class ApiClient {
     endpoint: string,
     params?: Record<string, unknown>,
   ): Promise<string> {
-    logger.debug('Sending GET request to with params:', params);
+    logger.debug(`Sending GET request to '${endpoint}' with params: ${params}`);
     try {
       const response = await this.axiosInstance.get(endpoint, {
         params: params,
         responseType: 'text',
       });
-      // logger.info(
-      //   `Response from GET request to '${endpoint}':`,
-      //   response.data,
-      // );
+      logger.debug(
+        `Response from GET request to '${endpoint}': ${response.data}`,
+      );
       return response.data;
     } catch (error) {
       console.error('Error in GET request:', error);
@@ -54,9 +53,7 @@ export class ApiClient {
   // NOTE: this is the low-level API communication that uses the Axios instance
   public async post(endpoint: string, data: string): Promise<string> {
     try {
-      // logger.info(
-      //   `Sending POST request to '${endpoint}' with data:`, data:`,
-      // );
+      logger.debug(`Sending POST request to '${endpoint}' with data: ${data}`);
       const response = await this.axiosInstance.post(endpoint, data, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -64,10 +61,9 @@ export class ApiClient {
         },
         responseType: 'text',
       });
-      // logger.info(
-      //   `Response from POST request to '${endpoint}':`,
-      //   response.data,
-      // );
+      logger.debug(
+        `Response from POST request to '${endpoint}': ${response.data}`,
+      );
       return response.data;
     } catch (error) {
       console.error('Error in POST request:', error);
@@ -162,7 +158,7 @@ export class ApiClient {
     xpath: string,
     parse: boolean = true,
   ): Promise<ApiResponse<ApiResult> | string> {
-    // logger.info(`Fetching config for '${xpath}'`);
+    // logger.debug(`Fetching config for '${xpath}'`);
     const params = {
       type: 'config',
       action: 'get',
@@ -181,7 +177,7 @@ export class ApiClient {
 
       // Extract the data from the response and trim it
       const trimmedResponseXml = responseXml.trim();
-      logger.info('Trimmed API response:', trimmedResponseXml); // Log the trimmed response
+      logger.debug('Trimmed API response:', trimmedResponseXml); // Log the trimmed response
 
       // Parse the XML and return it as ApiResponse<ApiResult>
       return await this.parseXml<ApiResult>(trimmedResponseXml);

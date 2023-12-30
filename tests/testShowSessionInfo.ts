@@ -54,7 +54,7 @@ async function testShowSessionInfo() {
     const showSessionInfoResponse = await firewall.showSessionInfo();
 
     // Output detailed session information to the console.
-    logger.info(
+    logger.debug(
       'Session Info:',
       JSON.stringify(showSessionInfoResponse, null, 2),
     );

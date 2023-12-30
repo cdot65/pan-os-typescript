@@ -65,7 +65,7 @@ const argv = yargs(hideBin(process.argv))
 logger.level = argv.logLevel;
 
 async function testAddressObjectFind() {
-  logger.info('Initializing test for finding an address object...');
+  logger.debug('Initializing test for finding an address object...');
 
   const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
@@ -74,10 +74,10 @@ async function testAddressObjectFind() {
     throw new Error('API key is not set in environment variables.');
   }
 
-  logger.info(`Creating a Firewall instance with hostname: ${hostname}`);
+  logger.debug(`Creating a Firewall instance with hostname: ${hostname}`);
   const firewall = new Firewall(hostname, apiKey);
 
-  logger.info(`Creating an AddressObject with name: ${argv.name}`);
+  logger.debug(`Creating an AddressObject with name: ${argv.name}`);
   const addressObject = new AddressObject(
     argv.name,
     argv.value,
@@ -86,15 +86,15 @@ async function testAddressObjectFind() {
     argv.tag,
   );
 
-  logger.info('Adding AddressObject to the Firewall object...');
+  logger.debug('Adding AddressObject to the Firewall object...');
   firewall.addChild(addressObject);
 
-  logger.info('Attempting to find AddressObject by name...');
+  logger.debug('Attempting to find AddressObject by name...');
   const foundObject = firewall.find(argv.name, AddressObject);
 
   if (foundObject) {
-    logger.info(`Found AddressObject '${argv.name}'.`);
-    logger.info('AddressObject Details:', {
+    logger.debug(`Found AddressObject '${argv.name}'.`);
+    logger.debug('AddressObject Details:', {
       name: foundObject.name,
       value: foundObject.value,
       type: foundObject.type,

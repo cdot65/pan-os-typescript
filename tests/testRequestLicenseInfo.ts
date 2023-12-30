@@ -54,7 +54,7 @@ async function testRequestLicenseInfo() {
     const licenseInfo = await firewall.requestLicenseInfo();
 
     // Output the license information to the console.
-    logger.info('Licenses:', JSON.stringify(licenseInfo, null, 2));
+    logger.debug('Licenses:', JSON.stringify(licenseInfo, null, 2));
   } catch (error) {
     // Handle and log any errors that occur while fetching license information.
     console.error('Error:', error);

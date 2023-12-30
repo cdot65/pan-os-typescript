@@ -59,7 +59,7 @@ async function testUrlInfo() {
     const urlInfoResponse = await firewall.testUrlInfo(url);
 
     // Log the fetched URL information to the console for inspection.
-    logger.info(
+    logger.debug(
       `URL Info for ${url}:`,
       JSON.stringify(urlInfoResponse, null, 2),
     );

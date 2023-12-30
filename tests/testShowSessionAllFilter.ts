@@ -62,7 +62,7 @@ async function testShowSessionAllFilter() {
     );
 
     // Output the results of the session filter query.
-    logger.info(
+    logger.debug(
       `Filtered Session Info (source: ${srcIp}, destination: ${dstIp}):`,
       JSON.stringify(sessionAllFilterResponse, null, 2),
     );

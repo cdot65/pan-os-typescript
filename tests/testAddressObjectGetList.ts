@@ -47,10 +47,10 @@ async function testAddressObjectGetList() {
   try {
     // Attempt to retrieve the list of address objects on the PAN-OS device.
     const response = await firewall.addressObjectGetList();
-    logger.info('Response:', response);
+    logger.debug('Response:', response);
 
     // Log the response from the PAN-OS API.
-    logger.info('List of Address Objects:', JSON.stringify(response, null, 2));
+    logger.debug('List of Address Objects:', JSON.stringify(response, null, 2));
   } catch (error) {
     // Log any errors encountered during address object creation.
     console.error('Error:', error);

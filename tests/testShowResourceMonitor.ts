@@ -51,7 +51,7 @@ async function testShowResourceMonitor() {
 
   try {
     const resourceMonitorInfo = await firewall.showResourceMonitor();
-    logger.info(
+    logger.debug(
       'Resource Monitor Info:',
       JSON.stringify(resourceMonitorInfo, null, 2),
     );
