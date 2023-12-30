@@ -41,20 +41,6 @@ export abstract class PanObject {
   }
 
   /**
-   * Abstract method to get the XPath of the object for PAN-OS configuration.
-   * @abstract
-   * @returns The XPath string of the object.
-   */
-  public abstract getXpath(): string;
-
-  /**
-   * Abstract method to convert the object to its XML representation for PAN-OS API calls.
-   * @abstract
-   * @returns The XML string of the object.
-   */
-  public abstract toXml(): string;
-
-  /**
    * Adds a child PanObject to the current object, setting the current object as the parent.
    * @param child - The PanObject instance to be added as a child.
    */
@@ -118,43 +104,5 @@ export abstract class PanObject {
       }
     }
     return null;
-  }
-
-  /**
-   * Fetches the configuration for this object type from the device.
-   *
-   * @param xpath - The XPath specific to the object type.
-   * @returns A promise resolving to the configuration data as a parsed object.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async fetchConfig(xpath: string): Promise<any> {
-    const apiClient = this.apiClient; // Retrieve the ApiClient instance
-    return apiClient.getConfig(xpath);
-  }
-
-  /**
-   * Creates the PAN-OS configuration object on the device by sending an API request.
-   * This method calls the API to create the object based on its XPath and XML representation.
-   * @returns A promise that resolves once the creation API call completes.
-   */
-  public async create(): Promise<void> {
-    const xpath = this.getXpath();
-    const element = this.toXml();
-    await this.apiClient.setConfig(xpath, element);
-
-    // Optionally, mark the configuration as changed
-    // Additional implementation details for marking the configuration...
-  }
-
-  /**
-   * Applies the PAN-OS configuration object on the device by sending an API request.
-   * This method calls the API to replace the object based on its XPath and XML representation.
-   * @returns A promise that resolves once the apply API call completes.
-   */
-  public async apply(): Promise<void> {
-    const xpath = this.getXpath();
-    const element = this.toXml();
-    const entryName = this.name;
-    await this.apiClient.editConfig(xpath, element, entryName);
   }
 }
