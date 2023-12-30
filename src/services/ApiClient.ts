@@ -2,7 +2,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 import { parseStringPromise } from 'xml2js';
-
+import { ApiResponse, ApiResult } from '../interfaces/ApiResponse';
 /**
  * A class for interacting with the Palo Alto Networks XML API.
  */
@@ -28,7 +28,10 @@ export class ApiClient {
   }
 
   // NOTE: this is the low-level API communication that uses the Axios instance
-  public async get(endpoint: string, params?: object): Promise<string> {
+  public async get(
+    endpoint: string,
+    params?: Record<string, unknown>,
+  ): Promise<string> {
     // console.log(`Sending GET request to '${endpoint}' with params:`, params); // Log request details
     try {
       const response = await this.axiosInstance.get(endpoint, {
@@ -74,17 +77,17 @@ export class ApiClient {
    * to get data from the API and parse it into a JavaScript object.
    * Currently used by the `op()` and `generateApiKey()` methods in PanDevice.
    */
-  public async getData(
+  public async getData<T extends ApiResult>(
     endpoint: string,
-    params?: object,
+    params?: Record<string, unknown>,
     parse: boolean = true,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
+  ): Promise<ApiResponse<T> | string> {
     const responseXml = await this.get(endpoint, params);
     if (!parse) {
       return responseXml;
     }
-    return this.parseXml(responseXml);
+    const parsedXml: ApiResponse<T> = await this.parseXml(responseXml);
+    return parsedXml;
   }
 
   /**
@@ -156,7 +159,7 @@ export class ApiClient {
   public async getConfig(
     xpath: string,
     parse: boolean = true,
-  ): Promise<string> {
+  ): Promise<ApiResponse<ApiResult> | string> {
     // console.log(`Fetching config for '${xpath}'`);
     const params = {
       type: 'config',
@@ -169,14 +172,17 @@ export class ApiClient {
       // Use the existing get() method to perform the API call
       const responseXml = await this.get('/api/', params);
 
+      // If we do not need to parse the XML, return the response text trimmed
+      if (!parse) {
+        return responseXml.trim();
+      }
+
       // Extract the data from the response and trim it
       const trimmedResponseXml = responseXml.trim();
       console.log('Trimmed API response:', trimmedResponseXml); // Log the trimmed response
 
-      if (!parse) {
-        return trimmedResponseXml;
-      }
-      return await this.parseXml(trimmedResponseXml);
+      // Parse the XML and return it as ApiResponse<ApiResult>
+      return await this.parseXml<ApiResult>(trimmedResponseXml);
     } catch (error) {
       console.error('Error in getConfig:', error);
       throw error;
@@ -188,19 +194,20 @@ export class ApiClient {
    * @param xml - The XML string to be parsed.
    * @returns A promise resolved with the parsed object.
    */
-  public async parseXml(
+  public async parseXml<T extends ApiResult>(
     xml: string,
     explicitArray: boolean = false,
     ignoreAttrs: boolean = true,
-  ): Promise<string> {
+  ): Promise<ApiResponse<T>> {
     try {
-      // console.log('Parsing XML:', xml); // Log the XML string
-      const parsedXml = await parseStringPromise(xml, {
+      const parsedObject = await parseStringPromise(xml, {
         explicitArray: explicitArray,
         ignoreAttrs: ignoreAttrs,
+        explicitRoot: false,
       });
-      // console.log('Parsed XML:', parsedXml); // Log the parsed object
-      return parsedXml;
+
+      // Since the root element is 'response', parsedObject should directly correspond to ApiResponse<T>
+      return parsedObject as ApiResponse<T>; // Cast it directly
     } catch (error) {
       console.error('Error parsing XML:', error);
       throw error;
