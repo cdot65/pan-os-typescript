@@ -28,15 +28,6 @@ export class PanDevice extends PanObject {
   }
 
   /**
-   * Retrieves the API key used by the API client.
-   * @protected
-   * @returns The API key as a string.
-   */
-  protected getApiKey(): string {
-    return this.apiClient.getApiKey();
-  }
-
-  /**
    * Generates an API key using the provided credentials.
    * @param username - The username for the PAN-OS device.
    * @param password - The password for the PAN-OS device.
@@ -109,84 +100,12 @@ export class PanDevice extends PanObject {
   }
 
   /**
-   * Converts a CLI-like command string into its XML representation.
-   * This method is invoked when an operational command is specified in
-   * a format other than XML and needs to be converted.
-   * @param cliCmd - The CLI command string to convert.
-   * @private
-   * @returns The XML representation of the command string.
-   */
-  private convertCliToXml(cliCmd: string): string {
-    const quote = '"';
-    const parts = cliCmd.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
-
-    if (parts.length === 0) {
-      return '';
-    }
-
-    let xmlCmd = '';
-    const openTags: string[] = [];
-
-    for (const part of parts) {
-      if (part.startsWith(quote) && part.endsWith(quote)) {
-        xmlCmd += part.slice(1, -1);
-      } else {
-        xmlCmd += `<${part}>`;
-        openTags.push(part);
-      }
-    }
-
-    while (openTags.length) {
-      const tag = openTags.pop();
-      xmlCmd += `</${tag}>`;
-    }
-
-    return xmlCmd;
-  }
-
-  /**
-   * Provides access to the ApiClient instance used by the PanDevice.
-   * @returns The ApiClient currently associated with the PanDevice.
-   */
-  public getApiClient(): ApiClient {
-    return this.apiClient;
-  }
-
-  /**
-   * Executes an operational command on the PAN-OS device and optionally parses the response.
-   * @param command - The operational command in XML or CLI-like format.
-   * @param parse - Optionally parse the response into object format. Default is true.
-   * @returns The response from executing the operational command.
-   */
-  public async op(
-    command: string,
-    parse: boolean = true,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    let xmlCmd: string;
-
-    if (command.startsWith('<') && command.endsWith('>')) {
-      xmlCmd = command;
-    } else {
-      xmlCmd = this.convertCliToXml(command);
-    }
-
-    const encodedCmd = encodeURIComponent(xmlCmd);
-    const response = await this.apiClient.getData(
-      `/api/?type=op&cmd=${encodedCmd}`,
-      { key: this.getApiKey() },
-      parse,
-    );
-    return response;
-  }
-
-  /**
    * Requests and retrieves license information from the PAN-OS device.
    * @returns A promise resolved with license information from the device.
    */
   public async requestLicenseInfo(): Promise<LicenseInfoResponse> {
     const xmlCmd = '<request><license><info/></license></request>';
-    const response = await this.op(xmlCmd);
+    const response = await this.apiClient.op(xmlCmd);
     return response;
   }
 
@@ -196,7 +115,7 @@ export class PanDevice extends PanObject {
    */
   public async showJobsAll(): Promise<JobsResponse> {
     const xmlCmd = '<show><jobs><all/></jobs></show>';
-    const response = await this.op(xmlCmd);
+    const response = await this.apiClient.op(xmlCmd);
     return response;
   }
 
@@ -207,7 +126,7 @@ export class PanDevice extends PanObject {
    */
   public async showJobsId(jobId: string): Promise<JobsResponse> {
     const xmlCmd = `<show><jobs><id>${jobId}</id></jobs></show>`;
-    const response = await this.op(xmlCmd);
+    const response = await this.apiClient.op(xmlCmd);
     return response;
   }
 
@@ -217,7 +136,7 @@ export class PanDevice extends PanObject {
    */
   public async showSystemInfoResponse(): Promise<SystemInfoResponse> {
     const xmlCmd = '<show><system><info/></system></show>';
-    const response = await this.op(xmlCmd);
+    const response = await this.apiClient.op(xmlCmd);
     return response;
   }
 }
