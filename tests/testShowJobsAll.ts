@@ -1,4 +1,7 @@
 import dotenv from 'dotenv';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load the appropriate environment configuration based on the NODE_ENV setting.
 dotenv.config({
@@ -6,6 +9,23 @@ dotenv.config({
 });
 
 import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Tests the `showJobsAll` function of the `Firewall` class which fetches all job results
@@ -35,7 +55,7 @@ async function testShowJobsAll() {
     const jobsAll = await firewall.showJobsAll();
 
     // Output the job results to the console.
-    console.log('All Job Results:', JSON.stringify(jobsAll, null, 2));
+    logger.info('All Job Results:', JSON.stringify(jobsAll, null, 2));
   } catch (error) {
     // Handle any errors that occur during job retrieval and log them.
     console.error('Error:', error);

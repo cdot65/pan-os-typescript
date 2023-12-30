@@ -1,6 +1,9 @@
 // tests/testUrlInfo.ts
 
 import dotenv from 'dotenv';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load environment variables from the .env file based on the current NODE_ENV environment variable.
 dotenv.config({
@@ -8,6 +11,23 @@ dotenv.config({
 });
 
 import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Fetches and logs the URL information from a PAN-OS device for a given or default URL.
@@ -39,7 +59,7 @@ async function testUrlInfo() {
     const urlInfoResponse = await firewall.testUrlInfo(url);
 
     // Log the fetched URL information to the console for inspection.
-    console.log(
+    logger.info(
       `URL Info for ${url}:`,
       JSON.stringify(urlInfoResponse, null, 2),
     );

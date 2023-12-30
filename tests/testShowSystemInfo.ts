@@ -1,6 +1,9 @@
 // tests/testShowSystemInfoResponse.ts
 
 import dotenv from 'dotenv';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load and configure environment variables from the .env file based on the current environment (development or production).
 dotenv.config({
@@ -8,6 +11,23 @@ dotenv.config({
 });
 
 import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Retrieves and logs the system information from a PAN-OS device.
@@ -36,7 +56,7 @@ async function testShowSystemInfoResponse() {
     const systemInfo = await firewall.showSystemInfoResponse();
 
     // Log the retrieved system information to the console for verification.
-    console.log('System Info:', JSON.stringify(systemInfo, null, 2));
+    logger.info('System Info:', JSON.stringify(systemInfo, null, 2));
   } catch (error) {
     // Log any errors encountered during the retrieval process.
     console.error('Error retrieving system info:', error);

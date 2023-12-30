@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { Firewall, AddressObject, AddressType } from '../src/index';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load environment variables.
 dotenv.config({
@@ -16,6 +17,7 @@ interface Arguments {
   type: AddressType;
   description?: string;
   tag?: string[];
+  logLevel: string;
 }
 
 const argv = yargs(hideBin(process.argv))
@@ -50,11 +52,20 @@ const argv = yargs(hideBin(process.argv))
       default: undefined,
       description: 'Tags associated with the address object',
     },
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
   })
   .parseSync() as Arguments;
 
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
+
 async function testAddressObjectFind() {
-  console.log('Initializing test for finding an address object...');
+  logger.info('Initializing test for finding an address object...');
 
   const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
@@ -63,10 +74,10 @@ async function testAddressObjectFind() {
     throw new Error('API key is not set in environment variables.');
   }
 
-  console.log(`Creating a Firewall instance with hostname: ${hostname}`);
+  logger.info(`Creating a Firewall instance with hostname: ${hostname}`);
   const firewall = new Firewall(hostname, apiKey);
 
-  console.log(`Creating an AddressObject with name: ${argv.name}`);
+  logger.info(`Creating an AddressObject with name: ${argv.name}`);
   const addressObject = new AddressObject(
     argv.name,
     argv.value,
@@ -75,15 +86,15 @@ async function testAddressObjectFind() {
     argv.tag,
   );
 
-  console.log('Adding AddressObject to the Firewall object...');
+  logger.info('Adding AddressObject to the Firewall object...');
   firewall.addChild(addressObject);
 
-  console.log('Attempting to find AddressObject by name...');
+  logger.info('Attempting to find AddressObject by name...');
   const foundObject = firewall.find(argv.name, AddressObject);
 
   if (foundObject) {
-    console.log(`Found AddressObject '${argv.name}'.`);
-    console.log('AddressObject Details:', {
+    logger.info(`Found AddressObject '${argv.name}'.`);
+    logger.info('AddressObject Details:', {
       name: foundObject.name,
       value: foundObject.value,
       type: foundObject.type,

@@ -1,4 +1,7 @@
 import dotenv from 'dotenv';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load and configure environment variables from the .env file based on the current NODE_ENV setting.
 dotenv.config({
@@ -6,6 +9,23 @@ dotenv.config({
 });
 
 import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Demonstrates fetching and logging the status of a job from a PAN-OS device by its job ID.
@@ -37,7 +57,7 @@ async function testShowJobsId() {
     const jobsIdResult = await firewall.showJobsId(jobId);
 
     // Print the job status result.
-    console.log('Job Result:', JSON.stringify(jobsIdResult, null, 2));
+    logger.info('Job Result:', JSON.stringify(jobsIdResult, null, 2));
   } catch (error) {
     // Log any errors encountered when fetching the job status.
     console.error('Error:', error);

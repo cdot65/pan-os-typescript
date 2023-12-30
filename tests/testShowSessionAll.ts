@@ -1,6 +1,9 @@
 // tests/testShowSessionAll.ts
 
 import dotenv from 'dotenv';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load and configure environment variables from the .env file based on the NODE_ENV setting.
 dotenv.config({
@@ -8,6 +11,23 @@ dotenv.config({
 });
 
 import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Fetches and logs the 'show session all' response from a PAN-OS device.
@@ -35,7 +55,7 @@ async function testShowSessionAllResponse() {
     const showSessionAll = await firewall.showSessionAll();
 
     // Log the retrieved session data, formatted for better readability.
-    console.log('Session Info:', JSON.stringify(showSessionAll, null, 2));
+    logger.info('Session Info:', JSON.stringify(showSessionAll, null, 2));
   } catch (error) {
     // Log any errors encountered during the information retrieval.
     console.error('Error fetching session info:', error);

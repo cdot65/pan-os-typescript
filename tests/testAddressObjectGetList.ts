@@ -2,11 +2,32 @@
 
 import dotenv from 'dotenv';
 import { Firewall } from '../src/index';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load the correct environment variables based on the NODE_ENV value.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
+
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Test script to create an address object in PAN-OS using values from command line arguments.
@@ -26,10 +47,10 @@ async function testAddressObjectGetList() {
   try {
     // Attempt to retrieve the list of address objects on the PAN-OS device.
     const response = await firewall.addressObjectGetList();
-    console.log('Response:', response);
+    logger.info('Response:', response);
 
     // Log the response from the PAN-OS API.
-    console.log('List of Address Objects:', JSON.stringify(response, null, 2));
+    logger.info('List of Address Objects:', JSON.stringify(response, null, 2));
   } catch (error) {
     // Log any errors encountered during address object creation.
     console.error('Error:', error);

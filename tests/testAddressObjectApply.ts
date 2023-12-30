@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { Firewall, AddressObject, AddressType } from '../src/index';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
 
 // Load environment variables.
 dotenv.config({
@@ -16,6 +17,7 @@ interface Arguments {
   type: AddressType;
   description?: string;
   tag?: string[];
+  logLevel: string;
 }
 
 const argv = yargs(hideBin(process.argv))
@@ -50,11 +52,23 @@ const argv = yargs(hideBin(process.argv))
       default: undefined,
       description: 'Tags associated with the address object',
     },
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
   })
   .parseSync() as Arguments;
 
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
+
 async function testAddressObjectApply() {
-  console.log('Initializing test for applying an address object...');
+  logger.info('Initializing test for applying an address object...');
 
   const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
@@ -63,10 +77,10 @@ async function testAddressObjectApply() {
     throw new Error('API key is not set in environment variables.');
   }
 
-  console.log(`Creating a Firewall instance with hostname: ${hostname}`);
+  logger.info(`Creating a Firewall instance with hostname: ${hostname}`);
   const firewall = new Firewall(hostname, apiKey);
 
-  console.log(`Creating an AddressObject with name: ${argv.name}`);
+  logger.info(`Creating an AddressObject with name: ${argv.name}`);
   const addressObject = new AddressObject(
     argv.name,
     argv.value,
@@ -75,20 +89,20 @@ async function testAddressObjectApply() {
     argv.tag ? argv.tag.filter((t) => t !== undefined) : undefined,
   );
 
-  console.log('Adding AddressObject to the Firewall object...');
+  logger.info('Adding AddressObject to the Firewall object...');
   firewall.addChild(addressObject);
 
   // Verifying if the AddressObject is successfully added
   if (firewall.hasChild(addressObject)) {
-    console.log(`AddressObject '${argv.name}' added to Firewall.`);
+    logger.info(`AddressObject '${argv.name}' added to Firewall.`);
   } else {
     throw new Error(`Failed to add AddressObject '${argv.name}' to Firewall.`);
   }
 
   try {
-    console.log('Attempting to apply AddressObject on the PAN-OS device...');
+    logger.info('Attempting to apply AddressObject on the PAN-OS device...');
     await addressObject.apply();
-    console.log(
+    logger.info(
       `Address Object '${argv.name}' applied successfully on PAN-OS device.`,
     );
   } catch (error) {
