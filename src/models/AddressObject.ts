@@ -1,4 +1,5 @@
 import { VersionedPanObject } from './VersionedPanObject';
+import { AddressObjectConfig } from '../interfaces/AddressObjectConfig';
 
 /**
  * Represents the types of network addresses in PAN-OS.
@@ -51,7 +52,7 @@ export class AddressObject extends VersionedPanObject {
     this.value = value;
     this.type = type;
     this.description = description;
-    this.tag = tag;
+    this.tag = tag?.filter((t) => t != null) || []; // Filters out undefined values
   }
 
   /**
@@ -88,5 +89,24 @@ export class AddressObject extends VersionedPanObject {
     }
     xml += '</entry>';
     return xml;
+  }
+
+  protected parseConfigObjects(config: AddressObjectConfig): AddressObject[] {
+    const addressEntries = config.response.result.address.entry;
+    return addressEntries.map(
+      (entry) =>
+        new AddressObject(
+          entry.$.name,
+          entry['ip-netmask'] || entry.fqdn || '',
+          entry['ip-netmask'] ? 'ip-netmask' : 'fqdn',
+          entry.description || '',
+          (entry.tag?.member
+            ? Array.isArray(entry.tag.member)
+              ? entry.tag.member
+              : [entry.tag.member]
+            : []
+          ).filter((t): t is string => t !== undefined), // Filter out undefined values
+        ),
+    );
   }
 }
