@@ -48,8 +48,10 @@ export class ApiClient {
 
   // NOTE: this is the low-level API communication that uses the Axios instance
   public async post(endpoint: string, data: string): Promise<string> {
-    // console.log(`Sending POST request to '${endpoint}' with data:`, data);
     try {
+      // console.log(
+      //   `Sending POST request to '${endpoint}' with data:`, data:`,
+      // );
       const response = await this.axiosInstance.post(endpoint, data, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         responseType: 'text',
