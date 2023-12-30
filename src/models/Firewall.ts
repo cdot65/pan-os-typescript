@@ -40,7 +40,7 @@ export class Firewall extends PanDevice {
     const cmd = 'show running resource-monitor minute';
 
     // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
+    return this.apiClient.op(cmd);
   }
 
   /**
@@ -51,7 +51,7 @@ export class Firewall extends PanDevice {
     const cmd = 'show routing route';
 
     // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
+    return this.apiClient.op(cmd);
   }
 
   /**
@@ -62,7 +62,7 @@ export class Firewall extends PanDevice {
     const cmd = 'show session all';
 
     // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
+    return this.apiClient.op(cmd);
   }
 
   /**
@@ -76,7 +76,7 @@ export class Firewall extends PanDevice {
     sourceIp: string,
   ): Promise<SessionResponse> {
     const xmlCmd = `<show><session><all><filter><source>${sourceIp}</source><destination>${destinationIp}</destination></filter></all></session></show>`;
-    const response = await this.op(xmlCmd);
+    const response = await this.apiClient.op(xmlCmd);
     return response;
   }
 
@@ -87,7 +87,7 @@ export class Firewall extends PanDevice {
    */
   public async showSessionId(sessionId: string): Promise<SessionIdResponse> {
     const xmlCmd = `<show><session><id>${sessionId}</id></session></show>`;
-    const response = await this.op(xmlCmd);
+    const response = await this.apiClient.op(xmlCmd);
     return response;
   }
 
@@ -99,7 +99,7 @@ export class Firewall extends PanDevice {
     const cmd = 'show session info';
 
     // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
+    return this.apiClient.op(cmd);
   }
 
   /**
@@ -109,7 +109,7 @@ export class Firewall extends PanDevice {
    */
   public async testUrlInfo(url: string): Promise<TestUrlInfoResponse> {
     const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
-    const response = await this.op(xmlCmd);
+    const response = await this.apiClient.op(xmlCmd);
     return response;
   }
 
@@ -119,7 +119,7 @@ export class Firewall extends PanDevice {
    */
   public async addressObjectGetList(): Promise<AddressObjectEntry[]> {
     const xmlCmd = `<show><config><running><xpath>devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address</xpath></running></config></show>`;
-    const responseXml = await this.op(xmlCmd, false);
+    const responseXml = await this.apiClient.op(xmlCmd, false);
 
     // Parse the XML response
     const parsedResponse = await parseStringPromise(responseXml, {
