@@ -188,7 +188,6 @@ export class ApiClient {
    * @param xml - The XML string to be parsed.
    * @returns A promise resolved with the parsed object.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async parseXml(
     xml: string,
     explicitArray: boolean = false,
@@ -208,8 +207,61 @@ export class ApiClient {
     }
   }
 
-  // TODO: this is currently only used by the `op()` method in PanDevice
-  public getApiKey(): string {
-    return this.apiKey;
+  public async op(
+    command: string,
+    parse: boolean = true,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> {
+    let xmlCmd: string;
+
+    if (command.startsWith('<') && command.endsWith('>')) {
+      xmlCmd = command;
+    } else {
+      xmlCmd = this.convertCliToXml(command);
+    }
+
+    const encodedCmd = encodeURIComponent(xmlCmd);
+    const response = await this.getData(
+      `/api/?type=op&cmd=${encodedCmd}`,
+      { key: this.apiKey },
+      parse,
+    );
+    return response;
+  }
+
+  /**
+   * Converts a CLI-like command string into its XML representation.
+   * This method is invoked when an operational command is specified in
+   * a format other than XML and needs to be converted.
+   * @param cliCmd - The CLI command string to convert.
+   * @private
+   * @returns The XML representation of the command string.
+   */
+  private convertCliToXml(cliCmd: string): string {
+    const quote = '"';
+    const parts = cliCmd.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+
+    if (parts.length === 0) {
+      return '';
+    }
+
+    let xmlCmd = '';
+    const openTags: string[] = [];
+
+    for (const part of parts) {
+      if (part.startsWith(quote) && part.endsWith(quote)) {
+        xmlCmd += part.slice(1, -1);
+      } else {
+        xmlCmd += `<${part}>`;
+        openTags.push(part);
+      }
+    }
+
+    while (openTags.length) {
+      const tag = openTags.pop();
+      xmlCmd += `</${tag}>`;
+    }
+
+    return xmlCmd;
   }
 }
