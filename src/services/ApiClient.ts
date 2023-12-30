@@ -94,7 +94,6 @@ export class ApiClient {
    * @param action can be 'set', 'edit', or 'delete'. Higher level abstractions will differ on this argument value
    * @param apiKey the API key to be used. Defaults to the API key provided during instantiation
    */
-  // TODO: can we nix the `apiKey` argument and just use the instance property?
   public async postConfig(
     xpath: string,
     element: string,
@@ -123,7 +122,6 @@ export class ApiClient {
    * @param xpath string of the xpath to be used
    * @param element string representation of the xml element to be pushed
    */
-  // TODO: can we nix the `apiKey` argument and just use the instance property?
   public async setConfig(xpath: string, element: string): Promise<string> {
     return this.postConfig(xpath, element, 'set');
   }
@@ -136,7 +134,6 @@ export class ApiClient {
    * @param element string representation of the xml element to be pushed
    * @param entryName string name of the entry to be edited
    */
-  // TODO: can we nix the `apiKey` argument and just use the instance property?
   public async editConfig(
     xpath: string,
     element: string,
@@ -164,22 +161,21 @@ export class ApiClient {
       type: 'config',
       action: 'get',
       xpath: xpath,
+      key: this.apiKey,
     };
 
     try {
-      const response = await this.axiosInstance.get('/api/', {
-        params,
-        responseType: 'text',
-      });
+      // Use the existing get() method to perform the API call
+      const responseXml = await this.get('/api/', params);
 
       // Extract the data from the response and trim it
-      const responseXml = response.data.trim();
-      console.log('Trimmed API response:', responseXml); // Log the trimmed response
+      const trimmedResponseXml = responseXml.trim();
+      console.log('Trimmed API response:', trimmedResponseXml); // Log the trimmed response
 
       if (!parse) {
-        return responseXml;
+        return trimmedResponseXml;
       }
-      return await this.parseXml(responseXml);
+      return await this.parseXml(trimmedResponseXml);
     } catch (error) {
       console.error('Error in getConfig:', error);
       throw error;
