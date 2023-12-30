@@ -153,9 +153,10 @@ export class ApiClient {
     return this.post('/api/', data.toString());
   }
 
-  // TODO: can we use the `get` method to perform the API call?
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async getConfig(xpath: string, parse: boolean = true): Promise<any> {
+  public async getConfig(
+    xpath: string,
+    parse: boolean = true,
+  ): Promise<string> {
     // console.log(`Fetching config for '${xpath}'`);
     const params = {
       type: 'config',
