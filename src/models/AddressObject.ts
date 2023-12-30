@@ -2,44 +2,44 @@ import { VersionedPanObject } from './VersionedPanObject';
 import { AddressObjectConfig } from '../interfaces/AddressObjectConfig';
 
 /**
- * Represents the types of network addresses in PAN-OS.
+ * Defines the available types of network addresses in PAN-OS.
  */
 export type AddressType = 'ip-netmask' | 'ip-range' | 'ip-wildcard' | 'fqdn';
 
 /**
- * The `AddressObject` class models network address entities for PAN-OS configuration.
- * This class extends `VersionedPanObject` and encapsulates properties like value, type,
- * description, and associated tags for an address object.
+ * Network address entities for PAN-OS configuration are modeled by the `AddressObject` class.
+ * It is a subclass of `VersionedPanObject`, and it contains the network address attributes like value, type,
+ * an optional description, and associated tags.
  */
 export class AddressObject extends VersionedPanObject {
   /**
-   * The value of the address object, such as an IP address or range.
+   * The network address value represented by the object.
    */
   value: string;
 
   /**
-   * The type of the address object, indicating its format.
+   * The format of the network address (e.g., IP netmask, IP range, etc.).
    */
   type: AddressType;
 
   /**
-   * An optional description for the address object.
+   * A human-readable description for the address object.
    */
   description?: string;
 
   /**
-   * Optional tags associated with the address object.
+   * Any associated tags for the address object.
    */
   tag?: string[];
 
   /**
-   * Constructs an `AddressObject` instance.
+   * Constructs a new instance of an `AddressObject`.
    *
-   * @param name - The unique name identifying this address object.
-   * @param value - The address or range this object represents.
-   * @param type - The type of the address, determining its format.
-   * @param description - An optional description of the address object.
-   * @param tag - An optional array of tags associated with the address object.
+   * @param name         - The unique identifier for the address object.
+   * @param value        - The network address or range that the object represents.
+   * @param type         - The format of the network address.
+   * @param description  - An optional narrative description of the address object.
+   * @param tag          - Optional labels associated with the address object.
    */
   constructor(
     name: string,
@@ -52,26 +52,32 @@ export class AddressObject extends VersionedPanObject {
     this.value = value;
     this.type = type;
     this.description = description;
-    this.tag = tag?.filter((t) => t != null) || []; // Filters out undefined values
+    this.tag = tag?.filter((t) => t != null) || [];
   }
 
   /**
-   * Static method to generate the XPath referencing address objects in the PAN-OS configuration.
+   * Generates the XPath used to reference address objects within PAN-OS configuration XML.
+   * This is a static method that can be used without an instance of `AddressObject`.
    *
-   * @returns The XPath as a string.
+   * @returns The XPath string that can locate address objects in the PAN-OS configuration XML.
    */
   public static getXpath(): string {
     return "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address";
   }
 
+  /**
+   * Retrieves the XPath used for addressing the current address object within PAN-OS configuration XML.
+   *
+   * @returns The XPath string specific to this address object.
+   */
   public getXpath(): string {
     return AddressObject.getXpath();
   }
 
   /**
-   * Creates the XML representation of this address object for PAN-OS API interactions.
+   * Transforms the address object to its XML string representation, suitable for PAN-OS API interactions.
    *
-   * @returns The XML string representing this address object.
+   * @returns An XML string representing the address object for API consumption.
    */
   public toXml(): string {
     let xml = `<entry name="${this.name}"><${this.type}>${this.value}</${this.type}>`;
@@ -91,6 +97,13 @@ export class AddressObject extends VersionedPanObject {
     return xml;
   }
 
+  /**
+   * Parses a configuration object to create an array of `AddressObject` instances.
+   * Protected method intended for internal use within the SDK.
+   *
+   * @param config - The configuration object from the PAN-OS API response.
+   * @returns An array of `AddressObject` instances instantiated from the configuration object.
+   */
   protected parseConfigObjects(config: AddressObjectConfig): AddressObject[] {
     const addressEntries = config.response.result.address.entry;
     return addressEntries.map(
@@ -105,7 +118,7 @@ export class AddressObject extends VersionedPanObject {
               ? entry.tag.member
               : [entry.tag.member]
             : []
-          ).filter((t): t is string => t !== undefined), // Filter out undefined values
+          ).filter((t): t is string => t !== undefined),
         ),
     );
   }
