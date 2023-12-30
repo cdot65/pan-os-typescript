@@ -53,7 +53,10 @@ export class ApiClient {
       //   `Sending POST request to '${endpoint}' with data:`, data:`,
       // );
       const response = await this.axiosInstance.post(endpoint, data, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-PAN-KEY': this.apiKey,
+        },
         responseType: 'text',
       });
       // console.log(
@@ -96,7 +99,6 @@ export class ApiClient {
     xpath: string,
     element: string,
     action: 'set' | 'edit' | 'delete',
-    apiKey: string = this.apiKey,
   ): Promise<string> {
     /**
      * The API expects the following format:
@@ -106,7 +108,6 @@ export class ApiClient {
     const data = new URLSearchParams();
     data.append('type', 'config');
     data.append('action', action);
-    data.append('key', apiKey);
     data.append('xpath', xpath);
     if (action !== 'delete') {
       data.append('element', element);
@@ -124,7 +125,7 @@ export class ApiClient {
    */
   // TODO: can we nix the `apiKey` argument and just use the instance property?
   public async setConfig(xpath: string, element: string): Promise<string> {
-    return this.postConfig(xpath, element, 'set', this.apiKey);
+    return this.postConfig(xpath, element, 'set');
   }
 
   /**
@@ -149,7 +150,6 @@ export class ApiClient {
     const data = new URLSearchParams();
     data.append('type', 'config');
     data.append('action', 'edit');
-    data.append('key', this.apiKey);
     data.append('xpath', fullPath);
     data.append('element', element);
 
