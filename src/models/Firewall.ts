@@ -1,140 +1,134 @@
 // src/models/Firewall.ts
 
 import { PanDevice } from './PanDevice';
+import { parseStringPromise } from 'xml2js';
 import { ApiClient } from '../services/ApiClient';
 import { SessionResponse } from '../interfaces/SessionResponse';
 import { SessionIdResponse } from '../interfaces/SessionIdResponse';
 import { SessionAllResponse } from '../interfaces/SessionAllResponse';
 import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
 import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
+import { AddressObjectEntry } from '../interfaces/AddressObjectResponse';
 import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
-import { AddressObjectEntry } from '../interfaces/AddressObjectResponse';
-import { parseStringPromise } from 'xml2js';
 
 /**
- * Extends the PanDevice class, providing specialized methods for managing and interacting
- * with a Palo Alto Networks firewall. Functionality includes resource monitoring, session
- * management, routing information retrieval, URL category testing, and address object management.
+ * A specialized {@link PanDevice} subclass for interacting with Palo Alto Networks firewalls.
+ * Offers capabilities for monitoring resources, managing sessions, retrieving routing information,
+ * testing URL categories, and handling address objects.
  */
 export class Firewall extends PanDevice {
   /**
-   * Constructs a new Firewall instance for managing a PAN-OS firewall.
-   * @param hostname - The hostname or IP address of the PAN-OS device.
-   * @param apiKey - An optional API key for device authentication (if not provided during PanDevice instantiation).
+   * Initializes a new instance of the `Firewall` class.
+   *
+   * @param hostname - The hostname or IP of the PAN-OS firewall.
+   * @param apiKey   - The API key for PAN-OS authentication (optional if provided during `PanDevice` instantiation).
    */
   constructor(hostname: string, apiKey?: string) {
     let apiClient;
     if (apiKey) {
       apiClient = new ApiClient(hostname, apiKey);
     }
-    super(hostname, apiClient); // Pass the hostname and apiClient
+    super(hostname, apiClient);
     this.hostname = hostname;
   }
 
   /**
-   * Fetches resource monitoring data such as CPU and memory utilization.
-   * @returns A promise resolved with resource monitoring data.
+   * Retrieves system resource monitoring data, including CPU and memory usage statistics.
+   *
+   * @returns A `Promise` resolved with the resource monitoring data from the firewall.
    */
   public async showResourceMonitor(): Promise<ResourceMonitorResponse> {
     const cmd = 'show running resource-monitor minute';
-
-    // Using op from PanDevice to handle the command execution.
     return this.apiClient.op(cmd);
   }
 
   /**
-   * Retrieves the routing table information from the firewall.
-   * @returns A promise resolved with routing table details.
+   * Fetches the routing table from the firewall.
+   *
+   * @returns A `Promise` resolved with the details of the routing table.
    */
   public async showRoutingRoute(): Promise<RoutingRouteResponse> {
     const cmd = 'show routing route';
-
-    // Using op from PanDevice to handle the command execution.
     return this.apiClient.op(cmd);
   }
 
   /**
-   * Retrieves a list of all active sessions on the firewall.
-   * @returns A promise resolved with active session details.
+   * Obtains a list of all active sessions on the firewall.
+   *
+   * @returns A `Promise` resolved with details of active sessions.
    */
   public async showSessionAll(): Promise<SessionAllResponse> {
     const cmd = 'show session all';
-
-    // Using op from PanDevice to handle the command execution.
     return this.apiClient.op(cmd);
   }
 
   /**
-   * Retrieves detailed session information filtered by destination and source IP.
-   * @param destinationIp - IP address to use as a filter for the destination.
-   * @param sourceIp - IP address to use as a filter for the source.
-   * @returns A promise resolved with session information based on provided filters.
+   * Retrieves detailed information about firewall sessions based on source and destination IP filtering.
+   *
+   * @param destinationIp - The destination IP to filter by.
+   * @param sourceIp      - The source IP to filter by.
+   * @returns A `Promise` resolved with session information using the specified filter criteria.
    */
   public async showSessionAllFilter(
     destinationIp: string,
     sourceIp: string,
   ): Promise<SessionResponse> {
     const xmlCmd = `<show><session><all><filter><source>${sourceIp}</source><destination>${destinationIp}</destination></filter></all></session></show>`;
-    const response = await this.apiClient.op(xmlCmd);
-    return response;
+    return this.apiClient.op(xmlCmd);
   }
 
   /**
-   * Retrieves detailed information about a specific session identified by its ID.
-   * @param sessionId - The unique session ID to retrieve information for.
-   * @returns A promise resolved with detailed session information for the specified ID.
+   * Fetches information about a specific session on the firewall using its session ID.
+   *
+   * @param sessionId - The unique identifier of the session to retrieve.
+   * @returns A `Promise` resolved with details about the specified session.
    */
   public async showSessionId(sessionId: string): Promise<SessionIdResponse> {
     const xmlCmd = `<show><session><id>${sessionId}</id></session></show>`;
-    const response = await this.apiClient.op(xmlCmd);
-    return response;
+    return this.apiClient.op(xmlCmd);
   }
 
   /**
-   * Retrieves information about sessions from the PAN-OS firewall, including configuration and statistics.
-   * @returns A promise resolved with session information.
+   * Requests information about the firewall's session states, configurations, and statistics.
+   *
+   * @returns A `Promise` resolved with general information about firewall sessions.
    **/
   public async showSessionInfo(): Promise<SessionInfoResponse> {
     const cmd = 'show session info';
-
-    // Using op from PanDevice to handle the command execution.
     return this.apiClient.op(cmd);
   }
 
   /**
-   * Retrieves category information about a specified URL.
-   * @param url - The URL to test for category information.
-   * @returns A promise resolved with the category information of the URL.
+   * Retrieves the categorization information for a given URL from the firewall.
+   *
+   * @param url - The URL whose category information is to be tested.
+   * @returns A `Promise` resolved with the category information for the specified URL.
    */
   public async testUrlInfo(url: string): Promise<TestUrlInfoResponse> {
     const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
-    const response = await this.apiClient.op(xmlCmd);
-    return response;
+    return this.apiClient.op(xmlCmd);
   }
 
   /**
-   * Retrieves a list of all address objects configured on the firewall.
-   * @returns A promise resolved with an array of address object entries.
+   * Obtains a listing of all address objects currently configured on the firewall.
+   *
+   * @returns A `Promise` resolved with an array of entries corresponding to each address object.
    */
   public async addressObjectGetList(): Promise<AddressObjectEntry[]> {
     const xmlCmd = `<show><config><running><xpath>devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address</xpath></running></config></show>`;
     const responseXml = await this.apiClient.op(xmlCmd, false);
-
-    // Parse the XML response
     const parsedResponse = await parseStringPromise(responseXml, {
       explicitArray: false,
     });
 
-    // Check if the response is successful
     const addressEntries = parsedResponse?.response?.result?.address?.entry;
     if (!addressEntries) {
       throw new Error(
-        'Failed to retrieve address objects or unexpected response format',
+        'Failed to retrieve address objects or the response format is unexpected.',
       );
     }
 
-    // Normalize the data structure and map to the interface
     const normalizedEntries = Array.isArray(addressEntries)
       ? addressEntries
       : [addressEntries];
