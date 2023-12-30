@@ -4,6 +4,7 @@ import { PanObject } from './PanObject';
 import { ApiClient } from '../services/ApiClient';
 import { JobsResponse } from '../interfaces/JobsResponse';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
+import { ApiKeyResult } from '../interfaces/ApiResponse';
 import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
 
@@ -21,7 +22,7 @@ export class PanDevice extends PanObject {
    * @param apiClient - An optional instance of ApiClient.
    */
   constructor(hostname: string, apiClient?: ApiClient) {
-    super(hostname, apiClient); // Correctly pass the arguments
+    super(hostname, apiClient);
     this.hostname = hostname;
   }
 
@@ -37,24 +38,23 @@ export class PanDevice extends PanObject {
   ): Promise<ApiKeyResponse> {
     try {
       const tempApiClient = new ApiClient(this.hostname, '');
-      const apiKeyResponse = await tempApiClient.getData('/api/', {
+      const apiKeyResult = await tempApiClient.getData<ApiKeyResult>('/api/', {
         type: 'keygen',
         user: username,
         password: password,
       });
 
-      if (!apiKeyResponse?.response?.result?.key) {
+      if (
+        typeof apiKeyResult !== 'string' &&
+        apiKeyResult.result &&
+        'key' in apiKeyResult.result
+      ) {
+        return {
+          key: apiKeyResult.result.key,
+        };
+      } else {
         throw new Error('API key generation failed');
       }
-
-      /**
-       * the result of the API key generation looks like this:
-       * {response: {result: {key: 'mykey123=='}}}
-       * so we need to return the key from the result object
-       */
-      return {
-        key: apiKeyResponse.response.result.key,
-      };
     } catch (error) {
       console.error('Error generating API key:', error);
       throw error;
