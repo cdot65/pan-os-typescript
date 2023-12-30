@@ -33,43 +33,55 @@ export class PanDevice extends PanObject {
    * @returns The API key as a string.
    */
   protected getApiKey(): string {
-    return this.apiClient.getApiKey(); // Assuming getApiKey() is a method in ApiClient
-  }
-
-  public getXpath(): string {
-    // Implement the getXpath logic specific to PanDevice
-    // Return a string representing the XPath
-    return '';
-  }
-
-  public toXml(): string {
-    // Implement the toXml logic specific to PanDevice
-    // Return a string representing the XML
-    return '';
+    return this.apiClient.getApiKey();
   }
 
   /**
    * Generates an API key using the provided credentials.
    * @param username - The username for the PAN-OS device.
    * @param password - The password for the PAN-OS device.
-   * @returns A promise resolving to the KeyResponse with the generated API key.
+   * @returns A promise resolving to the ApiKeyResponse with the generated API key.
    */
   public async generateApiKey(
     username: string,
     password: string,
   ): Promise<ApiKeyResponse> {
-    // Create a temporary ApiClient instance for API key generation
-    const tempApiClient = new ApiClient(this.hostname, '');
-    const response = await tempApiClient.getData('/api/', {
-      type: 'keygen',
-      user: username,
-      password: password,
-    });
+    try {
+      const tempApiClient = new ApiClient(this.hostname, '');
+      const apiKeyResponse = await tempApiClient.getData('/api/', {
+        type: 'keygen',
+        user: username,
+        password: password,
+      });
 
-    // Extract and return the API key from the response
-    return {
-      key: response?.response?.result?.[0]?.key?.[0],
-    };
+      if (!apiKeyResponse?.response?.result?.key) {
+        throw new Error('API key generation failed');
+      }
+
+      /**
+       * the result of the API key generation looks like this:
+       * {response: {result: {key: 'mykey123=='}}}
+       * so we need to return the key from the result object
+       */
+      return {
+        key: apiKeyResponse.response.result.key,
+      };
+    } catch (error) {
+      console.error('Error generating API key:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches the configuration for this object type from the device.
+   *
+   * @param xpath - The XPath specific to the object type.
+   * @returns A promise resolving to the configuration data as a parsed object.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async fetchConfig(xpath: string): Promise<any> {
+    const apiClient = this.apiClient; // Retrieve the ApiClient instance
+    return apiClient.getConfig(xpath);
   }
 
   /**
@@ -162,7 +174,7 @@ export class PanDevice extends PanObject {
     const encodedCmd = encodeURIComponent(xmlCmd);
     const response = await this.apiClient.getData(
       `/api/?type=op&cmd=${encodedCmd}`,
-      { key: this.getApiKey() }, // Use getApiKey()
+      { key: this.getApiKey() },
       parse,
     );
     return response;
