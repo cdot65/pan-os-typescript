@@ -32,18 +32,6 @@ export class Firewall extends PanDevice {
     this.hostname = hostname;
   }
 
-  public getXpath(): string {
-    // Implement the getXpath logic specific to PanDevice
-    // Return a string representing the XPath
-    return '';
-  }
-
-  public toXml(): string {
-    // Implement the toXml logic specific to PanDevice
-    // Return a string representing the XML
-    return '';
-  }
-
   /**
    * Fetches resource monitoring data such as CPU and memory utilization.
    * @returns A promise resolved with resource monitoring data.
@@ -162,14 +150,5 @@ export class Firewall extends PanDevice {
           : [entry.tag.member]
         : [],
     }));
-  }
-
-  /**
-   * Edits an existing address object on the PAN-OS firewall.
-   */
-  public override async apply(): Promise<void> {
-    const xpath = this.getXpath();
-    const element = this.toXml();
-    await this.apiClient.editConfig(xpath, element);
   }
 }
