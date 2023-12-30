@@ -3,6 +3,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { ApiResponse, ApiResult } from '../interfaces/ApiResponse';
+import logger from '../utils/logger';
+
 /**
  * A class for interacting with the Palo Alto Networks XML API.
  */
@@ -32,13 +34,13 @@ export class ApiClient {
     endpoint: string,
     params?: Record<string, unknown>,
   ): Promise<string> {
-    // console.log(`Sending GET request to '${endpoint}' with params:`, params); // Log request details
+    logger.debug('Sending GET request to with params:', params);
     try {
       const response = await this.axiosInstance.get(endpoint, {
         params: params,
         responseType: 'text',
       });
-      // console.log(
+      // logger.info(
       //   `Response from GET request to '${endpoint}':`,
       //   response.data,
       // );
@@ -52,7 +54,7 @@ export class ApiClient {
   // NOTE: this is the low-level API communication that uses the Axios instance
   public async post(endpoint: string, data: string): Promise<string> {
     try {
-      // console.log(
+      // logger.info(
       //   `Sending POST request to '${endpoint}' with data:`, data:`,
       // );
       const response = await this.axiosInstance.post(endpoint, data, {
@@ -62,7 +64,7 @@ export class ApiClient {
         },
         responseType: 'text',
       });
-      // console.log(
+      // logger.info(
       //   `Response from POST request to '${endpoint}':`,
       //   response.data,
       // );
@@ -160,7 +162,7 @@ export class ApiClient {
     xpath: string,
     parse: boolean = true,
   ): Promise<ApiResponse<ApiResult> | string> {
-    // console.log(`Fetching config for '${xpath}'`);
+    // logger.info(`Fetching config for '${xpath}'`);
     const params = {
       type: 'config',
       action: 'get',
@@ -179,7 +181,7 @@ export class ApiClient {
 
       // Extract the data from the response and trim it
       const trimmedResponseXml = responseXml.trim();
-      console.log('Trimmed API response:', trimmedResponseXml); // Log the trimmed response
+      logger.info('Trimmed API response:', trimmedResponseXml); // Log the trimmed response
 
       // Parse the XML and return it as ApiResponse<ApiResult>
       return await this.parseXml<ApiResult>(trimmedResponseXml);
