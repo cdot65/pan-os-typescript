@@ -1,11 +1,31 @@
+import { Firewall } from '../src/index';
 import dotenv from 'dotenv';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
 // Load environment configurations based on the execution context.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Tests the retrieval of license information for a PAN-OS device.
@@ -33,7 +53,7 @@ async function testRequestLicenseInfo() {
     const licenseInfo = await firewall.requestLicenseInfo();
 
     // Output the license information to the console.
-    console.log('Licenses:', JSON.stringify(licenseInfo, null, 2));
+    logger.debug('Licenses:', JSON.stringify(licenseInfo, null, 2));
   } catch (error) {
     // Handle and log any errors that occur while fetching license information.
     console.error('Error:', error);

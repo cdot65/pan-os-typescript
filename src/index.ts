@@ -1,37 +1,36 @@
-// src/index.ts
-
 /**
- * @module Provides foundational and specialized classes for interacting with
- * Palo Alto Networks Operating System (PAN-OS) devices including base objects,
- * device-specific classes, and various object types for network configuration.
+ * The root module providing foundational and specialized classes to interact
+ * with Palo Alto Networks Operating System (PAN-OS) devices. It includes base
+ * objects, device-specific classes, and various object types for network configuration.
  */
 
 /**
- * Represents a specialized `PanDevice` for interacting with Palo Alto Networks firewall devices.
- * This class includes methods that provide firewall-specific functionalities,
- * such as resource monitoring and system information retrieval.
- *
- * @class Firewall
- * @extends PanDevice
- * @exports
+ * Firewall class derived from `PanDevice` for interactions with Palo Alto Networks
+ * firewall devices. Extends generic device functionalities with methods tailored
+ * to firewall resource monitoring and system information management.
+ * @module Firewall
  */
 export { Firewall } from './models/Firewall';
 
 /**
- * Represents network address configurations in Palo Alto Networks Operating System (PAN-OS).
- * This class provides methods for managing address objects and associating them with
- * security policies and other system entities.
- *
- * @class AddressObject
- * @exports
+ * Class representing network address entities (objects) in the context of Palo Alto Networks
+ * Operating System (PAN-OS). Encapsulates functionality for managing
+ * network address configurations and their associations within security policies and other
+ * system components.
+ * @module AddressObject
  */
 export { AddressObject } from './models/AddressObject';
 
 /**
- * Enumerates the supported formats of network addresses in PAN-OS, such as IP netmask,
- * IP range, and Fully Qualified Domain Name (FQDN).
- *
- * @enum AddressType
- * @exports
+ * Enumeration of supported network address formats in PAN-OS.
+ * Includes IP netmask, IP range, IP wildcard, and Fully Qualified Domain Name (FQDN) types.
+ * @module AddressType
  */
 export { AddressType } from './models/AddressObject';
+
+/**
+ * Service class for generating API keys for Palo Alto Networks devices.
+ * Handles API key generation using provided credentials.
+ * @module ApiKeyGenerator
+ */
+export { ApiKeyGenerator } from './services/ApiKeyGenerator';

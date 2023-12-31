@@ -1,154 +1,127 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/models/Firewall.ts
 
-import { PanDevice } from './PanDevice';
-import { AddressObject } from './AddressObject';
 import { ApiClient } from '../services/ApiClient';
-import { ApiResponse } from '../interfaces/ApiResponse';
-import { SessionResponse } from '../interfaces/SessionResponse';
-import { SessionIdResponse } from '../interfaces/SessionIdResponse';
-import { SessionAllResponse } from '../interfaces/SessionAllResponse';
-import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
-import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
-import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
-import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
-import { AddressObjectEntry } from '../interfaces/AddressObjectResponse';
+import { PanDevice } from './PanDevice';
 import { parseStringPromise } from 'xml2js';
 
 /**
- * Extends the PanDevice class, providing specialized methods for managing and interacting
- * with a Palo Alto Networks firewall. Functionality includes resource monitoring, session
- * management, routing information retrieval, URL category testing, and address object management.
+ * Represents a Palo Alto Networks Firewall, extending {@link PanDevice}.
+ * Provides methods to interact with various firewall features such as
+ * resource monitoring, session management, routing information, URL categorization, and address objects.
  */
 export class Firewall extends PanDevice {
   /**
-   * Constructs a new Firewall instance for managing a PAN-OS firewall.
-   * @param hostname - The hostname or IP address of the PAN-OS device.
-   * @param apiKey - An optional API key for device authentication (if not provided during PanDevice instantiation).
+   * Creates a new `Firewall` instance.
+   *
+   * @param hostname The hostname or IP address of the PAN-OS firewall.
+   * @param apiKey The API key for PAN-OS authentication
    */
-  constructor(hostname: string, apiKey?: string) {
+  constructor(hostname: string, apiKey: string) {
     let apiClient;
     if (apiKey) {
       apiClient = new ApiClient(hostname, apiKey);
     }
-    super(hostname, apiClient); // Pass the hostname and apiClient
+    super(hostname, apiClient);
     this.hostname = hostname;
   }
 
-  public getXpath(): string {
-    // Implement the getXpath logic specific to PanDevice
-    // Return a string representing the XPath
-    return '';
-  }
-
-  public toXml(): string {
-    // Implement the toXml logic specific to PanDevice
-    // Return a string representing the XML
-    return '';
-  }
-
   /**
-   * Fetches resource monitoring data such as CPU and memory utilization.
-   * @returns A promise resolved with resource monitoring data.
+   * Retrieves system resource monitoring data from the firewall.
+   *
+   * @returns A promise that resolves with the resource monitoring data including CPU and memory usage statistics.
    */
-  public async showResourceMonitor(): Promise<ResourceMonitorResponse> {
+  public async showResourceMonitor(): Promise<any> {
     const cmd = 'show running resource-monitor minute';
-
-    // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
+    return this.apiClient.op(cmd);
   }
 
   /**
    * Retrieves the routing table information from the firewall.
-   * @returns A promise resolved with routing table details.
+   *
+   * @returns A promise that resolves with the details of the firewall's routing table.
    */
-  public async showRoutingRoute(): Promise<RoutingRouteResponse> {
+  public async showRoutingRoute(): Promise<any> {
     const cmd = 'show routing route';
-
-    // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
+    return this.apiClient.op(cmd);
   }
 
   /**
    * Retrieves a list of all active sessions on the firewall.
-   * @returns A promise resolved with active session details.
+   *
+   * @returns A promise that resolves with details of all active sessions.
    */
-  public async showSessionAll(): Promise<SessionAllResponse> {
+  public async showSessionAll(): Promise<any> {
     const cmd = 'show session all';
-
-    // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
+    return this.apiClient.op(cmd);
   }
 
   /**
-   * Retrieves detailed session information filtered by destination and source IP.
-   * @param destinationIp - IP address to use as a filter for the destination.
-   * @param sourceIp - IP address to use as a filter for the source.
-   * @returns A promise resolved with session information based on provided filters.
+   * Retrieves detailed information about firewall sessions based on source and destination IP filtering.
+   *
+   * @param destinationIp The destination IP address to filter sessions by.
+   * @param sourceIp The source IP address to filter sessions by.
+   * @returns A promise that resolves with session information filtered by the specified criteria.
    */
   public async showSessionAllFilter(
     destinationIp: string,
     sourceIp: string,
-  ): Promise<SessionResponse> {
+  ): Promise<any> {
     const xmlCmd = `<show><session><all><filter><source>${sourceIp}</source><destination>${destinationIp}</destination></filter></all></session></show>`;
-    const response = await this.op(xmlCmd);
-    return response;
+    return this.apiClient.op(xmlCmd);
   }
 
   /**
-   * Retrieves detailed information about a specific session identified by its ID.
-   * @param sessionId - The unique session ID to retrieve information for.
-   * @returns A promise resolved with detailed session information for the specified ID.
+   * Retrieves information about a specific session on the firewall using its session ID.
+   *
+   * @param sessionId The unique identifier of the session.
+   * @returns A promise that resolves with details about the specified session.
    */
-  public async showSessionId(sessionId: string): Promise<SessionIdResponse> {
+  public async showSessionId(sessionId: string): Promise<any> {
     const xmlCmd = `<show><session><id>${sessionId}</id></session></show>`;
-    const response = await this.op(xmlCmd);
-    return response;
+    return this.apiClient.op(xmlCmd);
   }
 
   /**
-   * Retrieves information about sessions from the PAN-OS firewall, including configuration and statistics.
-   * @returns A promise resolved with session information.
-   **/
-  public async showSessionInfo(): Promise<SessionInfoResponse> {
-    const cmd = 'show session info';
-
-    // Using op from PanDevice to handle the command execution.
-    return this.op(cmd);
-  }
-
-  /**
-   * Retrieves category information about a specified URL.
-   * @param url - The URL to test for category information.
-   * @returns A promise resolved with the category information of the URL.
+   * Retrieves general information about the firewall's session states, configurations, and statistics.
+   *
+   * @returns A promise that resolves with general session information from the firewall.
    */
-  public async testUrlInfo(url: string): Promise<TestUrlInfoResponse> {
+  public async showSessionInfo(): Promise<any> {
+    const cmd = 'show session info';
+    return this.apiClient.op(cmd);
+  }
+
+  /**
+   * Retrieves categorization information for a specified URL from the firewall.
+   *
+   * @param url The URL to test categorization for.
+   * @returns A promise that resolves with the category information of the specified URL.
+   */
+  public async testUrlInfo(url: string): Promise<any> {
     const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
-    const response = await this.op(xmlCmd);
-    return response;
+    return this.apiClient.op(xmlCmd);
   }
 
   /**
    * Retrieves a list of all address objects configured on the firewall.
-   * @returns A promise resolved with an array of address object entries.
+   *
+   * @returns A promise that resolves with an array of address objects, each containing relevant details.
    */
-  public async addressObjectGetList(): Promise<AddressObjectEntry[]> {
+  public async addressObjectGetList(): Promise<any[]> {
     const xmlCmd = `<show><config><running><xpath>devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address</xpath></running></config></show>`;
-    const responseXml = await this.op(xmlCmd, false);
-
-    // Parse the XML response
+    const responseXml = await this.apiClient.op(xmlCmd, false);
     const parsedResponse = await parseStringPromise(responseXml, {
       explicitArray: false,
     });
 
-    // Check if the response is successful
     const addressEntries = parsedResponse?.response?.result?.address?.entry;
     if (!addressEntries) {
       throw new Error(
-        'Failed to retrieve address objects or unexpected response format',
+        'Failed to retrieve address objects or the response format is unexpected.',
       );
     }
 
-    // Normalize the data structure and map to the interface
     const normalizedEntries = Array.isArray(addressEntries)
       ? addressEntries
       : [addressEntries];
@@ -164,74 +137,5 @@ export class Firewall extends PanDevice {
           : [entry.tag.member]
         : [],
     }));
-  }
-
-  /**
-   * Creates a new address object on the PAN-OS firewall.
-   * @param addressObject - The AddressObject instance representing the network address to create.
-   * @returns A promise resolved with an ApiResponse indicating the result.
-   */
-  public async createAddressObject(
-    addressObject: AddressObject,
-  ): Promise<ApiResponse> {
-    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address`;
-    const element = addressObject.toXml();
-
-    // Using postConfig from ApiClient through inherited apiClient
-    const responseXml = await this.apiClient.postConfig(
-      xpath,
-      element,
-      'set',
-      this.getApiKey(),
-    );
-
-    return this.parseApiResponse(responseXml);
-  }
-
-  /**
-   * Edits an existing address object on the PAN-OS firewall.
-   * @param addressObject - The AddressObject instance that holds updated properties to be saved.
-   * @param fields - Optional array of fields to be updated; when omitted, all fields are updated.
-   * @returns A promise resolved with an ApiResponse indicating the result.
-   */
-  public async editAddressObject(
-    addressObject: AddressObject,
-    fields: Array<keyof AddressObject> = [],
-  ): Promise<ApiResponse> {
-    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${addressObject.name}']`;
-    const element = addressObject.toEditableXml(fields);
-
-    // Send the edit request using the apiClient
-    const responseXml = await this.apiClient.postConfig(
-      xpath,
-      element,
-      'edit',
-      this.getApiKey(),
-    );
-
-    // Parse and return the response
-    return this.parseApiResponse(responseXml);
-  }
-
-  /**
-   * Deletes an existing address object from the PAN-OS firewall.
-   * @param addressObjectName - The name of the address object to delete.
-   * @returns A promise resolved with an ApiResponse indicating the result.
-   */
-  public async deleteAddressObject(
-    addressObjectName: string,
-  ): Promise<ApiResponse> {
-    const xpath = `/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address/entry[@name='${addressObjectName}']`;
-
-    // Send the delete request using the apiClient
-    const responseXml = await this.apiClient.postConfig(
-      xpath,
-      '',
-      'delete',
-      this.getApiKey(),
-    );
-
-    // Parse and return the response
-    return this.parseApiResponse(responseXml);
   }
 }

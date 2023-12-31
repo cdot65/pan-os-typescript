@@ -1,13 +1,33 @@
 // tests/testShowSessionInfo.ts
 
+import { Firewall } from '../src/index';
 import dotenv from 'dotenv';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
 // Load environment variables depending on the execution environment.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Retrieves and logs detailed session information from a PAN-OS device using the SDK's Firewall class.
@@ -34,7 +54,7 @@ async function testShowSessionInfo() {
     const showSessionInfoResponse = await firewall.showSessionInfo();
 
     // Output detailed session information to the console.
-    console.log(
+    logger.debug(
       'Session Info:',
       JSON.stringify(showSessionInfoResponse, null, 2),
     );

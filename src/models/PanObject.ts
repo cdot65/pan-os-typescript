@@ -3,9 +3,8 @@
 import { ApiClient } from '../services/ApiClient';
 
 /**
- * An abstract class representing a PAN-OS configuration object.
- * This class provides the structure and common functionality for derived configuration objects
- * such as address objects, service objects, and security policies.
+ * Abstract base class representing a configuration object in PAN-OS.
+ * Serves as the foundational structure for derived configuration objects such as address objects, service objects, and security policies.
  */
 export abstract class PanObject {
   protected parent: PanObject | null;
@@ -14,9 +13,10 @@ export abstract class PanObject {
   protected _apiClient: ApiClient | null;
 
   /**
-   * Constructs a new PanObject with a given name and, optionally, an ApiClient instance.
-   * @param name - The name of the object.
-   * @param apiClient - An optional ApiClient for making API requests (will be inherited if not provided).
+   * Creates a new instance of `PanObject`.
+   *
+   * @param name The name of this configuration object.
+   * @param apiClient Optional. An `ApiClient` instance for API requests. Inherited from the hierarchy if not provided.
    */
   constructor(name: string, apiClient?: ApiClient) {
     this.name = name;
@@ -26,9 +26,10 @@ export abstract class PanObject {
   }
 
   /**
-   * Retrieves the ApiClient instance from the object or its hierarchy.
-   * @returns The ApiClient instance associated with this object.
-   * @throws An error if the ApiClient instance is not set.
+   * Retrieves the `ApiClient` from the current instance or its parent hierarchy.
+   *
+   * @returns The `ApiClient` associated with this object.
+   * @throws An error if the `ApiClient` instance is not found in the hierarchy.
    */
   public get apiClient(): ApiClient {
     if (this._apiClient) {
@@ -41,22 +42,9 @@ export abstract class PanObject {
   }
 
   /**
-   * Abstract method to get the XPath of the object for PAN-OS configuration.
-   * @abstract
-   * @returns The XPath string of the object.
-   */
-  public abstract getXpath(): string;
-
-  /**
-   * Abstract method to convert the object to its XML representation for PAN-OS API calls.
-   * @abstract
-   * @returns The XML string of the object.
-   */
-  public abstract toXml(): string;
-
-  /**
-   * Adds a child PanObject to the current object, setting the current object as the parent.
-   * @param child - The PanObject instance to be added as a child.
+   * Adds a `PanObject` as a child to this object, establishing a parent-child relationship.
+   *
+   * @param child The `PanObject` to be added as a child.
    */
   public addChild(child: PanObject): void {
     child.parent = this;
@@ -64,8 +52,9 @@ export abstract class PanObject {
   }
 
   /**
-   * Removes a child PanObject from the current object's children and clears its parent reference.
-   * @param child - The PanObject instance to be removed from the children list.
+   * Removes a `PanObject` from this object's children, severing the parent-child relationship.
+   *
+   * @param child The `PanObject` to be removed from the children.
    */
   public removeChild(child: PanObject): void {
     const index = this.children.indexOf(child);
@@ -76,42 +65,50 @@ export abstract class PanObject {
   }
 
   /**
-   * Provides read-only access to the child PanObjects of the current object.
-   * @returns An array of PanObject instances that are children of this object.
+   * Retrieves the child `PanObject` instances of this object.
+   *
+   * @returns An array of `PanObject` representing the children of this object.
    */
   public getChildren(): ReadonlyArray<PanObject> {
     return this.children;
   }
 
   /**
-   * Finds a child PanObject within the current object's children by name.
-   * @param name - The name of the child object to find.
-   * @returns The found PanObject instance or null if no child is found with the given name.
+   * Searches for a child `PanObject` by its name.
+   *
+   * @param name The name of the child object to locate.
+   * @returns The found `PanObject`, or `null` if no match is found.
    */
   public findChildByName(name: string): PanObject | null {
     return this.children.find((child) => child.name === name) || null;
   }
 
   /**
-   * Checks whether the given PanObject is a child of the current object.
-   * @param child - The PanObject instance to check for in the children list.
-   * @returns True if the object is a child, false otherwise.
+   * Checks if a given `PanObject` is a child of this object.
+   *
+   * @param child The `PanObject` to verify.
+   * @returns `true` if the specified `PanObject` is a child of this object, otherwise `false`.
    */
   public hasChild(child: PanObject): boolean {
     return this.children.includes(child);
   }
 
   /**
-   * Creates the PAN-OS configuration object on the device by sending an API request.
-   * This method calls the API to create the object based on its XPath and XML representation.
-   * @returns A promise that resolves once the creation API call completes.
+   * Locates a child `PanObject` within the configuration tree by name and, optionally, by type.
+   *
+   * @param name The name of the object to search for.
+   * @param classType Optional. The class constructor to match instances against.
+   * @returns The matching `PanObject` instance, or `null` if not found.
    */
-  public async create(): Promise<void> {
-    const xpath = this.getXpath();
-    const element = this.toXml();
-    await this.apiClient.setConfig(xpath, element);
-
-    // Optionally, mark the configuration as changed
-    // Additional implementation details for marking the configuration...
+  public find<ObjectType extends PanObject>(
+    name: string,
+    classType?: new (...args: unknown[]) => ObjectType,
+  ): ObjectType | null {
+    for (const child of this.children) {
+      if (child.name === name && (!classType || child instanceof classType)) {
+        return child as ObjectType;
+      }
+    }
+    return null;
   }
 }

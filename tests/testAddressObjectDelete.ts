@@ -1,9 +1,10 @@
 // tests/testAddressObjectDelete.ts
 
-import dotenv from 'dotenv';
 import { Firewall } from '../src/index';
-import yargs from 'yargs';
+import dotenv from 'dotenv';
 import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
 // Load the correct environment variables based on the NODE_ENV value.
 dotenv.config({
@@ -15,6 +16,7 @@ dotenv.config({
  */
 interface Arguments {
   name: string; // Only the name is needed for deletion
+  logLevel: string;
 }
 
 // Parse command line arguments using yargs.
@@ -26,8 +28,17 @@ const argv = yargs(hideBin(process.argv))
       alias: 'n',
       description: 'Name of the address object to delete',
     },
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
   })
   .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Test script to delete an address object in PAN-OS using the name from command line arguments.
@@ -48,7 +59,7 @@ async function testDeleteAddressObject() {
     const response = await firewall.deleteAddressObject(argv.name);
 
     // Log the response from the PAN-OS API.
-    console.log(
+    logger.debug(
       'Delete Address Object Response:',
       JSON.stringify(response, null, 2),
     );

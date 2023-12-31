@@ -1,6 +1,6 @@
 {
   "name": "pan-os-typescript",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -40,6 +40,7 @@
     "@types/yargs": "^17.0.32",
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
     "xml2js": "^0.6.2",
     "yargs": "^17.7.2"
   }

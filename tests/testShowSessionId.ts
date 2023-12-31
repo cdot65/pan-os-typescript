@@ -1,13 +1,33 @@
 // tests/testShowSessionId.ts
 
+import { Firewall } from '../src/index';
 import dotenv from 'dotenv';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
 // Load environment variables from the .env file according to the execution environment (development or production).
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Fetches and logs the information for a specific session on a PAN-OS device using a session ID.
@@ -40,7 +60,7 @@ async function testShowSessionId() {
     const sessionIdResponse = await firewall.showSessionId(sessionId);
 
     // Log the session information to the console.
-    console.log(
+    logger.debug(
       `Session ID ${sessionId} Response:`,
       JSON.stringify(sessionIdResponse, null, 2),
     );

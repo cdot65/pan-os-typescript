@@ -1,13 +1,33 @@
 // tests/testShowSessionAllFilter.ts
 
+import { Firewall } from '../src/index';
 import dotenv from 'dotenv';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
 // Load configuration variables based on the NODE_ENV setting.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-import { Firewall } from '../src/index';
+interface Arguments {
+  logLevel: string;
+}
+
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
  * Retrieves and logs the filtered session information based on source and destination IP addresses from a PAN-OS device.
@@ -42,7 +62,7 @@ async function testShowSessionAllFilter() {
     );
 
     // Output the results of the session filter query.
-    console.log(
+    logger.debug(
       `Filtered Session Info (source: ${srcIp}, destination: ${dstIp}):`,
       JSON.stringify(sessionAllFilterResponse, null, 2),
     );
