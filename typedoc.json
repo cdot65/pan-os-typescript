@@ -3,7 +3,8 @@
     "src/index.ts",
     "src/interfaces/*.ts",
     "src/models/*.ts",
-    "src/services/*.ts"
+    "src/services/*.ts",
+    "src/utils/*.ts"
   ],
   "out": "docs",
   "exclude": ["**/node_modules/**"],
