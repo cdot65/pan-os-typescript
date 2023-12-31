@@ -11,8 +11,7 @@
   - [📖 Detailed Documentation](#-detailed-documentation)
   - [📚 Quick Examples](#-quick-examples)
     - [Generating an API key](#generating-an-api-key)
-    - [Creating an Address Object](#creating-an-address-object)
-    - [Running a 'show' command](#running-a-show-command)
+    - [Requesting System Info](#requesting-system-info)
   - [🤝 Contributing](#-contributing)
   - [📄 License](#-license)
   - [✉️ Contact](#️-contact)
@@ -40,48 +39,87 @@ For comprehensive API documentation, including usage examples, configuration det
 
 ## 📚 Quick Examples
 
+Examples can be found in the [tests/](tests/) directory.
+
 ### Generating an API key
 
 ```typescript
+import { ApiKeyGenerator } from '../src/index';
 import dotenv from 'dotenv';
+import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
-// Load environment configuration based on the NODE_ENV setting
+/**
+ * Loads environment configuration based on the NODE_ENV setting.
+ * Configures the script to use either production or development environment variables.
+ */
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-import { Firewall } from '../src/index';
+/**
+ * Defines the structure for command-line arguments used in the script.
+ */
+interface Arguments {
+  logLevel: string;
+  hostname: string;
+  password: string;
+  username: string;
+}
 
 /**
- * A test function to generate an API key for a PAN-OS device.
- * It uses environment variables for configuration and credential details,
- * and demonstrates generating an API key using the Firewall class.
+ * Parses command-line arguments to configure the script's runtime settings.
+ * Allows setting of log level, hostname, username, and password.
+ */
+const argv = yargs(hideBin(process.argv))
+  .options({
+    logLevel: {
+      type: 'string',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
+    },
+    hostname: {
+      type: 'string',
+      default: process.env.PANOS_HOSTNAME || 'datacenter.cdot.io', // Provide a default value or handle the absence
+      description: 'Set the target device hostname',
+    },
+    password: {
+      type: 'string',
+      default: process.env.PANOS_PASSWORD, // Adjusted to PANOS_PASSWORD
+      description: 'Set the user password',
+      demandOption: true, // Require this option
+    },
+    username: {
+      type: 'string',
+      default: process.env.PANOS_USERNAME,
+      description: 'Set the user name',
+      demandOption: true, // Require this option
+    },
+  })
+  .parseSync() as Arguments;
+
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
+
+/**
+ * Test function to generate an API key for a PAN-OS device.
+ * Utilizes the ApiKeyGenerator to generate an API key based on provided credentials.
  */
 async function testGenerateApiKey() {
-  // Retrieve PAN-OS hostname, username, and password from environment variables
-  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
-  const username = process.env.PANOS_USERNAME || '';
-  const password = process.env.PANOS_PASSWORD || '';
-
-  // Ensure username and password are provided; otherwise, throw an error
-  if (!username || !password) {
-    throw new Error(
-      'Username or password is not set in environment variables.',
-    );
-  }
-
-  // Initialize the Firewall class without an initial API key
-  const firewall = new Firewall(hostname, '');
+  // Initialize the ApiKeyGenerator
+  const apiClient = new ApiKeyGenerator(argv.hostname);
 
   try {
-    // Attempt to generate an API key using the provided credentials
-    const apiKeyResponse = await firewall.generateApiKey(username, password);
-
-    // Extract the API key from the response
-    const apiKey = apiKeyResponse.key;
+    // Generate an API key
+    const apiKey = await apiClient.generateApiKey(
+      argv.username,
+      argv.password,
+    );
 
     // Log the generated API key to the console
-    console.log('Generated API Key:', apiKey);
+    logger.info(`Generated API Key: ${apiKey}`);
   } catch (error) {
     // Handle and log any errors that occur during the API key generation
     console.error('Error:', error);
@@ -95,656 +133,96 @@ testGenerateApiKey();
 Executing with `ts-node`:
 
 ```bash
-ts-node tests/testGenerateApiKey.ts
-Generated API Key: LUFRPT0vMGkvbXRlVE82VDM1TitmQmo4a0g5VFVXNDg9N2dxVE1qdUZFM0FROE40Tm9WVFRLSmx5QWRCdnlKRnduQ3dDZUxPek5hMXpJcGJnVVU5R1lMMEUvckdRSHg2d3Y1Z000Q1k4K3RYemNQczlTVVdZTnc9PQ==
+$ ts-node tests/testGenerateApiKey.ts --username automation --password paloalto#1! --hostname datacenter.cdot.io
+info: Generated API Key: LUFRPT1iN2N1M0Z4ZjdrT0IyZlQxUmpDVlRUOXZKVTQ9N2dxVE1qdUZFM0FROE40Tm9WVFRLSmx5QWRCdnlKRnduQ3dDZUxPek5hMXpJcGJnVVU5R1lMMEUvckdRSHg2d2ZsbTc1UzBzclozNGJhakJxYmlPc2c9PQ== {"timestamp":"2023-12-31T14:13:58.052Z"}
 ```
 
-### Creating an Address Object
+
+
+
+### Requesting System Info
 
 ```typescript
-// tests/testAddressObjectCreate.ts
+// tests/testShowSystemInfoResponse.ts
 
+import { Firewall } from '../src/index';
 import dotenv from 'dotenv';
-import { Firewall, AddressObject, AddressType } from '../src/index';
-import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
-// Load environment variables.
+/**
+ * Script for testing the retrieval of system information from a PAN-OS device.
+ * Demonstrates the use of the Firewall class to fetch system details.
+ * Utilizes environment variables for configuration and command-line arguments to set the logging level.
+ */
+
+// Load and configure environment variables based on the current environment setting.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
+/**
+ * Defines the structure for command-line arguments used in the script.
+ */
 interface Arguments {
-  name: string;
-  value: string;
-  type: AddressType;
-  description?: string;
-  tag?: string[];
+  logLevel: string;
 }
 
+// Parse command-line arguments to configure the script's runtime settings.
 const argv = yargs(hideBin(process.argv))
   .options({
-    name: {
+    logLevel: {
       type: 'string',
-      demandOption: true,
-      alias: 'n',
-      description: 'Name of the address object',
-    },
-    value: {
-      type: 'string',
-      demandOption: true,
-      alias: 'v',
-      description: 'Value of the address object',
-    },
-    type: {
-      type: 'string',
-      demandOption: true,
-      choices: ['ip-netmask', 'ip-range', 'ip-wildcard', 'fqdn'],
-      alias: 't',
-    },
-    description: {
-      type: 'string',
-      alias: 'd',
-      default: undefined,
-      description: 'Description of the address object',
-    },
-    tag: {
-      type: 'array',
-      alias: 'g',
-      default: undefined,
-      description: 'Tags associated with the address object',
+      default: 'info',
+      choices: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
+      description: 'Set the logging level',
     },
   })
   .parseSync() as Arguments;
 
-async function testCreateAddressObject() {
-  console.log('Initializing test for creating an address object...');
-
-  const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
-  const apiKey = process.env.PANOS_API_KEY || '';
-
-  if (!apiKey) {
-    throw new Error('API key is not set in environment variables.');
-  }
-
-  console.log(`Creating a Firewall instance with hostname: ${hostname}`);
-  const firewall = new Firewall(hostname, apiKey);
-
-  console.log(`Creating an AddressObject with name: ${argv.name}`);
-  const addressObject = new AddressObject(
-    argv.name,
-    argv.value,
-    argv.type,
-    argv.description,
-    argv.tag,
-  );
-
-  console.log('Adding AddressObject to the Firewall object...');
-  firewall.addChild(addressObject);
-
-  // Verifying if the AddressObject is successfully added
-  if (firewall.hasChild(addressObject)) {
-    console.log(`AddressObject '${argv.name}' added to Firewall.`);
-  } else {
-    throw new Error(`Failed to add AddressObject '${argv.name}' to Firewall.`);
-  }
-
-  try {
-    console.log('Attempting to create AddressObject on the PAN-OS device...');
-    await addressObject.create();
-    console.log(
-      `Address Object '${argv.name}' created successfully on PAN-OS device.`,
-    );
-  } catch (error) {
-    console.error('Error in creating address object on PAN-OS device:', error);
-  }
-}
-
-testCreateAddressObject();
-```
-
-Execute with `ts-node`:
-
-```bash
-ts-node tests/testAddressObjectCreate.ts -n testxyz -v text.xyz.com -t fqdn -d test -g Automation
-Create Address Object Response: {
-  "status": "success",
-  "code": 20,
-  "message": "command succeeded"
-}
-```
-
-### Running a 'show' command
-
-```typescript
-// tests/testExecuteOperationalCommand.ts
-
-import dotenv from 'dotenv';
-
-// Configure environment variables
-dotenv.config({
-  path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
-});
-
-import { Firewall } from '../src/index'; // Importing Firewall from the index
+// Set the logger level based on the argument
+logger.level = argv.logLevel;
 
 /**
- * Executes an operational command on the Firewall and logs the response.
- * The command to be executed is the second command-line argument or defaults to showing the "management" interface.
+ * Test function to retrieve and log system information from a PAN-OS device.
+ * Validates the SDK's ability to interact with the device API and process the data.
+ * @async
+ * @throws An error if the API key is not set in the environment variables or if there is a failure in fetching the information.
  */
-async function testExecuteOperationalCommand() {
-  // Define the PAN-OS hostname and API key from environment variables
+async function testShowSystemInfoResponse() {
   const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
   const apiKey = process.env.PANOS_API_KEY || '';
 
-  // Throw an error if the API key is not provided.
+  // Ensure the API key is present before attempting the operation; otherwise, throw an error.
   if (!apiKey) {
     throw new Error('API key is not set in environment variables.');
   }
 
-  // Create an instance of the Firewall class with the specified hostname and API key.
+  // Initialize a new instance of the Firewall class with API key and hostname.
   const firewall = new Firewall(hostname, apiKey);
 
   try {
-    // Get the CLI command from the command-line arguments or use a default command.
-    const cliCmd = process.argv[2] || 'show interface "management"';
+    // Fetch the system information from the PAN-OS device using the Firewall class's method.
+    const systemInfo = await firewall.showSystemInfoResponse();
 
-    // Execute the operational CLI command on the PAN-OS device.
-    const cliCommandResponse = await firewall.op(cliCmd);
-
-    // Log the CLI command and its response.
-    console.log(
-      'CLI Command: ' + cliCmd,
-      '\n',
-      JSON.stringify(cliCommandResponse, null, 2),
-    );
+    // Log the retrieved system information to the console for verification.
+    logger.info('System Info:', systemInfo);
   } catch (error) {
-    // Catch and log any errors that occur during the execution of the operational command.
-    console.error('Error executing operational command:', error);
+    // Log any errors encountered during the retrieval process.
+    console.error('Error retrieving system info:', error);
   }
 }
 
-// Invoke the test function to execute the operational command.
-testExecuteOperationalCommand();
+// Run the function to test system information retrieval.
+testShowSystemInfoResponse();
 ```
 
-Execute with `ts-nodes`:
+Executing with ts-node:
 
 ```bash
-ts-node tests/testExecuteOperationalCommand.ts '<request><license><info/></license></request>'
-CLI Command: <request><license><info/></license></request>
- {
-  "response": {
-    "$": {
-      "status": "success"
-    },
-    "result": [
-      {
-        "licenses": [
-          {
-            "entry": [
-              {
-                "feature": [
-                  "Advanced Threat Prevention"
-                ],
-                "description": [
-                  "Advanced Threat Prevention Subcription"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "Advanced URL Filtering"
-                ],
-                "description": [
-                  "Palo Alto Networks Advanced URL License"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "Advanced WildFire License"
-                ],
-                "description": [
-                  "Access to Advanced WildFire signatures, logs, API"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "DNS Security"
-                ],
-                "description": [
-                  "Palo Alto Networks DNS Security License"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "GlobalProtect Gateway"
-                ],
-                "description": [
-                  "GlobalProtect Gateway License"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "Logging Service"
-                ],
-                "description": [
-                  "Device Logging Service"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "April 04, 2026"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "custom": [
-                  {
-                    "_Log_Storage_TB": [
-                      "2"
-                    ]
-                  }
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "PAN-DB URL Filtering"
-                ],
-                "description": [
-                  "Palo Alto Networks URL Filtering License"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "SD WAN"
-                ],
-                "description": [
-                  "License to enable SD WAN feature"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "Standard"
-                ],
-                "description": [
-                  "10 x 5 phone support; repair and replace hardware service"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "Threat Prevention"
-                ],
-                "description": [
-                  "Threat Prevention"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "Virtual Systems"
-                ],
-                "description": [
-                  "Additional 1 Virtual System Licenses"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "Never"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              },
-              {
-                "feature": [
-                  "WildFire License"
-                ],
-                "description": [
-                  "WildFire signature feed, integrated WildFire logs, WildFire API"
-                ],
-                "serial": [
-                  "010987654321"
-                ],
-                "issued": [
-                  "July 31, 2023"
-                ],
-                "expires": [
-                  "June 04, 2028"
-                ],
-                "expired": [
-                  "no"
-                ],
-                "authcode": [
-                  ""
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-Execute with `ts-nodes`:
-
-```bash
-ts-node tests/testExecuteOperationalCommand.ts 'show system info'
-CLI Command: show system info
- {
-  "response": {
-    "$": {
-      "status": "success"
-    },
-    "result": [
-      {
-        "system": [
-          {
-            "hostname": [
-              "DataCenter"
-            ],
-            "ip-address": [
-              "10.0.0.3"
-            ],
-            "public-ip-address": [
-              "unknown"
-            ],
-            "netmask": [
-              "255.255.255.0"
-            ],
-            "default-gateway": [
-              "10.0.0.1"
-            ],
-            "is-dhcp": [
-              "no"
-            ],
-            "ipv6-address": [
-              "unknown"
-            ],
-            "ipv6-link-local-address": [
-              "fe80::8e36:7aff:fe02:5485/64"
-            ],
-            "mac-address": [
-              "8c:36:7a:02:54:85"
-            ],
-            "time": [
-              "Tue Dec 26 17:40:35 2023\n"
-            ],
-            "uptime": [
-              "9 days, 11:42:18"
-            ],
-            "devicename": [
-              "DataCenter"
-            ],
-            "family": [
-              "400"
-            ],
-            "model": [
-              "PA-440"
-            ],
-            "serial": [
-              "010987654321"
-            ],
-            "base_mac": [
-              "c8:29:c8:49:be:00"
-            ],
-            "mac_count": [
-              "254"
-            ],
-            "cloud-mode": [
-              "non-cloud"
-            ],
-            "sw-version": [
-              "11.0.3"
-            ],
-            "global-protect-client-package-version": [
-              "6.2.2"
-            ],
-            "device-dictionary-version": [
-              "107-458"
-            ],
-            "device-dictionary-release-date": [
-              "2023/12/22 17:14:26 CST"
-            ],
-            "app-version": [
-              "8792-8469"
-            ],
-            "app-release-date": [
-              "2023/12/19 16:38:55 CST"
-            ],
-            "av-version": [
-              "4668-5186"
-            ],
-            "av-release-date": [
-              "2023/12/16 06:03:28 CST"
-            ],
-            "threat-version": [
-              "8792-8469"
-            ],
-            "threat-release-date": [
-              "2023/12/19 16:38:55 CST"
-            ],
-            "wf-private-version": [
-              "0"
-            ],
-            "wf-private-release-date": [
-              "unknown"
-            ],
-            "url-db": [
-              "paloaltonetworks"
-            ],
-            "wildfire-version": [
-              "0"
-            ],
-            "wildfire-rt": [
-              "Disabled"
-            ],
-            "url-filtering-version": [
-              "20231226.20355"
-            ],
-            "global-protect-datafile-version": [
-              "0"
-            ],
-            "global-protect-datafile-release-date": [
-              "unknown"
-            ],
-            "global-protect-clientless-vpn-version": [
-              "0"
-            ],
-            "logdb-version": [
-              "11.0.0"
-            ],
-            "plugin_versions": [
-              {
-                "entry": [
-                  {
-                    "$": {
-                      "name": "dlp",
-                      "version": "4.0.2"
-                    },
-                    "pkginfo": [
-                      "dlp-4.0.2"
-                    ]
-                  }
-                ]
-              }
-            ],
-            "platform-family": [
-              "400"
-            ],
-            "vpn-disable-mode": [
-              "off"
-            ],
-            "multi-vsys": [
-              "off"
-            ],
-            "ZTP": [
-              "Disabled"
-            ],
-            "operational-mode": [
-              "normal"
-            ],
-            "advanced-routing": [
-              "off"
-            ],
-            "device-certificate-status": [
-              "Valid"
-            ]
-          }
-        ]
-      }
-    ]
-  }
-}
+$ts-node tests/testShowSystemInfo.ts
+info: System Info: {"result":{"system":{"ZTP":"Disabled","advanced-routing":"off","app-release-date":"2023/12/19 16:38:55 CST","app-version":"8792-8469","av-release-date":"2023/12/16 06:03:28 CST","av-version":"4668-5186","base_mac":"c8:29:c8:49:be:00","cloud-mode":"non-cloud","default-gateway":"10.0.0.1","device-certificate-status":"Valid","device-dictionary-release-date":"2023/12/29 13:37:56 CST","device-dictionary-version":"108-460","devicename":"DataCenter","family":"400","global-protect-client-package-version":"6.2.2","global-protect-clientless-vpn-version":"0","global-protect-datafile-release-date":"unknown","global-protect-datafile-version":"0","hostname":"DataCenter","ip-address":"10.0.0.3","ipv6-address":"unknown","ipv6-link-local-address":"fe80::1f36:7aff:fe02:5485/64","is-dhcp":"no","logdb-version":"11.0.0","mac-address":"1f:36:7a:02:54:85","mac_count":"254","model":"PA-440","multi-vsys":"off","netmask":"255.255.255.0","operational-mode":"normal","platform-family":"400","plugin_versions":{"entry":{"pkginfo":"dlp-4.0.2"}},"public-ip-address":"unknown","serial":"0123456789010","sw-version":"11.0.3","threat-release-date":"2023/12/19 16:38:55 CST","threat-version":"8792-8469","time":"Sun Dec 31 08:16:31 2023\n","uptime":"14 days, 2:18:15","url-db":"paloaltonetworks","url-filtering-version":"20231231.20213","vpn-disable-mode":"off","wf-private-release-date":"unknown","wf-private-version":"0","wildfire-rt":"Disabled","wildfire-version":"0"}},"timestamp":"2023-12-31T14:16:32.437Z"}
 ```
 
 ## 🤝 Contributing

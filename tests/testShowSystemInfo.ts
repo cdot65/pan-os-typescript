@@ -62,7 +62,7 @@ async function testShowSystemInfoResponse() {
     const systemInfo = await firewall.showSystemInfoResponse();
 
     // Log the retrieved system information to the console for verification.
-    logger.info('System Info:', JSON.stringify(systemInfo, null, 2));
+    logger.info('System Info:', systemInfo);
   } catch (error) {
     // Log any errors encountered during the retrieval process.
     console.error('Error retrieving system info:', error);
