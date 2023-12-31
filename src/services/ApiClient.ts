@@ -100,16 +100,18 @@ export class ApiClient {
    *                Defaults to `true`.
    * @returns The response data as a raw XML string or as an `ApiResponse<T>`.
    */
-  public async getData<T extends ApiResult>(
+  public async getData(
     endpoint: string,
     params?: Record<string, unknown>,
     parse: boolean = true,
-  ): Promise<ApiResponse<T> | string> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> {
     const responseXml = await this.get(endpoint, params);
     if (!parse) {
       return responseXml;
     }
-    const parsedXml: ApiResponse<T> = await this.parseXml(responseXml);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const parsedXml: any = await this.parseXml(responseXml);
     return parsedXml;
   }
 
@@ -262,7 +264,7 @@ export class ApiClient {
     logger.debug(
       `Sending the encoded command of ${encodedCmd} to the API with key ${this.apiKey}`,
     );
-    const apiResponse = await this.getData<T>(
+    const apiResponse = await this.getData(
       `/api/?type=op&cmd=${encodedCmd}`,
       { key: this.apiKey },
       parse,

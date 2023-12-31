@@ -1,15 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/models/Firewall.ts
 
-import { AddressObjectEntry } from '../interfaces/AddressObjectResponse';
 import { ApiClient } from '../services/ApiClient';
 import { PanDevice } from './PanDevice';
-import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
-import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
-import { SessionAllResponse } from '../interfaces/SessionAllResponse';
-import { SessionIdResponse } from '../interfaces/SessionIdResponse';
-import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
-import { SessionResponse } from '../interfaces/SessionResponse';
-import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
 import { parseStringPromise } from 'xml2js';
 
 /**
@@ -38,7 +31,7 @@ export class Firewall extends PanDevice {
    *
    * @returns A `Promise` resolved with the resource monitoring data from the firewall.
    */
-  public async showResourceMonitor(): Promise<ResourceMonitorResponse> {
+  public async showResourceMonitor(): Promise<any> {
     const cmd = 'show running resource-monitor minute';
     return this.apiClient.op(cmd);
   }
@@ -48,7 +41,7 @@ export class Firewall extends PanDevice {
    *
    * @returns A `Promise` resolved with the details of the routing table.
    */
-  public async showRoutingRoute(): Promise<RoutingRouteResponse> {
+  public async showRoutingRoute(): Promise<any> {
     const cmd = 'show routing route';
     return this.apiClient.op(cmd);
   }
@@ -58,7 +51,7 @@ export class Firewall extends PanDevice {
    *
    * @returns A `Promise` resolved with details of active sessions.
    */
-  public async showSessionAll(): Promise<SessionAllResponse> {
+  public async showSessionAll(): Promise<any> {
     const cmd = 'show session all';
     return this.apiClient.op(cmd);
   }
@@ -73,7 +66,7 @@ export class Firewall extends PanDevice {
   public async showSessionAllFilter(
     destinationIp: string,
     sourceIp: string,
-  ): Promise<SessionResponse> {
+  ): Promise<any> {
     const xmlCmd = `<show><session><all><filter><source>${sourceIp}</source><destination>${destinationIp}</destination></filter></all></session></show>`;
     return this.apiClient.op(xmlCmd);
   }
@@ -84,7 +77,7 @@ export class Firewall extends PanDevice {
    * @param sessionId - The unique identifier of the session to retrieve.
    * @returns A `Promise` resolved with details about the specified session.
    */
-  public async showSessionId(sessionId: string): Promise<SessionIdResponse> {
+  public async showSessionId(sessionId: string): Promise<any> {
     const xmlCmd = `<show><session><id>${sessionId}</id></session></show>`;
     return this.apiClient.op(xmlCmd);
   }
@@ -94,7 +87,7 @@ export class Firewall extends PanDevice {
    *
    * @returns A `Promise` resolved with general information about firewall sessions.
    **/
-  public async showSessionInfo(): Promise<SessionInfoResponse> {
+  public async showSessionInfo(): Promise<any> {
     const cmd = 'show session info';
     return this.apiClient.op(cmd);
   }
@@ -105,7 +98,7 @@ export class Firewall extends PanDevice {
    * @param url - The URL whose category information is to be tested.
    * @returns A `Promise` resolved with the category information for the specified URL.
    */
-  public async testUrlInfo(url: string): Promise<TestUrlInfoResponse> {
+  public async testUrlInfo(url: string): Promise<any> {
     const xmlCmd = `<test><url-info-cloud>${url}</url-info-cloud></test>`;
     return this.apiClient.op(xmlCmd);
   }
@@ -115,7 +108,7 @@ export class Firewall extends PanDevice {
    *
    * @returns A `Promise` resolved with an array of entries corresponding to each address object.
    */
-  public async addressObjectGetList(): Promise<AddressObjectEntry[]> {
+  public async addressObjectGetList(): Promise<any[]> {
     const xmlCmd = `<show><config><running><xpath>devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/address</xpath></running></config></show>`;
     const responseXml = await this.apiClient.op(xmlCmd, false);
     const parsedResponse = await parseStringPromise(responseXml, {

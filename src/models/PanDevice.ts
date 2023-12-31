@@ -1,12 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/PanDevice.ts
 
 import { ApiClient } from '../services/ApiClient';
 import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
-import { ApiKeyResult } from '../interfaces/ApiResponse';
-import { JobsResponse } from '../interfaces/JobsResponse';
-import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
 import { PanObject } from './PanObject';
-import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 
 /**
  * Base class for interaction with Palo Alto Networks devices.
@@ -41,7 +38,7 @@ export class PanDevice extends PanObject {
   ): Promise<ApiKeyResponse> {
     try {
       const tempApiClient = new ApiClient(this.hostname, '');
-      const apiKeyResult = await tempApiClient.getData<ApiKeyResult>('/api/', {
+      const apiKeyResult = await tempApiClient.getData('/api/', {
         type: 'keygen',
         user: username,
         password: password,
@@ -81,7 +78,7 @@ export class PanDevice extends PanObject {
    *
    * @returns A promise resolving to the license information from the device.
    */
-  public async requestLicenseInfo(): Promise<LicenseInfoResponse> {
+  public async requestLicenseInfo(): Promise<any> {
     const xmlCmd = '<request><license><info/></license></request>';
     const response = await this.apiClient.op(xmlCmd);
     return response;
@@ -92,7 +89,7 @@ export class PanDevice extends PanObject {
    *
    * @returns A promise resolving to the details of all jobs on the device.
    */
-  public async showJobsAll(): Promise<JobsResponse> {
+  public async showJobsAll(): Promise<any> {
     const xmlCmd = '<show><jobs><all/></jobs></show>';
     const response = await this.apiClient.op(xmlCmd);
     return response;
@@ -104,7 +101,7 @@ export class PanDevice extends PanObject {
    * @param jobId - The ID of the job to query.
    * @returns A promise resolving to the details of the specified job.
    */
-  public async showJobsId(jobId: string): Promise<JobsResponse> {
+  public async showJobsId(jobId: string): Promise<any> {
     const xmlCmd = `<show><jobs><id>${jobId}</id></jobs></show>`;
     const response = await this.apiClient.op(xmlCmd);
     return response;
@@ -115,7 +112,7 @@ export class PanDevice extends PanObject {
    *
    * @returns A promise resolving to the system information and status.
    */
-  public async showSystemInfoResponse(): Promise<SystemInfoResponse> {
+  public async showSystemInfoResponse(): Promise<any> {
     const xmlCmd = '<show><system><info/></system></show>';
     const response = await this.apiClient.op(xmlCmd);
     return response;
