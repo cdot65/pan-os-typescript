@@ -1,5 +1,3 @@
-// src/index.ts
-
 /**
  * The root module providing foundational and specialized classes to interact
  * with Palo Alto Networks Operating System (PAN-OS) devices. It includes base
@@ -7,28 +5,32 @@
  */
 
 /**
- * A specialized class derived from `PanDevice` for interactions with Palo Alto Networks
- * firewall devices. It extends the generic device functionalities with methods tailored
+ * Firewall class derived from `PanDevice` for interactions with Palo Alto Networks
+ * firewall devices. Extends generic device functionalities with methods tailored
  * to firewall resource monitoring and system information management.
- *
- * @exports Firewall
+ * @module Firewall
  */
 export { Firewall } from './models/Firewall';
 
 /**
- * A class representing network address entities (objects) in the context of Palo Alto Networks
- * Operating System (PAN-OS). It encapsulates the functionality necessary for managing
+ * Class representing network address entities (objects) in the context of Palo Alto Networks
+ * Operating System (PAN-OS). Encapsulates functionality for managing
  * network address configurations and their associations within security policies and other
  * system components.
- *
- * @exports AddressObject
+ * @module AddressObject
  */
 export { AddressObject } from './models/AddressObject';
 
 /**
- * An enumeration of supported network address formats in PAN-OS.
+ * Enumeration of supported network address formats in PAN-OS.
  * Includes IP netmask, IP range, IP wildcard, and Fully Qualified Domain Name (FQDN) types.
- *
- * @exports AddressType
+ * @module AddressType
  */
 export { AddressType } from './models/AddressObject';
+
+/**
+ * Service class for generating API keys for Palo Alto Networks devices.
+ * Handles API key generation using provided credentials.
+ * @module ApiKeyGenerator
+ */
+export { ApiKeyGenerator } from './services/ApiKeyGenerator';

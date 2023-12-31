@@ -1,4 +1,4 @@
-// src/interfaces/LicenseInfoResponse.ts
+// src/interfaces/RequestLicenseInfo.ts
 
 /**
  * Describes an individual license's details provided by the PAN-OS API, including its status and metadata.

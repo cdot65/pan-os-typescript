@@ -7,11 +7,19 @@ import { hideBin } from 'yargs/helpers';
 import logger from '../src/utils/logger';
 import yargs from 'yargs';
 
+/**
+ * Script for testing the creation of address objects in Palo Alto Networks Operating System (PAN-OS).
+ * Loads environment variables and uses command-line arguments to specify the details of the address object.
+ */
+
 // Load environment variables.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
+/**
+ * Defines the structure for command-line arguments used in the script.
+ */
 interface Arguments {
   name: string;
   value: string;
@@ -21,6 +29,7 @@ interface Arguments {
   logLevel: string;
 }
 
+// Parse command-line arguments.
 const argv = yargs(hideBin(process.argv))
   .options({
     name: {
@@ -65,6 +74,10 @@ const argv = yargs(hideBin(process.argv))
 // Set the logger level based on the argument
 logger.level = argv.logLevel;
 
+/**
+ * Test function to create an address object on a PAN-OS device.
+ * Utilizes the Firewall and AddressObject classes for this operation.
+ */
 async function testCreateAddressObject() {
   logger.debug('Initializing test for creating an address object...');
 

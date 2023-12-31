@@ -6,15 +6,25 @@ import { hideBin } from 'yargs/helpers';
 import logger from '../src/utils/logger';
 import yargs from 'yargs';
 
-// Load and configure environment variables from the .env file based on the current environment (development or production).
+/**
+ * Script for testing the retrieval of system information from a PAN-OS device.
+ * Demonstrates the use of the Firewall class to fetch system details.
+ * Utilizes environment variables for configuration and command-line arguments to set the logging level.
+ */
+
+// Load and configure environment variables based on the current environment setting.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
+/**
+ * Defines the structure for command-line arguments used in the script.
+ */
 interface Arguments {
   logLevel: string;
 }
 
+// Parse command-line arguments to configure the script's runtime settings.
 const argv = yargs(hideBin(process.argv))
   .options({
     logLevel: {
@@ -30,14 +40,10 @@ const argv = yargs(hideBin(process.argv))
 logger.level = argv.logLevel;
 
 /**
- * Retrieves and logs the system information from a PAN-OS device.
- * This script demonstrates the use of the `Firewall` class from the SDK to obtain system-related details,
- * validating the SDK's ability to interact with the device API and handle the returned data.
- * Errors are thrown if the API key is not set in environment variables or if there is a failure in fetching the information.
- *
+ * Test function to retrieve and log system information from a PAN-OS device.
+ * Validates the SDK's ability to interact with the device API and process the data.
  * @async
- * @function testShowSystemInfoResponse
- * @throws {Error} When the API key is not provided in environment variables or if the request to retrieve system information fails.
+ * @throws An error if the API key is not set in the environment variables or if there is a failure in fetching the information.
  */
 async function testShowSystemInfoResponse() {
   const hostname = process.env.PANOS_HOSTNAME || 'datacenter.cdot.io';
@@ -56,7 +62,7 @@ async function testShowSystemInfoResponse() {
     const systemInfo = await firewall.showSystemInfoResponse();
 
     // Log the retrieved system information to the console for verification.
-    logger.debug('System Info:', JSON.stringify(systemInfo, null, 2));
+    logger.info('System Info:', JSON.stringify(systemInfo, null, 2));
   } catch (error) {
     // Log any errors encountered during the retrieval process.
     console.error('Error retrieving system info:', error);

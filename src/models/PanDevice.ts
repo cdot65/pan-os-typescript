@@ -2,22 +2,20 @@
 // src/PanDevice.ts
 
 import { ApiClient } from '../services/ApiClient';
-import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
 import { PanObject } from './PanObject';
 
 /**
- * Base class for interaction with Palo Alto Networks devices.
- * It offers methods to generate API keys, execute operational commands,
- * and gather system and license information.
+ * Represents the base class for interaction with Palo Alto Networks devices.
+ * Provides methods to generate API keys, execute operational commands, and gather system and license information.
  */
 export class PanDevice extends PanObject {
   protected hostname: string;
 
   /**
-   * Initializes a new instance of the `PanDevice` class.
+   * Creates a new instance of `PanDevice`.
    *
-   * @param hostname  - The hostname or IP address of the device.
-   * @param apiClient - An optional pre-configured `ApiClient` instance.
+   * @param hostname The hostname or IP address of the Palo Alto Networks device.
+   * @param apiClient A pre-configured `ApiClient` instance.
    */
   constructor(hostname: string, apiClient?: ApiClient) {
     super(hostname, apiClient);
@@ -25,50 +23,12 @@ export class PanDevice extends PanObject {
   }
 
   /**
-   * Generates an API key for the device using the given credentials.
+   * Retrieves configuration data from the device based on an XPath query.
    *
-   * @param username - The device username.
-   * @param password - The device password.
-   * @throws Will throw an error if API key generation fails.
-   * @returns A promise resolving to an object containing the generated API key.
+   * @param xpath The XPath query specific to the object type being queried.
+   * @returns A promise resolving to the device's configuration data in parsed form.
    */
-  public async generateApiKey(
-    username: string,
-    password: string,
-  ): Promise<ApiKeyResponse> {
-    try {
-      const tempApiClient = new ApiClient(this.hostname, '');
-      const apiKeyResult = await tempApiClient.getData('/api/', {
-        type: 'keygen',
-        user: username,
-        password: password,
-      });
-
-      if (
-        typeof apiKeyResult !== 'string' &&
-        apiKeyResult.result &&
-        'key' in apiKeyResult.result
-      ) {
-        return {
-          key: apiKeyResult.result.key,
-        };
-      } else {
-        throw new Error('API key generation failed');
-      }
-    } catch (error) {
-      console.error('Error generating API key:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Retrieves configuration data for this object type from the device.
-   *
-   * @param xpath - The XPath query specific to the object type.
-   * @returns A promise resolving to the device's configuration data as a parsed object.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async fetchConfig(xpath: string): Promise<any> {
+  public async getConfig(xpath: string): Promise<any> {
     const apiClient = this.apiClient; // Retrieve the ApiClient instance
     return apiClient.getConfig(xpath);
   }

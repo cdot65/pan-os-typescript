@@ -51,7 +51,7 @@ async function testFetchAddressObjectConfig() {
       'Attempting to retrieve AddressObject configuration from the PAN-OS device...',
     );
     const xpath = AddressObject.getXpath(); // Static method in AddressObject to get XPath
-    const addressObjectConfig = await firewall.fetchConfig(xpath);
+    const addressObjectConfig = await firewall.getConfig(xpath);
     logger.debug(
       'AddressObject configuration:',
       JSON.stringify(addressObjectConfig, null, 2),
