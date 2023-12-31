@@ -1,9 +1,10 @@
 // src/services/ApiClient.ts
 
-import axios, { AxiosInstance } from 'axios';
-import { parseStringPromise } from 'xml2js';
 import { ApiResponse, ApiResult } from '../interfaces/ApiResponse';
+import axios, { AxiosInstance } from 'axios';
+
 import logger from '../utils/logger';
+import { parseStringPromise } from 'xml2js';
 
 /**
  * Client for interacting with the Palo Alto Networks XML API, encapsulating methods
@@ -42,7 +43,9 @@ export class ApiClient {
     endpoint: string,
     params?: Record<string, unknown>,
   ): Promise<string> {
-    logger.debug(`Sending GET request to '${endpoint}' with params: ${params}`);
+    logger.debug(
+      `Sending the GET request to '${endpoint}' with params: ${params}`,
+    );
     try {
       const response = await this.axiosInstance.get(endpoint, {
         params: params,
@@ -66,7 +69,9 @@ export class ApiClient {
    * @returns A string containing the raw XML response.
    */
   public async post(endpoint: string, data: string): Promise<string> {
-    logger.debug(`Sending POST request to '${endpoint}' with data: ${data}`);
+    logger.debug(
+      `Sending the POST request to '${endpoint}' with data: ${data}`,
+    );
     try {
       const response = await this.axiosInstance.post(endpoint, data, {
         headers: {
@@ -249,12 +254,21 @@ export class ApiClient {
       xmlCmd = this.convertCliToXml(command);
     }
 
+    logger.debug(
+      `Sending the operational command of ${xmlCmd} to the API with key ${this.apiKey}`,
+    );
     const encodedCmd = encodeURIComponent(xmlCmd);
-    return this.getData<T>(
+
+    logger.debug(
+      `Sending the encoded command of ${encodedCmd} to the API with key ${this.apiKey}`,
+    );
+    const apiResponse = await this.getData<T>(
       `/api/?type=op&cmd=${encodedCmd}`,
       { key: this.apiKey },
       parse,
     );
+
+    return apiResponse;
   }
 
   /**

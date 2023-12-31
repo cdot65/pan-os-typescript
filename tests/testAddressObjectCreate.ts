@@ -1,10 +1,11 @@
 // tests/testAddressObjectCreate.ts
 
+import { AddressObject, AddressType, Firewall } from '../src/index';
+
 import dotenv from 'dotenv';
-import { Firewall, AddressObject, AddressType } from '../src/index';
-import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
 // Load environment variables.
 dotenv.config({

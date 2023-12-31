@@ -1,16 +1,22 @@
 // tests/testAddressObjectApply.ts
 
+import { AddressObject, AddressType, Firewall } from '../src/index';
+
 import dotenv from 'dotenv';
-import { Firewall, AddressObject, AddressType } from '../src/index';
-import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
-// Load environment variables.
+/**
+ * Load environment variables based on the current NODE_ENV.
+ */
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
+/**
+ * Interface representing the command line arguments.
+ */
 interface Arguments {
   name: string;
   value: string;
@@ -20,6 +26,9 @@ interface Arguments {
   logLevel: string;
 }
 
+/**
+ * Parse command line arguments using yargs.
+ */
 const argv = yargs(hideBin(process.argv))
   .options({
     name: {
@@ -64,9 +73,9 @@ const argv = yargs(hideBin(process.argv))
 // Set the logger level based on the argument
 logger.level = argv.logLevel;
 
-// Set the logger level based on the argument
-logger.level = argv.logLevel;
-
+/**
+ * Main function to test the application of an address object.
+ */
 async function testAddressObjectApply() {
   logger.debug('Initializing test for applying an address object...');
 

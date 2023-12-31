@@ -1,5 +1,5 @@
-import { VersionedPanObject } from './VersionedPanObject';
 import { AddressObjectConfig } from '../interfaces/AddressObjectConfig';
+import { VersionedPanObject } from './VersionedPanObject';
 
 /**
  * Defines the available types of network addresses in PAN-OS.

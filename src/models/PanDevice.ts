@@ -1,12 +1,12 @@
 // src/PanDevice.ts
 
-import { PanObject } from './PanObject';
 import { ApiClient } from '../services/ApiClient';
+import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
 import { ApiKeyResult } from '../interfaces/ApiResponse';
 import { JobsResponse } from '../interfaces/JobsResponse';
-import { ApiKeyResponse } from '../interfaces/ApiKeyResponse';
-import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 import { LicenseInfoResponse } from '../interfaces/LicenseInfoResponse';
+import { PanObject } from './PanObject';
+import { SystemInfoResponse } from '../interfaces/SystemInfoResponse';
 
 /**
  * Base class for interaction with Palo Alto Networks devices.

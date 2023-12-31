@@ -1,16 +1,16 @@
 // src/models/Firewall.ts
 
-import { PanDevice } from './PanDevice';
-import { parseStringPromise } from 'xml2js';
-import { ApiClient } from '../services/ApiClient';
-import { SessionResponse } from '../interfaces/SessionResponse';
-import { SessionIdResponse } from '../interfaces/SessionIdResponse';
-import { SessionAllResponse } from '../interfaces/SessionAllResponse';
-import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
-import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
 import { AddressObjectEntry } from '../interfaces/AddressObjectResponse';
-import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
+import { ApiClient } from '../services/ApiClient';
+import { PanDevice } from './PanDevice';
 import { ResourceMonitorResponse } from '../interfaces/ResourceMonitorResponse';
+import { RoutingRouteResponse } from '../interfaces/RoutingRouteResponse';
+import { SessionAllResponse } from '../interfaces/SessionAllResponse';
+import { SessionIdResponse } from '../interfaces/SessionIdResponse';
+import { SessionInfoResponse } from '../interfaces/SessionInfoResponse';
+import { SessionResponse } from '../interfaces/SessionResponse';
+import { TestUrlInfoResponse } from '../interfaces/TestUrlInfoResponse';
+import { parseStringPromise } from 'xml2js';
 
 /**
  * A specialized {@link PanDevice} subclass for interacting with Palo Alto Networks firewalls.

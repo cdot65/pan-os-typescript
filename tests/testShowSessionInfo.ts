@@ -1,16 +1,16 @@
 // tests/testShowSessionInfo.ts
 
+import { Firewall } from '../src/index';
 import dotenv from 'dotenv';
-import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import logger from '../src/utils/logger';
+import yargs from 'yargs';
 
 // Load environment variables depending on the execution environment.
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
 });
 
-import { Firewall } from '../src/index';
 interface Arguments {
   logLevel: string;
 }

@@ -1,11 +1,10 @@
 // tests/testExecuteOperationalCommand.ts
 
+import { Firewall } from '../src/index'; // Importing Firewall from the index
 import dotenv from 'dotenv';
-import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import logger from '../src/utils/logger';
-
-import { Firewall } from '../src/index'; // Importing Firewall from the index
+import yargs from 'yargs';
 
 // Configure environment variables
 dotenv.config({
