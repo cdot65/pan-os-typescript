@@ -6,16 +6,18 @@ import { ApiResponse, ApiResult } from '../interfaces/ApiResponse';
 import logger from '../utils/logger';
 
 /**
- * A class for interacting with the Palo Alto Networks XML API.
+ * Client for interacting with the Palo Alto Networks XML API, encapsulating methods
+ * for performing HTTP GET and POST requests with XML data and conversion utilities for API operations.
  */
 export class ApiClient {
   private axiosInstance: AxiosInstance;
   private apiKey: string;
 
   /**
-   * Constructs a new ApiClient instance for interacting with the Palo Alto Networks XML API.
-   * @param hostname - The hostname or IP address of the PAN-OS device.
-   * @param apiKey - The API key for device authentication.
+   * Initializes a new instance of `ApiClient`.
+   *
+   * @param hostname - The hostname or IP address of the target PAN-OS device.
+   * @param apiKey - An API key for authenticating requests to the PAN-OS device.
    */
   constructor(hostname: string, apiKey: string) {
     this.apiKey = apiKey;
@@ -29,7 +31,13 @@ export class ApiClient {
     });
   }
 
-  // NOTE: this is the low-level API communication that uses the Axios instance
+  /**
+   * Performs an HTTP GET request to the specified endpoint on the PAN-OS device.
+   *
+   * @param endpoint - The API endpoint to send the request to.
+   * @param params - Optional parameters to include in the request.
+   * @returns A string containing the raw XML response.
+   */
   public async get(
     endpoint: string,
     params?: Record<string, unknown>,
@@ -45,15 +53,21 @@ export class ApiClient {
       );
       return response.data;
     } catch (error) {
-      console.error('Error in GET request:', error);
+      logger.error('Error in GET request:', error);
       throw error;
     }
   }
 
-  // NOTE: this is the low-level API communication that uses the Axios instance
+  /**
+   * Performs an HTTP POST request to the specified endpoint on the PAN-OS device.
+   *
+   * @param endpoint - The API endpoint to send the request to.
+   * @param data - The XML string to be sent as the request body.
+   * @returns A string containing the raw XML response.
+   */
   public async post(endpoint: string, data: string): Promise<string> {
+    logger.debug(`Sending POST request to '${endpoint}' with data: ${data}`);
     try {
-      logger.debug(`Sending POST request to '${endpoint}' with data: ${data}`);
       const response = await this.axiosInstance.post(endpoint, data, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -66,14 +80,20 @@ export class ApiClient {
       );
       return response.data;
     } catch (error) {
-      console.error('Error in POST request:', error);
+      logger.error('Error in POST request:', error);
       throw error;
     }
   }
 
-  /**This is the high-level API communication that uses the low-level methods
-   * to get data from the API and parse it into a JavaScript object.
-   * Currently used by the `op()` and `generateApiKey()` methods in PanDevice.
+  /**
+   * Retrieves data from the PAN-OS API and optionally parses the response XML into a JavaScript object.
+   *
+   * @typeparam T - The expected type of the API result.
+   * @param endpoint - The API endpoint to send the request to.
+   * @param params - Optional parameters to include in the request.
+   * @param parse - Whether to parse the XML response into a JavaScript object.
+   *                Defaults to `true`.
+   * @returns The response data as a raw XML string or as an `ApiResponse<T>`.
    */
   public async getData<T extends ApiResult>(
     endpoint: string,
@@ -89,22 +109,18 @@ export class ApiClient {
   }
 
   /**
-   * This is a high-level API abstraction that uses the low-level method of `post()`
-   * @param xpath string of the xpath to be used
-   * @param element string representation of the xml element to be pushed
-   * @param action can be 'set', 'edit', or 'delete'. Higher level abstractions will differ on this argument value
-   * @param apiKey the API key to be used. Defaults to the API key provided during instantiation
+   * Sends a configuration change to the PAN-OS device via an API POST request.
+   *
+   * @param xpath - The XPath of the configuration to be updated.
+   * @param element - The configuration's XML representation.
+   * @param action - The configuration action to perform (set, edit, or delete).
+   * @returns A string containing the raw XML response.
    */
   public async postConfig(
     xpath: string,
     element: string,
     action: 'set' | 'edit' | 'delete',
   ): Promise<string> {
-    /**
-     * The API expects the following format:
-     * type=config&action=set&key=<api_key>&xpath=<xpath>&element=<element>
-     * so here we are using URLSearchParams to build the query string
-     */
     const data = new URLSearchParams();
     data.append('type', 'config');
     data.append('action', action);
@@ -117,23 +133,23 @@ export class ApiClient {
   }
 
   /**
-   * This is a high-level API abstraction that uses the low-level method of `postConfig()`
-   * This method is called by the `create()` method in VersionedPanObject.
-   * Since the objective here is to create configuration, we are using the 'set' action.
-   * @param xpath string of the xpath to be used
-   * @param element string representation of the xml element to be pushed
+   * Facilitates the creation of a configuration entity on the PAN-OS device.
+   *
+   * @param xpath - The XPath of the configuration to be created.
+   * @param element - The configuration's XML representation.
+   * @returns A string containing the raw XML response from the configuration creation API call.
    */
   public async setConfig(xpath: string, element: string): Promise<string> {
     return this.postConfig(xpath, element, 'set');
   }
 
   /**
-   * This is a high-level API abstraction that uses the low-level method of `postConfig()`
-   * This method is called by the `apply()` method in VersionedPanObject.
-   * Since the objective here is to edit configuration, we are using the 'edit' action.
-   * @param xpath string of the xpath to be used
-   * @param element string representation of the xml element to be pushed
-   * @param entryName string name of the entry to be edited
+   * Applies edits to a configuration entity on the PAN-OS device.
+   *
+   * @param xpath - The XPath of the configuration to be edited.
+   * @param element - The configuration's XML representation.
+   * @param entryName - The name of the configuration entry to be edited.
+   * @returns A string containing the raw XML response from the configuration edit API call.
    */
   public async editConfig(
     xpath: string,
@@ -154,43 +170,47 @@ export class ApiClient {
     return this.post('/api/', data.toString());
   }
 
+  /**
+   * Retrieves the specified configuration from the PAN-OS device, with options to parse the response.
+   *
+   * @param xpath - The XPath of the configuration to be retrieved.
+   * @param parse - Whether to parse the XML response into a JavaScript object.
+   *                Defaults to `true`.
+   * @returns The configuration data as a raw XML string or as an `ApiResponse<ApiResult>`.
+   */
   public async getConfig(
     xpath: string,
     parse: boolean = true,
   ): Promise<ApiResponse<ApiResult> | string> {
-    // logger.debug(`Fetching config for '${xpath}'`);
     const params = {
       type: 'config',
       action: 'get',
-      xpath: xpath,
+      xpath,
       key: this.apiKey,
     };
 
     try {
-      // Use the existing get() method to perform the API call
       const responseXml = await this.get('/api/', params);
-
-      // If we do not need to parse the XML, return the response text trimmed
       if (!parse) {
         return responseXml.trim();
       }
 
-      // Extract the data from the response and trim it
       const trimmedResponseXml = responseXml.trim();
-      logger.debug('Trimmed API response:', trimmedResponseXml); // Log the trimmed response
-
-      // Parse the XML and return it as ApiResponse<ApiResult>
       return await this.parseXml<ApiResult>(trimmedResponseXml);
     } catch (error) {
-      console.error('Error in getConfig:', error);
+      logger.error('Error in getConfig:', error);
       throw error;
     }
   }
 
   /**
-   * Parses an XML string into a JavaScript object.
-   * @param xml - The XML string to be parsed.
-   * @returns A promise resolved with the parsed object.
+   * Parses the provided XML string into a JavaScript object structure.
+   *
+   * @typeparam T - The expected type of the API result structure.
+   * @param xml - The XML string to parse.
+   * @param explicitArray - If set to true, forces arrays for child elements. Defaults to `false`.
+   * @param ignoreAttrs - If set to true, ignores XML attributes and only creates text nodes. Defaults to `true`.
+   * @returns A promise resolved with the parsed object structure.
    */
   public async parseXml<T extends ApiResult>(
     xml: string,
@@ -204,63 +224,62 @@ export class ApiClient {
         explicitRoot: false,
       });
 
-      // Since the root element is 'response', parsedObject should directly correspond to ApiResponse<T>
-      return parsedObject as ApiResponse<T>; // Cast it directly
+      return parsedObject as ApiResponse<T>; // Ensuring the return type matches the expected ApiResponse<T>
     } catch (error) {
-      console.error('Error parsing XML:', error);
+      logger.error('Error parsing XML:', error);
       throw error;
     }
   }
 
-  public async op(
+  /**
+   * Executes an operational command on the PAN-OS device and retrieves the result.
+   *
+   * @typeparam T - The expected type of the API result structure.
+   * @param command - The command string or XML to execute.
+   * @param parse - Whether to parse the command response into a JavaScript object.
+   *                Defaults to `true`.
+   * @returns The response from the operational command, as raw XML or an object.
+   */
+  public async op<T extends ApiResult>(
     command: string,
     parse: boolean = true,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    let xmlCmd: string;
-
-    if (command.startsWith('<') && command.endsWith('>')) {
-      xmlCmd = command;
-    } else {
+  ): Promise<ApiResponse<T> | string> {
+    let xmlCmd: string = command;
+    if (!command.startsWith('<') || !command.endsWith('>')) {
       xmlCmd = this.convertCliToXml(command);
     }
 
     const encodedCmd = encodeURIComponent(xmlCmd);
-    const response = await this.getData(
+    return this.getData<T>(
       `/api/?type=op&cmd=${encodedCmd}`,
       { key: this.apiKey },
       parse,
     );
-    return response;
   }
 
   /**
-   * Converts a CLI-like command string into its XML representation.
-   * This method is invoked when an operational command is specified in
-   * a format other than XML and needs to be converted.
-   * @param cliCmd - The CLI command string to convert.
-   * @private
-   * @returns The XML representation of the command string.
+   * Converts a command string in CLI-like format to the XML format required by the PAN-OS API.
+   *
+   * @param cliCmd - The CLI command to convert to XML.
+   * @returns The XML representation of the CLI command.
    */
   private convertCliToXml(cliCmd: string): string {
     const quote = '"';
     const parts = cliCmd.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
-
     if (parts.length === 0) {
       return '';
     }
 
     let xmlCmd = '';
     const openTags: string[] = [];
-
-    for (const part of parts) {
+    parts.forEach((part) => {
       if (part.startsWith(quote) && part.endsWith(quote)) {
         xmlCmd += part.slice(1, -1);
       } else {
-        xmlCmd += `<${part}>`;
         openTags.push(part);
+        xmlCmd += `<${part}>`;
       }
-    }
+    });
 
     while (openTags.length) {
       const tag = openTags.pop();
