@@ -37,3 +37,6 @@ package-lock.json
 .eslintcache
 *v8.log
 /lib/
+
+# React Test App
+tests/react
