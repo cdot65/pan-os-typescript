@@ -36,6 +36,7 @@ export class ApiKeyGenerator {
 
     try {
       const response: AxiosResponse = await axios.get(endpoint, {
+        headers: { Accept: 'application/xml' },
         responseType: 'text',
       });
       // Parse the response to extract the API key
