@@ -39,4 +39,4 @@ package-lock.json
 /lib/
 
 # React Test App
-tests/react
+# tests/react
