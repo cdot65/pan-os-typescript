@@ -1,7 +1,7 @@
-import { ApiKeyGenerator } from '../src/index';
+import { ApiKeyGenerator } from '../../src/index';
 import dotenv from 'dotenv';
 import { hideBin } from 'yargs/helpers';
-import logger from '../src/utils/logger';
+import logger from '../../src/utils/logger';
 import yargs from 'yargs';
 
 /**

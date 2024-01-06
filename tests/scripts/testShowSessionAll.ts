@@ -1,9 +1,9 @@
 // tests/testShowSessionAll.ts
 
-import { Firewall } from '../src/index';
+import { Firewall } from '../../src/index';
 import dotenv from 'dotenv';
 import { hideBin } from 'yargs/helpers';
-import logger from '../src/utils/logger';
+import logger from '../../src/utils/logger';
 import yargs from 'yargs';
 
 // Load and configure environment variables from the .env file based on the NODE_ENV setting.

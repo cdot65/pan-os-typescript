@@ -1,7 +1,7 @@
-import { Firewall } from '../src/index';
+import { Firewall } from '../../src/index';
 import dotenv from 'dotenv';
 import { hideBin } from 'yargs/helpers';
-import logger from '../src/utils/logger';
+import logger from '../../src/utils/logger';
 import yargs from 'yargs';
 
 // Load the appropriate environment configuration based on the NODE_ENV setting.

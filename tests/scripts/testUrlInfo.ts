@@ -1,9 +1,9 @@
 // tests/testUrlInfo.ts
 
-import { Firewall } from '../src/index';
+import { Firewall } from '../../src/index';
 import dotenv from 'dotenv';
 import { hideBin } from 'yargs/helpers';
-import logger from '../src/utils/logger';
+import logger from '../../src/utils/logger';
 import yargs from 'yargs';
 
 // Load environment variables from the .env file based on the current NODE_ENV environment variable.
