@@ -1,3 +1,4 @@
+// tests/react/minecraft/pages/_document.tsx
 import Head from 'next/document';
 import Html from 'next/document';
 import Main from 'next/document';

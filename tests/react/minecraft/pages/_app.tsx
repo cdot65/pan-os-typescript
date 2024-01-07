@@ -1,3 +1,4 @@
+// tests/react/minecraft/pages/_app.tsx
 import 'styles/globals.scss';
 import 'styles/cmdk/panos.scss';
 import 'styles/cmdk/prisma.scss';

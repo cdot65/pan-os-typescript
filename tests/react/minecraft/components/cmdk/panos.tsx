@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react/no-unknown-property */
+// tests/react/minecraft/components/cmdk/panos.tsx
 import { Command } from 'cmdk';
 import React from 'react';
 

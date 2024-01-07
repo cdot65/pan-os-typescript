@@ -1,3 +1,4 @@
+// tests/react/minecraft/components/icons/index.tsx
 import styles from './icons.module.scss';
 
 export function FigmaIcon() {

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
+// tests/react/minecraft/pages/index.tsx
 import {
   AnimatePresence,
   AnimateSharedLayout,
