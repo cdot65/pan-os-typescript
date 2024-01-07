@@ -1,10 +1,10 @@
 import 'styles/globals.scss';
-import 'styles/cmdk/panorama.scss';
-import 'styles/cmdk/scm.scss';
 import 'styles/cmdk/panos.scss';
 import 'styles/cmdk/prisma.scss';
+import 'styles/cmdk/scm.scss';
+import 'styles/cmdk/settings.scss';
 
-import type { AppProps } from 'next/app';
+import AppProps from 'next/app';
 import Head from 'next/head';
 import { NextSeo } from 'next-seo';
 import { ThemeProvider } from 'next-themes';

@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable react/no-unknown-property */
 import { Command } from 'cmdk';
 import React from 'react';
 
-export function PanoramaCMDK() {
+export function SettingsCMDK() {
   const ref = React.useRef<HTMLDivElement | null>(null);
   const [inputValue, setInputValue] = React.useState('');
 
@@ -31,7 +33,7 @@ export function PanoramaCMDK() {
   }
 
   return (
-    <div className="panorama">
+    <div className="settings">
       <Command
         ref={ref}
         onKeyDown={(e: React.KeyboardEvent) => {
@@ -52,7 +54,7 @@ export function PanoramaCMDK() {
       >
         <div>
           {pages.map((p) => (
-            <div key={p} cmdk-panorama-badge="">
+            <div key={p} cmdk-settings-badge="">
               {p}
             </div>
           ))}
@@ -148,7 +150,7 @@ function Item({
     <Command.Item onSelect={onSelect}>
       {children}
       {shortcut && (
-        <div cmdk-panorama-shortcuts="">
+        <div cmdk-settings-shortcuts="">
           {shortcut.split(' ').map((key) => {
             return <kbd key={key}>{key}</kbd>;
           })}
@@ -215,24 +217,6 @@ function TeamsIcon() {
       <circle cx="9" cy="7" r="4"></circle>
       <path d="M23 21v-2a4 4 0 00-3-3.87"></path>
       <path d="M16 3.13a4 4 0 010 7.75"></path>
-    </svg>
-  );
-}
-
-function CopyIcon() {
-  return (
-    <svg
-      fill="none"
-      height="24"
-      shapeRendering="geometricPrecision"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      viewBox="0 0 24 24"
-      width="24"
-    >
-      <path d="M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866m-6 .17h8c1.105 0 2 .91 2 2.035v10.857C20 21.09 19.105 22 18 22h-8c-1.105 0-2-.911-2-2.036V9.107c0-1.124.895-2.036 2-2.036z"></path>
     </svg>
   );
 }

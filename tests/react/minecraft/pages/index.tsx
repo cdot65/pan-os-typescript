@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import {
   AnimatePresence,
   AnimateSharedLayout,
@@ -9,13 +10,13 @@ import {
   CopiedIcon,
   CopyIcon,
   GitHubIcon,
-  PanoramaCMDK,
   PanosCMDK,
   PanosIcon,
   PrismaCMDK,
   PrismaIcon,
   ScmCMDK,
   ScmIcon,
+  SettingsCMDK,
   SettingsIcon,
 } from 'components';
 
@@ -70,7 +71,7 @@ export default function Index() {
           )}
           {theme === 'Settings' && (
             <CMDKWrapper key="Settings">
-              <PanoramaCMDK />
+              <SettingsCMDK />
             </CMDKWrapper>
           )}
         </AnimatePresence>
@@ -265,19 +266,6 @@ function ThemeSwitcher() {
     </div>
   );
 }
-//////////////////////////////////////////////////////////////////
-
-// function Codeblock() {
-//   const code = `npm install pan-os-typescript`;
-
-//   return (
-//     <div className={styles.codeBlock}>
-//       <div className={styles.line2} aria-hidden />
-//       <div className={styles.line3} aria-hidden />
-//       <Code>{code}</Code>
-//     </div>
-//   );
-// }
 
 //////////////////////////////////////////////////////////////////
 

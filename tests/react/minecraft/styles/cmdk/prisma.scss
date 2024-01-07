@@ -4,32 +4,15 @@
     width: 100%;
     padding: 8px;
     background: #ffffff;
-    border-radius: 16px;
+    border-radius: 12px;
     overflow: hidden;
     font-family: var(--font-sans);
     border: 1px solid var(--gray6);
     box-shadow: var(--cmdk-shadow);
+    transition: transform 100ms ease;
 
     .dark & {
-      background: var(--gray2);
-    }
-  }
-
-  [cmdk-prisma-header] {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 48px;
-    padding: 0 8px;
-    border-bottom: 1px solid var(--gray5);
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-
-    svg {
-      width: 20px;
-      height: 20px;
-      color: var(--gray9);
-      transform: translateY(1px);
+      background: rgba(22, 22, 22, 0.7);
     }
   }
 
@@ -37,39 +20,55 @@
     font-family: var(--font-sans);
     border: none;
     width: 100%;
-    font-size: 16px;
+    font-size: 17px;
+    padding: 8px 8px 16px 8px;
     outline: none;
     background: var(--bg);
     color: var(--gray12);
+    border-bottom: 1px solid var(--gray6);
+    margin-bottom: 16px;
+    border-radius: 0;
 
     &::placeholder {
       color: var(--gray9);
     }
   }
 
+  [cmdk-prisma-badge] {
+    height: 20px;
+    background: var(--grayA3);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 12px;
+    color: var(--grayA11);
+    border-radius: 4px;
+    margin: 4px 0 4px 4px;
+    user-select: none;
+    text-transform: capitalize;
+    font-weight: 500;
+  }
+
   [cmdk-item] {
     content-visibility: auto;
 
     cursor: pointer;
-    border-radius: 12px;
+    height: 48px;
+    border-radius: 8px;
     font-size: 14px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    color: var(--gray12);
-    padding: 8px 8px;
-    margin-right: 8px;
-    font-weight: 500;
+    gap: 8px;
+    padding: 0 16px;
+    color: var(--gray11);
+    user-select: none;
+    will-change: background, color;
     transition: all 150ms ease;
     transition-property: none;
 
     &[data-selected='true'] {
-      background: var(--blue9);
-      color: #ffffff;
-
-      [cmdk-prisma-item-subtitle] {
-        color: #ffffff;
-      }
+      background: var(--grayA3);
+      color: var(--gray12);
     }
 
     &[data-disabled='true'] {
@@ -77,152 +76,49 @@
       cursor: not-allowed;
     }
 
+    &:active {
+      transition-property: background;
+      background: var(--gray4);
+    }
+
     &+[cmdk-item] {
       margin-top: 4px;
     }
 
     svg {
-      width: 16px;
-      height: 16px;
-      color: #ffffff;
-    }
-  }
-
-  [cmdk-prisma-icon-wrapper] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 32px;
-    height: 32px;
-    background: orange;
-    border-radius: 8px;
-  }
-
-  [cmdk-prisma-item-meta] {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  [cmdk-prisma-item-subtitle] {
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--gray11);
-  }
-
-  [cmdk-prisma-items] {
-    min-height: 308px;
-    display: flex;
-  }
-
-  [cmdk-prisma-left] {
-    width: 40%;
-  }
-
-  [cmdk-prisma-separator] {
-    width: 1px;
-    border: 0;
-    margin-right: 8px;
-    background: var(--gray6);
-  }
-
-  [cmdk-prisma-right] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    margin-left: 8px;
-    width: 60%;
-
-    button {
-      width: 120px;
-      height: 40px;
-      background: var(--blue9);
-      border-radius: 6px;
-      font-weight: 500;
-      color: white;
-      font-size: 14px;
-    }
-
-    input[type='text'] {
-      height: 40px;
-      width: 160px;
-      border: 1px solid var(--gray6);
-      background: #ffffff;
-      border-radius: 6px;
-      padding: 0 8px;
-      font-size: 14px;
-      font-family: var(--font-sans);
-      box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08);
-
-      &::placeholder {
-        color: var(--gray9);
-      }
-
-      @media (prefers-color-scheme: dark) {
-        background: var(--gray3);
-      }
-    }
-
-    [cmdk-prisma-radio] {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: var(--gray12);
-      font-weight: 500;
-      font-size: 14px;
-      accent-color: var(--blue9);
-
-      input {
-        width: 20px;
-        height: 20px;
-      }
-    }
-
-    img {
-      width: 40px;
-      height: 40px;
-      border-radius: 9999px;
-      border: 1px solid var(--gray6);
-    }
-
-    [cmdk-prisma-container] {
-      width: 100px;
-      height: 100px;
-      background: var(--blue9);
-      border-radius: 16px;
-    }
-
-    [cmdk-prisma-badge] {
-      background: var(--blue3);
-      padding: 0 8px;
-      height: 28px;
-      font-size: 14px;
-      line-height: 28px;
-      color: var(--blue11);
-      border-radius: 9999px;
-      font-weight: 500;
-    }
-
-    [cmdk-prisma-slider] {
-      height: 20px;
-      width: 200px;
-      background: scm-gradient(90deg, var(--blue9) 40%, var(--gray3) 0%);
-      border-radius: 9999px;
-
-      div {
-        width: 20px;
-        height: 20px;
-        background: #ffffff;
-        border-radius: 9999px;
-        box-shadow: 0 1px 3px -1px rgba(0, 0, 0, 0.32);
-        transform: translateX(70px);
-      }
+      width: 18px;
+      height: 18px;
     }
   }
 
   [cmdk-list] {
+    height: min(330px, calc(var(--cmdk-list-height)));
+    max-height: 400px;
     overflow: auto;
+    overscroll-behavior: contain;
+    transition: 100ms ease;
+    transition-property: height;
+  }
+
+  [cmdk-prisma-shortcuts] {
+    display: flex;
+    margin-left: auto;
+    gap: 8px;
+
+    kbd {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      min-width: 20px;
+      padding: 4px;
+      height: 20px;
+      border-radius: 4px;
+      color: var(--gray11);
+      background: var(--gray4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+    }
   }
 
   [cmdk-separator] {
@@ -230,6 +126,10 @@
     width: 100%;
     background: var(--gray5);
     margin: 4px 0;
+  }
+
+  *:not([hidden])+[cmdk-group] {
+    margin-top: 8px;
   }
 
   [cmdk-group-heading] {
@@ -244,18 +144,11 @@
 
   [cmdk-empty] {
     font-size: 14px;
-    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
     white-space: pre-wrap;
     color: var(--gray11);
-  }
-}
-
-@media (max-width: 640px) {
-  .prisma {
-    [cmdk-prisma-icon-wrapper] {}
-
-    [cmdk-prisma-item-subtitle] {
-      display: none;
-    }
   }
 }

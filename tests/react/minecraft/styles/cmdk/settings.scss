@@ -1,4 +1,4 @@
-.panorama {
+.settings {
   [cmdk-root] {
     max-width: 640px;
     width: 100%;
@@ -34,7 +34,7 @@
     }
   }
 
-  [cmdk-panorama-badge] {
+  [cmdk-settings-badge] {
     height: 20px;
     background: var(--grayA3);
     display: inline-flex;
@@ -100,7 +100,7 @@
     transition-property: height;
   }
 
-  [cmdk-panorama-shortcuts] {
+  [cmdk-settings-shortcuts] {
     display: flex;
     margin-left: auto;
     gap: 8px;
